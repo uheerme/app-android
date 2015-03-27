@@ -16,9 +16,21 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionRequest;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -31,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
     private SharedPreferences.Editor editor;
 
     private EditText urlText;
+    private EditText contentText;
     private Spinner type_of_request;
     private TextView textView;
 
@@ -51,6 +64,7 @@ public class MainActivity extends ActionBarActivity {
 
         //Finding important elements in the layout
         urlText = (EditText) findViewById(R.id.URL_to_be_requested);
+        contentText = (EditText) findViewById(R.id.method_parameters);
         type_of_request = (Spinner) findViewById(R.id.http_request);
         textView = (TextView) findViewById(R.id.request_container);
 
@@ -76,10 +90,10 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        //Getting network information (just basic information)
         ConnectivityManager connMgr = (ConnectivityManager)
                 getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
     }
 
     // When user clicks button, calls AsyncTask.
@@ -121,28 +135,36 @@ public class MainActivity extends ActionBarActivity {
     // the web page content as a InputStream, which it returns as
     // a string.
     private String downloadUrl(String myurl) throws IOException {
+
         InputStream is = null;
-        // Only display the first 50000 characters of the retrieved
-        // web page content.
-        int len = 10000;
 
         try {
             URL url = new URL(myurl);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setReadTimeout(10000 /* milliseconds */);
-            conn.setConnectTimeout(15000 /* milliseconds */);
+
+            HttpClient http = new DefaultHttpClient();
+            HttpResponse response = null;
+
             String type = app_settings.getString(getString(R.string.request_method), "GET");
-            conn.setRequestMethod(type);
-            conn.setDoInput(true);
+
+            if(type.compareTo("POST") == 0){
+                HttpPost post = new HttpPost(urlText.getText().toString());
+                post.addHeader("Content-Type", "application/json");
+                post.setEntity(new StringEntity(contentText.getText().toString()));
+                response = http.execute(post);
+            }else if(type.compareTo("GET") == 0){
+                HttpGet get = new HttpGet(urlText.getText().toString());
+                response = http.execute(get);
+            }
+
 
             // Starts the query
-            conn.connect();
-            int response = conn.getResponseCode();
-            System.out.println("The response is: " + response);
-            is = conn.getInputStream();
+
+            System.out.println("The response is: " + response.getStatusLine().getStatusCode());
+
+            System.out.println(response.getEntity().getContentType().getValue());
 
             // Convert the InputStream into a string
-            String contentAsString = readIt(is, len);
+            String contentAsString = readIt(response.getEntity().getContent());
             return contentAsString;
 
             // Makes sure that the InputStream is closed after the app is
@@ -155,16 +177,19 @@ public class MainActivity extends ActionBarActivity {
     }
 
     // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
+    public String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
         Reader reader = null;
         reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
+        char[] buffer = new char[128];
         String content = new String();
-        while(reader.ready()){
-            reader.read(buffer);
-            content = content + 
+        System.out.println("Teste2");
+        while(reader.read(buffer) >= 0){
+            System.out.println(buffer);
+            content = content + new String(buffer);
+            buffer = new char[128];
         }
-        return new String(buffer);
+        System.out.println("END");
+        return content;
     }
 
 

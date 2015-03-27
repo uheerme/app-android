@@ -2,8 +2,9 @@
     <string name="app_name">HTTP_Requests</string>
     <string name="request_container">Request will be parsed here</string>
     <string name="action_settings">Settings</string>
-    <string name="type_here_URL">Please, type here the URL</string>
+    <string name="type_here_URL">Type website URL here</string>
     <string name="send_request">Click here to Send Request</string>
+    <string name="type_here_method_content">Type method content here</string>
     <string-array name="request_method_list">
         <item>CREATE</item>
         <item>DELETE</item>
@@ -14,4 +15,5 @@
     <!-- Don't Translate-->
     <string name="app_settings_pref_file">CAJU.SETTINGS.APP</string>
     <string name="request_method">CAJU.SETTINGS.APP.TYPE_REQUEST</string>
+
 </resources>
