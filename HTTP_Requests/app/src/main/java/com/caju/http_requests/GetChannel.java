@@ -8,8 +8,6 @@ import android.os.AsyncTask;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
@@ -28,21 +26,28 @@ public class GetChannel {
     String error_response;
     int id;
 
+    /*
+        Constructor of the class. It needs the id of the client to be fetched and an Android Context
+        (system variables and information) to know about the current app instance.
+     */
 
-    GetChannel(int id, Context context, ConnectivityManager conn)
+    GetChannel(int id, Context context)
     {
         this.id = id;
-        conn = (ConnectivityManager)
+        ConnectivityManager conn = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo networkInfo = conn.getActiveNetworkInfo();
         if (networkInfo != null && networkInfo.isConnected()) {
-            new GetChannelByIDTask().execute(CHANNEL_ROUTE_URL + id);
+            GetChannelByIDTask get = new GetChannelByIDTask();
+            get.execute(CHANNEL_ROUTE_URL + id);
         } else {
             error_response = "No network connection available.";
         }
     }
-
+    /*
+        This class creates a background task for the GET method.
+     */
     private class GetChannelByIDTask extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... urls) {
@@ -63,6 +68,9 @@ public class GetChannel {
         }
     }
 
+    /*
+        The method is the connection to the server via GET.
+    */
     private String downloadContent(String URL_route) throws IOException {
 
         InputStream inputStream = null;
@@ -77,14 +85,10 @@ public class GetChannel {
             response = http.execute(get);
 
             // Starts the query
-
             System.out.println("The response of the GET of ChannelInfo is: " + response.getStatusLine().getStatusCode());
 
-            System.out.println(response.getEntity().getContentType().getValue());
-
             // Convert the InputStream into a string
-            String contentAsString = readIt(response.getEntity().getContent());
-            return contentAsString;
+            return convertResponse(response.getEntity().getContent());
 
             // Makes sure that the InputStream is closed after the app is
             // finished using it.
@@ -96,17 +100,22 @@ public class GetChannel {
     }
 
     // Reads an InputStream and converts it to a String.
-    public String readIt(InputStream stream) throws IOException, UnsupportedEncodingException {
+    public String convertResponse(InputStream stream) throws IOException, UnsupportedEncodingException {
         Reader reader = null;
         reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[128];
+        char[] buffer = new char[512]; //512 is the size of the string to be fetched each time
+        int retrieval_length = 0;
         String content = new String();
-        while(reader.read(buffer) >= 0){
-            System.out.println(buffer);
-            content = content + new String(buffer);
-            buffer = new char[128];
+        while((retrieval_length = reader.read(buffer)) >= 0)
+        {
+            content = content + new String(buffer, 0, retrieval_length); //copy contents of buffer from 0 to retrieval_length
         }
-        System.out.println("END");
+        if(content.length() == 0)
+        {
+            error_response = "The Channel is empty or couldn't be fetched";
+            return null;
+        }
+
         return content;
     }
 
