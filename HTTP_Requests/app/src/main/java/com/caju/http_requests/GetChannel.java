@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.view.View;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -20,11 +21,13 @@ import java.net.URL;
 /**
  * Created by camilo on 25/03/15.
  */
-public class GetChannel {
+public class GetChannel{
 
-    static final String CHANNEL_ROUTE_URL = "https://samesound.azurewebsites.net/api/Channels/";
-    String error_response;
-    int id;
+    private static final String CHANNEL_ROUTE_URL = "https://samesound.azurewebsites.net/api/Channels/";
+    private String errorResponse;
+    private String result;
+    private int id;
+    private boolean ready;
 
     /*
         Constructor of the class. It needs the id of the client to be fetched and an Android Context
@@ -34,6 +37,7 @@ public class GetChannel {
     GetChannel(int id, Context context)
     {
         this.id = id;
+        ready = false;
         ConnectivityManager conn = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -41,8 +45,9 @@ public class GetChannel {
         if (networkInfo != null && networkInfo.isConnected()) {
             GetChannelByIDTask get = new GetChannelByIDTask();
             get.execute(CHANNEL_ROUTE_URL + id);
+
         } else {
-            error_response = "No network connection available.";
+            errorResponse = "No network connection available.";
         }
     }
     /*
@@ -56,7 +61,7 @@ public class GetChannel {
             try {
                 return downloadContent(urls[0]);
             } catch (IOException e) {
-                error_response =  "Unable to retrieve information.";
+                errorResponse =  "Unable to retrieve information.";
                 return null;
             }
         }
@@ -65,6 +70,7 @@ public class GetChannel {
         @Override
         protected void onPostExecute(String result) {
             System.out.println("Result of the ASync Task to obtain ChannelInfo: " + result);
+            ready = true;
         }
     }
 
@@ -82,6 +88,7 @@ public class GetChannel {
             HttpResponse response = null;
 
             HttpGet get = new HttpGet(CHANNEL_ROUTE_URL + id);
+
             response = http.execute(get);
 
             // Starts the query
@@ -112,12 +119,23 @@ public class GetChannel {
         }
         if(content.length() == 0)
         {
-            error_response = "The Channel is empty or couldn't be fetched";
+            errorResponse = "The Channel is empty or couldn't be fetched";
             return null;
         }
 
         return content;
     }
 
+    public String getErrorResponse() {
+        return errorResponse;
+    }
+
+    public String getResult() {
+        return result;
+    }
+
+    public boolean isReady() {
+        return ready;
+    }
 
 }

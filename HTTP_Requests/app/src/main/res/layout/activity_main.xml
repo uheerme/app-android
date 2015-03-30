@@ -10,35 +10,28 @@
     tools:context=".MainActivity">
 
     <EditText
-        android:id="@+id/URL_to_be_requested"
+        android:id="@+id/channel_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/type_here_URL"
+        android:hint="@string/type_here_channel_ID"
         android:textAlignment="center"
+        android:inputType="number"
         android:textSize="20sp" />
-
-    <Spinner
-        android:id="@+id/http_request"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <EditText
-        android:id="@+id/method_parameters"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/type_here_method_content"
-        android:textAlignment="center"
-        android:textSize="20sp" />
-
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/fetch_channel"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="50dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:onClick="myClickHandler"
-        android:text="@string/send_request" />
+        android:text="@string/fetch_channel" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:id="@+id/progressBar1" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -46,10 +39,10 @@
         android:layout_gravity="center_horizontal">
 
         <TextView
-            android:id="@+id/request_container"
+            android:id="@+id/result_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/request_container"
+            android:text="@string/result_container"
             android:textSize="20sp" />
 
     </ScrollView>

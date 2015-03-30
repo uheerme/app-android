@@ -1,40 +1,14 @@
 package com.caju.http_requests;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.ProgressBar;
 import android.widget.TextView;
-
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ClientConnectionRequest;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -42,17 +16,16 @@ public class MainActivity extends ActionBarActivity {
     private SharedPreferences app_settings;
     private SharedPreferences.Editor editor;
 
-    private EditText urlText;
-    private EditText contentText;
-    private Spinner type_of_request;
+    private EditText channelNumber;
     private TextView textView;
+    private ProgressBar loadingChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        app_settings = getSharedPreferences(
+        /*app_settings = getSharedPreferences(
                 getString(R.string.app_settings_pref_file), Context.MODE_PRIVATE);
 
         //Initiating app_settings if not defined
@@ -60,44 +33,40 @@ public class MainActivity extends ActionBarActivity {
         if(!app_settings.contains(getString(R.string.request_method))){
             editor.putString(getString(R.string.request_method),"GET");
         }
-        editor.commit();
+        editor.commit();*/
 
         //Finding important elements in the layout
-        urlText = (EditText) findViewById(R.id.URL_to_be_requested);
-        contentText = (EditText) findViewById(R.id.method_parameters);
-        type_of_request = (Spinner) findViewById(R.id.http_request);
-        textView = (TextView) findViewById(R.id.request_container);
-
-        // Updating Spinner element options
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.request_method_list, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        type_of_request.setAdapter(adapter);
-        String type = app_settings.getString(getString(R.string.request_method),"GET");
-        type_of_request.setSelection(getCurrentTypeRequest());
-        type_of_request.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String type = (String) type_of_request.getItemAtPosition(position);
-                editor = app_settings.edit();
-                editor.putString(getString(R.string.request_method), type);
-                editor.commit();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                //
-            }
-        });
-
+        channelNumber = (EditText) findViewById(R.id.channel_id);
+        textView = (TextView) findViewById(R.id.result_container);
+        loadingChannel = (ProgressBar) findViewById(R.id.progressBar1);
+        loadingChannel.setMax(100);
     }
 
+    // When user clicks button, calls AsyncTask.
+    // Before attempting to fetch the URL, makes sure that there is a network connection.
     public void myClickHandler(View view) {
         // Gets the URL from the UI's text field.
-        String stringUrl = urlText.getText().toString();
-        GetChannel getChannel = new GetChannel(Integer.parseInt(stringUrl),getApplicationContext());
-    }
+        int id;
+        String s_id = channelNumber.getText().toString();
+        try
+        {
+            id = Integer.parseInt(s_id);
+        }
+        catch (NumberFormatException e)
+        {
+            id = 0;
+        }
 
+        GetChannel getChannel = new GetChannel(id, getApplicationContext());
+        System.out.println("Carregando");
+
+        System.out.println("Carregando3");
+        if(getChannel.getResult() != null)
+            textView.setText(getChannel.getResult());
+        else
+            textView.setText(getChannel.getErrorResponse());
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,15 +88,5 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private int getCurrentTypeRequest(){
-        String[] types = getResources().getStringArray(R.array.request_method_list);
-        String current_type = app_settings.getString(getString(R.string.request_method), "GET");
-        for(int i= 0; i < types.length; i++){
-            if(types[i].compareTo(current_type) == 0)
-                return i;
-        }
-        return -1;
     }
 }
