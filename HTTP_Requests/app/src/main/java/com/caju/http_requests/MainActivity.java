@@ -11,7 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements OnLoadFinishedListener {
 
     private SharedPreferences app_settings;
     private SharedPreferences.Editor editor;
@@ -19,6 +19,8 @@ public class MainActivity extends ActionBarActivity {
     private EditText channelNumber;
     private TextView textView;
     private ProgressBar loadingChannel;
+
+    GetChannel getChannel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,14 +59,9 @@ public class MainActivity extends ActionBarActivity {
             id = 0;
         }
 
-        GetChannel getChannel = new GetChannel(id, getApplicationContext());
-        System.out.println("Carregando");
-
-        System.out.println("Carregando3");
-        if(getChannel.getResult() != null)
-            textView.setText(getChannel.getResult());
-        else
-            textView.setText(getChannel.getErrorResponse());
+        getChannel = new GetChannel(id, getApplicationContext());
+        getChannel.setOnLoadFinishedListener(this);
+        System.out.println("Constructor Finished");
 
     }
 
@@ -88,5 +85,15 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    /* This method is called after GetChannel is finished */
+    public void onLoadFinished() {
+        System.out.println("Executing OnLoadFinished");
+        if(getChannel.getResult() != null)
+            textView.setText(getChannel.getResult());
+        else
+            textView.setText(getChannel.getErrorResponse());
     }
 }

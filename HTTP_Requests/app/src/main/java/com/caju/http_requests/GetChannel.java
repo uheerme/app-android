@@ -21,23 +21,25 @@ import java.net.URL;
 /**
  * Created by camilo on 25/03/15.
  */
-public class GetChannel{
+public class GetChannel {
 
-    private static final String CHANNEL_ROUTE_URL = "https://samesound.azurewebsites.net/api/Channels/";
+    private static final String CHANNEL_ROUTE_URL = "https://54.69.27.129/api/channels/";
     private String errorResponse;
     private String result;
     private int id;
     private boolean ready;
+
+    private OnLoadFinishedListener onLoad;
 
     /*
         Constructor of the class. It needs the id of the client to be fetched and an Android Context
         (system variables and information) to know about the current app instance.
      */
 
-    GetChannel(int id, Context context)
-    {
+    GetChannel(int id, Context context) {
         this.id = id;
         ready = false;
+        onLoad = null;
         ConnectivityManager conn = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
 
@@ -50,6 +52,7 @@ public class GetChannel{
             errorResponse = "No network connection available.";
         }
     }
+
     /*
         This class creates a background task for the GET method.
      */
@@ -61,7 +64,7 @@ public class GetChannel{
             try {
                 return downloadContent(urls[0]);
             } catch (IOException e) {
-                errorResponse =  "Unable to retrieve information.";
+                errorResponse = "Unable to retrieve information.";
                 return null;
             }
         }
@@ -71,6 +74,7 @@ public class GetChannel{
         protected void onPostExecute(String result) {
             System.out.println("Result of the ASync Task to obtain ChannelInfo: " + result);
             ready = true;
+            doLoadFinished();
         }
     }
 
@@ -78,32 +82,22 @@ public class GetChannel{
         The method is the connection to the server via GET.
     */
     private String downloadContent(String URL_route) throws IOException {
+        System.out.println("Getting URL content");
 
-        InputStream inputStream = null;
+        URL url = new URL(URL_route);
+        System.out.println("1");
+        HttpClient http = new DefaultHttpClient();
+        HttpResponse response = null;
+        System.out.println("2");
+        HttpGet get = new HttpGet(CHANNEL_ROUTE_URL + new Integer(id).toString());
+        System.out.println("3");
+        response = http.execute(get);
+        System.out.println("4");
+        // Starts the query
+        System.out.println("The response of the GET of ChannelInfo is: " + response.getStatusLine().getStatusCode());
 
-        try {
-            URL url = new URL(URL_route);
-
-            HttpClient http = new DefaultHttpClient();
-            HttpResponse response = null;
-
-            HttpGet get = new HttpGet(CHANNEL_ROUTE_URL + id);
-
-            response = http.execute(get);
-
-            // Starts the query
-            System.out.println("The response of the GET of ChannelInfo is: " + response.getStatusLine().getStatusCode());
-
-            // Convert the InputStream into a string
-            return convertResponse(response.getEntity().getContent());
-
-            // Makes sure that the InputStream is closed after the app is
-            // finished using it.
-        } finally {
-            if (inputStream != null) {
-                inputStream.close();
-            }
-        }
+        // Convert the InputStream into a string
+        return convertResponse(response.getEntity().getContent());
     }
 
     // Reads an InputStream and converts it to a String.
@@ -113,12 +107,10 @@ public class GetChannel{
         char[] buffer = new char[512]; //512 is the size of the string to be fetched each time
         int retrieval_length = 0;
         String content = new String();
-        while((retrieval_length = reader.read(buffer)) >= 0)
-        {
+        while ((retrieval_length = reader.read(buffer)) >= 0) {
             content = content + new String(buffer, 0, retrieval_length); //copy contents of buffer from 0 to retrieval_length
         }
-        if(content.length() == 0)
-        {
+        if (content.length() == 0) {
             errorResponse = "The Channel is empty or couldn't be fetched";
             return null;
         }
@@ -136,6 +128,16 @@ public class GetChannel{
 
     public boolean isReady() {
         return ready;
+    }
+
+
+    public void setOnLoadFinishedListener(OnLoadFinishedListener listener) {
+        onLoad = listener;
+    }
+
+    private void doLoadFinished() {
+        if (onLoad != null)
+            onLoad.onLoadFinished();
     }
 
 }
