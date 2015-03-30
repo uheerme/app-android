@@ -9,7 +9,15 @@ import android.view.View;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +25,10 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.security.cert.CertificateException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.security.cert.X509Certificate;
 
 /**
  * Created by camilo on 25/03/15.
@@ -85,14 +97,19 @@ public class GetChannel {
         System.out.println("Getting URL content");
 
         URL url = new URL(URL_route);
-        System.out.println("1");
-        HttpClient http = new DefaultHttpClient();
+
+        HttpClient client = new DefaultHttpClient();
+        HostnameVerifier hostnameVerifier = org.apache.http.conn.ssl.SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+        SchemeRegistry registry = new SchemeRegistry();
+        SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+        socketFactory.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+        registry.register(new Scheme("https", socketFactory, 443));
+        SingleClientConnManager mgr = new SingleClientConnManager(client.getParams(), registry);
+        DefaultHttpClient http = new DefaultHttpClient(mgr, client.getParams());
+
         HttpResponse response = null;
-        System.out.println("2");
         HttpGet get = new HttpGet(CHANNEL_ROUTE_URL + new Integer(id).toString());
-        System.out.println("3");
         response = http.execute(get);
-        System.out.println("4");
         // Starts the query
         System.out.println("The response of the GET of ChannelInfo is: " + response.getStatusLine().getStatusCode());
 
