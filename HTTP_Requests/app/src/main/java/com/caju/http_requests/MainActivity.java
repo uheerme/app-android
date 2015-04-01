@@ -7,48 +7,40 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.caju.utils.com.caju.utils.getters.GetChannel;
+import com.caju.utils.exceptions.NoConnectionException;
+import com.caju.utils.getters.GetChannel;
+import com.caju.utils.getters.GetChannelMusics;
+import com.caju.utils.interfaces.OnLoadFailedListener;
+import com.caju.utils.interfaces.OnLoadFinishedListener;
 
 
-public class MainActivity extends ActionBarActivity implements OnLoadFinishedListener {
+public class MainActivity extends ActionBarActivity implements OnLoadFinishedListener, OnLoadFailedListener {
 
     private SharedPreferences app_settings;
     private SharedPreferences.Editor editor;
 
     private EditText channelNumber;
     private TextView textView;
-    private ProgressBar loadingChannel;
 
-    GetChannel getChannel;
+    private GetChannel channel;
+    private GetChannelMusics channelMusics;
+    private int lastButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        /*app_settings = getSharedPreferences(
-                getString(R.string.app_settings_pref_file), Context.MODE_PRIVATE);
-
-        //Initiating app_settings if not defined
-        editor = app_settings.edit();
-        if(!app_settings.contains(getString(R.string.request_method))){
-            editor.putString(getString(R.string.request_method),"GET");
-        }
-        editor.commit();*/
-
         //Finding important elements in the layout
         channelNumber = (EditText) findViewById(R.id.channel_id);
         textView = (TextView) findViewById(R.id.result_container);
-        loadingChannel = (ProgressBar) findViewById(R.id.progressBar1);
-        loadingChannel.setMax(100);
     }
 
-    // When user clicks button, calls AsyncTask.
-    // Before attempting to fetch the URL, makes sure that there is a network connection.
-    public void myClickHandler(View view) {
+    /* When user clicks in the button*/
+    public void getChannel(View view) {
+        lastButton = 1;
         // Gets the URL from the UI's text field.
         int id;
         String s_id = channelNumber.getText().toString();
@@ -61,10 +53,42 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
             id = 0;
         }
 
-        getChannel = new GetChannel(id, getApplicationContext());
-        getChannel.setOnLoadFinishedListener(this);
-        System.out.println("Constructor Finished");
+        try
+        {
+            channel = new GetChannel(id, getApplicationContext());
+            channel.setOnLoadFinishedListener(this);
+            channel.setOnLoadFailedListener(this);
+        }
+        catch (NoConnectionException e)
+        {
+            textView.setText("You have no connection.");
+        }
+    }
 
+    public void getChannelMusics(View view) {
+        lastButton = 2;
+        // Gets the URL from the UI's text field.
+        int id;
+        String s_id = channelNumber.getText().toString();
+        try
+        {
+            id = Integer.parseInt(s_id);
+        }
+        catch (NumberFormatException e)
+        {
+            id = 0;
+        }
+
+        try
+        {
+            channelMusics = new GetChannelMusics(id, getApplicationContext());
+            channelMusics.setOnLoadFinishedListener(this);
+            channelMusics.setOnLoadFailedListener(this);
+        }
+        catch (NoConnectionException e)
+        {
+            textView.setText("You have no connection.");
+        }
     }
 
     @Override
@@ -93,9 +117,23 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
     /* This method is called after GetChannel is finished */
     public void onLoadFinished() {
         System.out.println("Executing OnLoadFinished");
-        if(getChannel.getResult() != null)
-            textView.setText(getChannel.getResult());
-        else
-            textView.setText(getChannel.getErrorResponse());
+        if(lastButton == 1){
+            if(channel.getResultResponse() != null)
+                textView.setText(channel.getResultResponse());
+            else
+                textView.setText("This shouldn't happen");
+        }
+        else if(lastButton == 2){
+            if(channelMusics.getResultResponse() != null)
+                textView.setText(channelMusics.getResultResponse());
+            else
+                textView.setText("This shouldn't happen");
+        }
+    }
+
+    @Override
+    public void onLoadFailed() {
+        System.out.println("Executing OnLoadFailed");
+        textView.setText("Unable to retrieve information from Channel.");
     }
 }

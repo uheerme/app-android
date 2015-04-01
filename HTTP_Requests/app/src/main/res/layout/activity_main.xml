@@ -24,14 +24,17 @@
         android:layout_height="50dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:onClick="myClickHandler"
+        android:onClick="getChannel"
         android:text="@string/fetch_channel" />
 
-    <ProgressBar
-        style="?android:attr/progressBarStyleLarge"
+    <Button
+        android:id="@+id/fetch_channel_musics"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
-        android:id="@+id/progressBar1" />
+        android:layout_height="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:onClick="getChannelMusics"
+        android:text="@string/fetch_channel_musics" />
 
     <ScrollView
         android:layout_width="match_parent"
