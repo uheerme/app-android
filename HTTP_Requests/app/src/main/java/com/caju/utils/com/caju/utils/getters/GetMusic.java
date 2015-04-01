@@ -1,4 +1,4 @@
-package com.caju.http_requests;
+package com.caju.utils.com.caju.utils.getters;
 
 /**
  * Created by camilo on 25/03/15.

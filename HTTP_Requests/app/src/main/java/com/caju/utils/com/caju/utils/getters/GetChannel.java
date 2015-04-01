@@ -1,4 +1,4 @@
-package com.caju.http_requests;
+package com.caju.utils.com.caju.utils.getters;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -6,14 +6,13 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.view.View;
 
+import com.caju.http_requests.OnLoadFinishedListener;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.ClientConnectionManager;
-import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -25,14 +24,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
-import java.security.cert.CertificateException;
 
 import javax.net.ssl.HostnameVerifier;
-import javax.security.cert.X509Certificate;
 
 /**
  * Created by camilo on 25/03/15.
  */
+
 public class GetChannel {
 
     private static final String CHANNEL_ROUTE_URL = "https://54.69.27.129/api/channels/";
@@ -48,7 +46,7 @@ public class GetChannel {
         (system variables and information) to know about the current app instance.
      */
 
-    GetChannel(int id, Context context) {
+    public GetChannel(int id, Context context) {
         this.id = id;
         ready = false;
         onLoad = null;

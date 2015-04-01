@@ -10,6 +10,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.caju.utils.com.caju.utils.getters.GetChannel;
+
 
 public class MainActivity extends ActionBarActivity implements OnLoadFinishedListener {
 
