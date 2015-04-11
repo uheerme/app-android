@@ -1,6 +1,11 @@
 package com.caju.http_requests;
 
+import android.app.Activity;
+import android.content.ContentResolver;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,11 +17,15 @@ import android.widget.TextView;
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.getters.GetChannel;
 import com.caju.utils.getters.GetChannelMusics;
-import com.caju.utils.interfaces.OnLoadFailedListener;
-import com.caju.utils.interfaces.OnLoadFinishedListener;
+import com.caju.utils.interfaces.OnFailedListener;
+import com.caju.utils.interfaces.OnFinishedListener;
+import com.caju.utils.posters.PostMusic;
+
+import java.io.File;
+import java.util.ArrayList;
 
 
-public class MainActivity extends ActionBarActivity implements OnLoadFinishedListener, OnLoadFailedListener {
+public class MainActivity extends ActionBarActivity implements OnFinishedListener, OnFailedListener {
 
     private SharedPreferences app_settings;
     private SharedPreferences.Editor editor;
@@ -26,6 +35,7 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
 
     private GetChannel channel;
     private GetChannelMusics channelMusics;
+    private PostMusic postMusic;
     private int lastButton;
 
     @Override
@@ -44,14 +54,7 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
         // Gets the URL from the UI's text field.
         int id;
         String s_id = channelNumber.getText().toString();
-        try
-        {
-            id = Integer.parseInt(s_id);
-        }
-        catch (NumberFormatException e)
-        {
-            id = 0;
-        }
+        try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
 
         try
         {
@@ -91,6 +94,20 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
         }
     }
 
+    public void postMusic(View view) {
+        lastButton = 3;
+        Intent intent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+        }
+        else{
+            intent = new Intent(Intent.ACTION_PICK);
+        }
+        intent.setType("audio/*");
+        startActivityForResult(intent, 10);
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -117,9 +134,15 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
     /* This method is called after GetChannel is finished */
     public void onLoadFinished() {
         System.out.println("Executing OnLoadFinished");
-        if(lastButton == 1){
+        /*if(lastButton == 1){
             if(channel.getResultResponse() != null)
                 textView.setText(channel.getResultResponse());
+            else
+                textView.setText("This shouldn't happen");
+        }*/
+        if(lastButton == 1){
+            if(postMusic.getResultResponse() != null)
+                textView.setText(postMusic.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }
@@ -129,11 +152,49 @@ public class MainActivity extends ActionBarActivity implements OnLoadFinishedLis
             else
                 textView.setText("This shouldn't happen");
         }
+        else if(lastButton == 3){
+            if(postMusic.getResultResponse() != null)
+                textView.setText(postMusic.getResultResponse());
+            else
+                textView.setText("This shouldn't happen");
+        }
     }
 
     @Override
     public void onLoadFailed() {
         System.out.println("Executing OnLoadFailed");
         textView.setText("Unable to retrieve information from Channel.");
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData)
+    {
+
+        if (requestCode == 10 && resultCode == Activity.RESULT_OK) {
+            Uri uri = null;
+            ArrayList<String> files = new ArrayList<>();
+
+            if (resultData != null) {
+                uri = resultData.getData();
+                files.add(uri.getPath());
+                if(new File(uri.getPath()).exists())
+                    System.out.println("EXISTS");
+            }
+
+            int id;
+            String s_id = channelNumber.getText().toString();
+            try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
+
+            try {
+                postMusic = new PostMusic(getApplicationContext(),id,files);
+                postMusic.setOnLoadFinishedListener(this);
+                postMusic.setOnLoadFailedListener(this);
+            }
+            catch (NoConnectionException e)
+            {
+                textView.setText("You have no connection.");
+            }
+
+        }
+
     }
 }

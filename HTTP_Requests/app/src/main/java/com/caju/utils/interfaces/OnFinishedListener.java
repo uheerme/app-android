@@ -8,7 +8,7 @@ package com.caju.utils.interfaces;
  * It can be used for layout or variable responses to success or fail on the tasks
  *
  */
-public interface OnLoadFinishedListener
+public interface OnFinishedListener
 {
     void onLoadFinished();
 }

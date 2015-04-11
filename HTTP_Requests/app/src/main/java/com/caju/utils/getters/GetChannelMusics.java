@@ -6,9 +6,9 @@ import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
 import com.caju.utils.exceptions.NoConnectionException;
-import com.caju.utils.interfaces.Getter;
-import com.caju.utils.interfaces.OnLoadFailedListener;
-import com.caju.utils.interfaces.OnLoadFinishedListener;
+import com.caju.utils.interfaces.OnFailedListener;
+import com.caju.utils.interfaces.OnFinishedListener;
+import com.caju.utils.interfaces.Routes;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -26,14 +26,14 @@ import java.net.URL;
  * Created by camilo on 01/04/15.
  */
 
-public class GetChannelMusics implements Getter {
+public class GetChannelMusics implements Routes {
 
     private String resultResponse;
     private int id;
     private boolean success;
 
-    private OnLoadFinishedListener onLoad;
-    private OnLoadFailedListener onFail;
+    private OnFinishedListener onLoad;
+    private OnFailedListener onFail;
 
     /*
         Constructor of the class. It needs the id of the channel to be fetched and an Android Context
@@ -142,12 +142,12 @@ public class GetChannelMusics implements Getter {
         return resultResponse;
     }
 
-    public void setOnLoadFinishedListener(OnLoadFinishedListener listener)
+    public void setOnLoadFinishedListener(OnFinishedListener listener)
     {
         onLoad = listener;
     }
 
-    public void setOnLoadFailedListener(OnLoadFailedListener listener)
+    public void setOnLoadFailedListener(OnFailedListener listener)
     {
         onFail = listener;
     }
