@@ -141,8 +141,8 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
                 textView.setText("This shouldn't happen");
         }*/
         if(lastButton == 1){
-            if(postMusic.getResultResponse() != null)
-                textView.setText(postMusic.getResultResponse());
+            if(channel.getResultResponse() != null)
+                textView.setText(channel.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }

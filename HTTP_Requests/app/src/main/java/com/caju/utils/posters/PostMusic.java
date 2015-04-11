@@ -19,7 +19,6 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.SyncFailedException;
 import java.util.ArrayList;
 
 /**
@@ -33,24 +32,28 @@ public class PostMusic implements Routes
 
     private ArrayList<File> uploaded;
     private ArrayList<File> unuploaded;
+    private ArrayList<JSONObject> song_JSONs;
     private ArrayList<Integer> song_IDs;
 
     private OnFinishedListener onFinishedUpload;
-    private OnFailedListener onFailUpload;
+    private OnFailedListener onFailedUpload;
 
     private JSONObject song;
 
     public PostMusic(Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException
     {
-        System.out.println("Constructor PostMusic");
+
+        onFinishedUpload = null;
+        onFailedUpload = null;
+
+        uploaded = new ArrayList<File>();
+        unuploaded = new ArrayList<File>();
+        song_JSONs = new ArrayList<JSONObject>();
+        song_IDs = new ArrayList<Integer>();
 
         File song_file;
         RequestParams http_params = new RequestParams();
         AsyncHttpClient client; //HTTP Client for the requests
-
-        uploaded = new ArrayList<File>();
-        unuploaded = new ArrayList<File>();
-        song_IDs = new ArrayList<Integer>();
 
         for(String s : song_paths)
         {
@@ -66,7 +69,7 @@ public class PostMusic implements Routes
                 uploaded.add(song_file);
         }
 
-
+        //get connection information
         ConnectivityManager conn = (ConnectivityManager)
                 context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = conn.getActiveNetworkInfo();
@@ -104,6 +107,7 @@ public class PostMusic implements Routes
                             try
                             {
                                 song = new JSONObject(response);
+                                song_JSONs.add(song);
                                 song_IDs.add(song.getInt("Id"));
                             } catch (JSONException e)
                             {
@@ -142,6 +146,11 @@ public class PostMusic implements Routes
         return resultResponse;
     }
 
+    public String getErrorResponse()
+    {
+        return errorResponse;
+    }
+
     public void setOnLoadFinishedListener(OnFinishedListener listener)
     {
         onFinishedUpload = listener;
@@ -149,7 +158,7 @@ public class PostMusic implements Routes
 
     public void setOnLoadFailedListener(OnFailedListener listener)
     {
-        onFailUpload = listener;
+        onFailedUpload = listener;
     }
 
     private void doFinished()
@@ -162,7 +171,7 @@ public class PostMusic implements Routes
     private void doFailed()
     {
         System.out.println(errorResponse);
-        if(onFailUpload != null)
-            onFailUpload.onLoadFailed();
+        if(onFailedUpload != null)
+            onFailedUpload.onLoadFailed();
     }
 }
