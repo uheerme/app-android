@@ -23,7 +23,6 @@ import com.caju.utils.postRequests.PostMusic;
 import java.io.File;
 import java.util.ArrayList;
 
-
 public class MainActivity extends ActionBarActivity implements OnFinishedListener, OnFailedListener {
 
     private SharedPreferences app_settings;

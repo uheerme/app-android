@@ -15,10 +15,6 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * Created by camilo on 01/04/15.
- */
-
 public class GetChannel implements Routes {
 
     private String resultResponse;
