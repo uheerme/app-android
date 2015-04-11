@@ -1,7 +1,6 @@
 package com.caju.http_requests;
 
 import android.app.Activity;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -15,11 +14,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.caju.utils.exceptions.NoConnectionException;
-import com.caju.utils.getters.GetChannel;
-import com.caju.utils.getters.GetChannelMusics;
+import com.caju.utils.getRequests.GetChannel;
+import com.caju.utils.getRequests.GetChannelMusics;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
-import com.caju.utils.posters.PostMusic;
+import com.caju.utils.postRequests.PostMusic;
 
 import java.io.File;
 import java.util.ArrayList;

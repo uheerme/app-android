@@ -1,4 +1,4 @@
-package com.caju.utils.posters;
+package com.caju.utils.postRequests;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

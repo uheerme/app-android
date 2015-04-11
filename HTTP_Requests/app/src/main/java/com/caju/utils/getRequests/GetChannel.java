@@ -1,4 +1,4 @@
-package com.caju.utils.getters;
+package com.caju.utils.getRequests;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

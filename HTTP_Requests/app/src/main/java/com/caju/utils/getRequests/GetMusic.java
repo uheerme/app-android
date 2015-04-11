@@ -1,4 +1,4 @@
-package com.caju.utils.getters;
+package com.caju.utils.getRequests;
 
 /**
  * Created by camilo on 25/03/15.
