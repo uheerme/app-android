@@ -1,5 +1,5 @@
-Current Development Focus -> JSON Parser, Music Upload and Download, Music Streaming.
+Current Development Focus -> Music Download and Streaming.
 
-Camilo -> Next task is to upload and download music files.
+Camilo -> Next task is to download music files.
 
-Flávia -> Next task is to create All Getters, create JSON Parser.
+Flávia -> Next task is to start developing App UI.
