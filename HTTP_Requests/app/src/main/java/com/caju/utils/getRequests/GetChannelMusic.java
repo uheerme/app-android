@@ -12,10 +12,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class GetChannelMusics implements Routes {
+public class GetChannelMusic implements Routes {
 
     private String resultResponse;
     private int id;
@@ -23,9 +24,9 @@ public class GetChannelMusics implements Routes {
     private OnFinishedListener onFinishedLoad;
     private OnFailedListener onFailedLoad;
 
-    private JSONObject channel;
+    private JSONArray songs;
 
-    public GetChannelMusics(int channelID, Context context) throws NoConnectionException {
+    public GetChannelMusic(int channelID, Context context) throws NoConnectionException {
 
         this.id = channelID;
         onFinishedLoad = null;
@@ -49,15 +50,13 @@ public class GetChannelMusics implements Routes {
                 {
                     if(statusCode == 200)
                     {
-                        if(response.charAt(0) == '[')
-                            response = response.substring(1,response.length()-1);
                         resultResponse = new String(response);
                         try
                         {
-                            channel = new JSONObject(response);
+                            songs = new JSONArray(response);
                         } catch (JSONException e)
                         {
-                            channel = null;
+                            songs = null;
                             System.err.println(response);
                         }
                     }
@@ -72,7 +71,7 @@ public class GetChannelMusics implements Routes {
                 @Override
                 public void onFinish()
                 {
-                    if(channel != null)
+                    if(songs != null)
                         doFinished();
                     else
                         doFailed();

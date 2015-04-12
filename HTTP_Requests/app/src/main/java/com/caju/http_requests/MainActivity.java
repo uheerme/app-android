@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.getRequests.GetChannel;
-import com.caju.utils.getRequests.GetChannelMusics;
+import com.caju.utils.getRequests.GetChannelMusic;
 import com.caju.utils.getRequests.GetMusic;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
@@ -35,8 +35,8 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     private TextView textView;
 
     private int lastButtonClicked;
-    private GetChannel channel;
-    private GetChannelMusics channelMusics;
+    private GetChannel getChannel;
+    private GetChannelMusic getChannelMusic;
     private PostMusic postMusic;
     private GetMusic getMusic;
 
@@ -62,9 +62,9 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
         try
         {
-            channel = new GetChannel(id, getApplicationContext());
-            channel.setOnLoadFinishedListener(this);
-            channel.setOnLoadFailedListener(this);
+            getChannel = new GetChannel(id, getApplicationContext());
+            getChannel.setOnLoadFinishedListener(this);
+            getChannel.setOnLoadFailedListener(this);
         }
         catch (NoConnectionException e)
         {
@@ -88,9 +88,9 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
         try
         {
-            channelMusics = new GetChannelMusics(id, getApplicationContext());
-            channelMusics.setOnLoadFinishedListener(this);
-            channelMusics.setOnLoadFailedListener(this);
+            getChannelMusic = new GetChannelMusic(id, getApplicationContext());
+            getChannelMusic.setOnLoadFinishedListener(this);
+            getChannelMusic.setOnLoadFailedListener(this);
         }
         catch (NoConnectionException e)
         {
@@ -162,20 +162,20 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     public void onLoadFinished() {
         System.out.println("Executing OnLoadFinished");
         /*if(lastButtonClicked == 1){
-            if(channel.getResultResponse() != null)
-                textView.setText(channel.getResultResponse());
+            if(getChannel.getResultResponse() != null)
+                textView.setText(getChannel.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }*/
         if(lastButtonClicked == 1){
-            if(channel.getResultResponse() != null)
-                textView.setText(channel.getResultResponse());
+            if(getChannel.getResultResponse() != null)
+                textView.setText(getChannel.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }
         else if(lastButtonClicked == 2){
-            if(channelMusics.getResultResponse() != null)
-                textView.setText(channelMusics.getResultResponse());
+            if(getChannelMusic.getResultResponse() != null)
+                textView.setText(getChannelMusic.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }

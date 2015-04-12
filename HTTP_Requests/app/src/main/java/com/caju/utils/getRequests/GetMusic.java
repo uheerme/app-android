@@ -3,7 +3,6 @@ package com.caju.utils.getRequests;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.Environment;
 
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.interfaces.OnFailedListener;
@@ -17,7 +16,6 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -62,7 +60,6 @@ public class GetMusic implements Routes {
                 {
                     if(statusCode == 200)
                     {
-                        System.out.println(response);
                         resultResponse = new String(response);
                         try
                         {

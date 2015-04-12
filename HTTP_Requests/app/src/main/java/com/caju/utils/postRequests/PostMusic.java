@@ -33,7 +33,7 @@ public class PostMusic implements Routes
     private OnFinishedListener onFinishedUpload;
     private OnFailedListener onFailedUpload;
 
-    private JSONObject song;
+    private JSONObject music;
 
     public PostMusic(Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException
     {
@@ -101,9 +101,9 @@ public class PostMusic implements Routes
                             resultResponse = new String(response);
                             try
                             {
-                                song = new JSONObject(response);
-                                song_JSONs.add(song);
-                                song_IDs.add(song.getInt("Id"));
+                                music = new JSONObject(response);
+                                song_JSONs.add(music);
+                                song_IDs.add(music.getInt("Id"));
                             } catch (JSONException e)
                             {
                                 System.err.println(response);
