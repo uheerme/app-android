@@ -159,17 +159,17 @@ public class GetMusic implements Routes {
 
         } catch (FileNotFoundException e)
         {
-            System.out.println("COULD NOT CREATE DOWNLOADED FILE");
+            System.err.println("COULD NOT CREATE DOWNLOADED FILE");
             e.printStackTrace();
             doFailed();
         } catch (JSONException e)
         {
-            System.out.println("JSON OBJECT DOESN'T HAVE ID PROPERTY");
+            System.err.println("JSON OBJECT DOESN'T HAVE ID PROPERTY");
             e.printStackTrace();
             doFailed();
         } catch (IOException e)
         {
-            System.out.println("COULD NOT CREATE NEW FILE IN THE FOLDER");
+            System.err.println("COULD NOT CREATE NEW FILE IN THE FOLDER");
             e.printStackTrace();
             doFailed();
         }

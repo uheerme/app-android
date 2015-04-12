@@ -246,8 +246,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
             if (resultData != null) {
                 uri = resultData.getData();
                 files.add(uri.getPath());
-                if(new File(uri.getPath()).exists())
-                    System.out.println("EXISTS");
             }
 
             int id;

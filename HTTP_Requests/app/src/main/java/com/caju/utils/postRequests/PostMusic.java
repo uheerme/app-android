@@ -19,13 +19,19 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class PostMusic implements Routes
 {
     private String resultResponse;
 
+    private Context context;
+
+    private File song_file;
     private ArrayList<File> uploaded;
     private ArrayList<File> unuploaded;
     private ArrayList<JSONObject> song_JSONs;
@@ -34,11 +40,11 @@ public class PostMusic implements Routes
     private OnFinishedListener onFinishedUpload;
     private OnFailedListener onFailedUpload;
 
-    private JSONObject music;
+    private JSONObject song;
 
-    public PostMusic(Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException, NoIDSelectedException
+    public PostMusic(final Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException, NoIDSelectedException
     {
-
+        this.context = context;
         onFinishedUpload = null;
         onFailedUpload = null;
 
@@ -50,7 +56,7 @@ public class PostMusic implements Routes
         song_JSONs = new ArrayList<JSONObject>();
         song_IDs = new ArrayList<Integer>();
 
-        File song_file;
+
         RequestParams http_params = new RequestParams();
         AsyncHttpClient client; //HTTP Client for the requests
 
@@ -86,10 +92,12 @@ public class PostMusic implements Routes
                 try
                 {
                     http_params.put("Music", f, "audio/mpeg");
+                    song_file = f; //Copy file reference if works to be used inside get method
                 } catch (FileNotFoundException e)
                 {
                     uploaded.remove(f);
                     unuploaded.add(f);
+                    System.err.println("FILE TO BE UPLOADED NOT FOUND");
                     continue;
                 }
 
@@ -105,12 +113,30 @@ public class PostMusic implements Routes
                             resultResponse = new String(response);
                             try
                             {
-                                music = new JSONObject(response);
-                                song_JSONs.add(music);
-                                song_IDs.add(music.getInt("Id"));
+                                song = new JSONObject(response);
+                                song_JSONs.add(song);
+                                song_IDs.add(song.getInt("Id"));
+                                //copying file from external to internal storage
+                                FileOutputStream fos = context.openFileOutput(song.getString("Id") + ".mp3", Context.MODE_PRIVATE);
+                                FileInputStream fis = new FileInputStream(song_file);
+                                while(fis.available() > 0){
+                                    try{ fos.write(fis.read()); }
+                                    catch (IOException e)
+                                    { System.err.println("FILE COPIED?");}
+                                }
+                                fos.close();
+                                fis.close();
+
                             } catch (JSONException e)
                             {
                                 System.err.println(response);
+                            } catch (FileNotFoundException e)
+                            {
+                                System.err.println("FILE TO BE COPIED TO INTERNAL STORAGE NOT FOUND");
+                            } catch (IOException e)
+                            {
+                                System.err.println("FILE NOT COPIED PROPERLY");
+                                e.printStackTrace();
                             }
                         }
                     }
