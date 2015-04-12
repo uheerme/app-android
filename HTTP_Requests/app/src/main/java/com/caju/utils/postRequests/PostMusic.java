@@ -41,6 +41,9 @@ public class PostMusic implements Routes
         onFinishedUpload = null;
         onFailedUpload = null;
 
+        if(channelID <= 0)
+            doFailed();
+
         uploaded = new ArrayList<File>();
         unuploaded = new ArrayList<File>();
         song_JSONs = new ArrayList<JSONObject>();

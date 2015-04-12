@@ -31,6 +31,9 @@ public class GetChannel implements Routes {
         onFinishedLoad = null;
         onFailedLoad = null;
 
+        if(channelID <= 0)
+            doFailed();
+
         AsyncHttpClient client; //HTTP Client for the requests
 
         //get connection information

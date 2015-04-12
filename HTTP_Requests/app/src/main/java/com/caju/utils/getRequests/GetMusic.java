@@ -16,6 +16,7 @@ import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class GetMusic implements Routes {
     private OnFailedListener onFailedLoad;
 
     private JSONObject song;
-
+    private boolean song_is_downloaded;
     private String filename;
 
     public GetMusic(int musicID, Context context) throws NoConnectionException, IOException
@@ -41,6 +42,12 @@ public class GetMusic implements Routes {
         this.context = context;
         onFinishedLoad = null;
         onFailedLoad = null;
+
+        if(musicID <= 0)
+            doFailed();
+
+        song_is_downloaded = (new File(context.getFileStreamPath(id + ".mp3").getPath()).exists());
+
 
         AsyncHttpClient client; //HTTP Client for the requests
 
@@ -69,6 +76,9 @@ public class GetMusic implements Routes {
                             song = null;
                             System.err.println(response);
                         }
+
+                        if(song_is_downloaded)
+                            doFinished();
                     }
                 }
 
@@ -79,25 +89,32 @@ public class GetMusic implements Routes {
                 }
 
             });
-            client.get(MUSIC_ROUTE + id + STREAM_END_ROUTE, new AsyncHttpResponseHandler()
+            if(song_is_downloaded){
+                filename = id + ".mp3";
+                System.out.println(filename);
+            }
+            else
             {
-                @Override
-                public void onSuccess(int statusCode, Header[] headers, byte[] response)
+                client.get(MUSIC_ROUTE + id + STREAM_END_ROUTE, new AsyncHttpResponseHandler()
                 {
-                    if(statusCode == 200)
+                    @Override
+                    public void onSuccess(int statusCode, Header[] headers, byte[] response)
                     {
-                        binaryResponse = response;
-                        doPartialFinished();
+                        if(statusCode == 200)
+                        {
+                            binaryResponse = response;
+                            doPartialFinished();
+                        }
                     }
-                }
 
-                @Override
-                public void onFailure(int statusCode, Header[] headers,byte[] errorResponse, Throwable throwable)
-                {
-                    doFailed();
-                }
+                    @Override
+                    public void onFailure(int statusCode, Header[] headers, byte[] errorResponse, Throwable throwable)
+                    {
+                        doFailed();
+                    }
 
-            });
+                });
+            }
 
         }
         else
@@ -133,10 +150,10 @@ public class GetMusic implements Routes {
             doFailed();
         try
         {
-            FileOutputStream fos = context.openFileOutput(song.getString("Name"), Context.MODE_PRIVATE);
+            FileOutputStream fos = context.openFileOutput(song.getString("Id") + ".mp3", Context.MODE_PRIVATE);
             fos.write(binaryResponse);
             fos.close();
-            filename = song.getString("Name");
+            filename = song.getString("Id") + ".mp3";
             System.out.println(filename);
 
         } catch (FileNotFoundException e)
@@ -146,7 +163,7 @@ public class GetMusic implements Routes {
             doFailed();
         } catch (JSONException e)
         {
-            System.out.println("JSON OBJECT DOESN'T HAVE NAME PROPERTY");
+            System.out.println("JSON OBJECT DOESN'T HAVE ID PROPERTY");
             e.printStackTrace();
             doFailed();
         } catch (IOException e)

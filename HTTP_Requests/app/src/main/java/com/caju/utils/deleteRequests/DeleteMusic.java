@@ -31,6 +31,9 @@ public class DeleteMusic implements Routes {
         onFinishedLoad = null;
         onFailedLoad = null;
 
+        if(musicID <= 0)
+            doFailed();
+
         AsyncHttpClient client; //HTTP Client for the requests
 
         //get connection information

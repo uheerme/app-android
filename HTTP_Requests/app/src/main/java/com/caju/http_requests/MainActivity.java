@@ -18,6 +18,7 @@ import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.getRequests.GetChannel;
 import com.caju.utils.getRequests.GetChannelMusic;
 import com.caju.utils.getRequests.GetMusic;
+import com.caju.utils.getRequests.GetStatusNow;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.postRequests.PostMusic;
@@ -35,10 +36,14 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     private TextView textView;
 
     private int lastButtonClicked;
+
+    private GetStatusNow getStatusNow;
     private GetChannel getChannel;
     private GetChannelMusic getChannelMusic;
-    private PostMusic postMusic;
     private GetMusic getMusic;
+    private PostMusic postMusic;
+
+
 
     private MediaPlayer mediaPlayer;
 
@@ -65,6 +70,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
             getChannel = new GetChannel(id, getApplicationContext());
             getChannel.setOnLoadFinishedListener(this);
             getChannel.setOnLoadFailedListener(this);
+            getStatusNow = new GetStatusNow(getApplicationContext());
         }
         catch (NoConnectionException e)
         {
@@ -193,10 +199,11 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
             File file = new File(getFileStreamPath(getMusic.getFilename()).getPath());
             Uri u = Uri.fromFile(file);
+            if(mediaPlayer != null)
+                mediaPlayer.release();
             mediaPlayer = new MediaPlayer();
             try
             {
-                System.out.println(mediaPlayer);
                 mediaPlayer.setDataSource(this,u);
                 mediaPlayer.prepare();
                 //mediaPlayer.seekTo(30*1000);
