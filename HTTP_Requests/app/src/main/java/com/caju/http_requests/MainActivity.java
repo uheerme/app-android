@@ -34,11 +34,13 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     private EditText number;
     private TextView textView;
 
+    private int lastButtonClicked;
     private GetChannel channel;
     private GetChannelMusics channelMusics;
     private PostMusic postMusic;
     private GetMusic getMusic;
-    private int lastButton;
+
+    private MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
     /* When user clicks in the button*/
     public void getChannel(View view) {
-        lastButton = 1;
+        lastButtonClicked = 1;
         // Gets the URL from the UI's text field.
         int id;
         String s_id = number.getText().toString();
@@ -71,7 +73,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     }
 
     public void getChannelMusics(View view) {
-        lastButton = 2;
+        lastButtonClicked = 2;
         // Gets the URL from the UI's text field.
         int id;
         String s_id = number.getText().toString();
@@ -97,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     }
 
     public void postMusic(View view) {
-        lastButton = 3;
+        lastButtonClicked = 3;
         Intent intent;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -111,7 +113,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     }
 
     public void getMusic(View view) {
-        lastButton = 4;
+        lastButtonClicked = 4;
         // Gets the URL from the UI's text field.
         int id;
         String s_id = number.getText().toString();
@@ -159,31 +161,31 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     /* This method is called after GetChannel is finished */
     public void onLoadFinished() {
         System.out.println("Executing OnLoadFinished");
-        /*if(lastButton == 1){
+        /*if(lastButtonClicked == 1){
             if(channel.getResultResponse() != null)
                 textView.setText(channel.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }*/
-        if(lastButton == 1){
+        if(lastButtonClicked == 1){
             if(channel.getResultResponse() != null)
                 textView.setText(channel.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }
-        else if(lastButton == 2){
+        else if(lastButtonClicked == 2){
             if(channelMusics.getResultResponse() != null)
                 textView.setText(channelMusics.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }
-        else if(lastButton == 3){
+        else if(lastButtonClicked == 3){
             if(postMusic.getResultResponse() != null)
                 textView.setText(postMusic.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
         }
-        else if(lastButton == 4){
+        else if(lastButtonClicked == 4){
             if(getMusic.getResultResponse() != null)
                 textView.setText(getMusic.getResultResponse());
             else
@@ -191,14 +193,15 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
             File file = new File(getFileStreamPath(getMusic.getFilename()).getPath());
             Uri u = Uri.fromFile(file);
-            MediaPlayer mediaPlayer = new MediaPlayer();
+            mediaPlayer = new MediaPlayer();
             try
             {
                 System.out.println(mediaPlayer);
                 mediaPlayer.setDataSource(this,u);
                 mediaPlayer.prepare();
+                //mediaPlayer.seekTo(30*1000);
                 mediaPlayer.start();
-                
+
             } catch (IOException e)
             {
                 e.printStackTrace();
@@ -210,7 +213,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     @Override
     public void onLoadFailed() {
         System.out.println("Executing OnLoadFailed");
-        textView.setText("Something went wrong in op " + lastButton);
+        textView.setText("Something went wrong in op " + lastButtonClicked);
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData)
