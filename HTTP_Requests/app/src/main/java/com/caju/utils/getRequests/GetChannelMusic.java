@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.caju.utils.exceptions.NoConnectionException;
+import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.interfaces.Routes;
@@ -26,11 +27,15 @@ public class GetChannelMusic implements Routes {
 
     private JSONArray songs;
 
-    public GetChannelMusic(int channelID, Context context) throws NoConnectionException {
+    public GetChannelMusic(int channelID, Context context) throws NoConnectionException, NoIDSelectedException
+    {
 
         this.id = channelID;
         onFinishedLoad = null;
         onFailedLoad = null;
+
+        if(channelID <= 0)
+            throw new NoIDSelectedException();
 
         AsyncHttpClient client; //HTTP Client for the requests
 

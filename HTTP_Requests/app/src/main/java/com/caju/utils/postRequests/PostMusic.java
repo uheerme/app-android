@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.os.Environment;
 
 import com.caju.utils.exceptions.NoConnectionException;
+import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.interfaces.Routes;
@@ -35,14 +36,14 @@ public class PostMusic implements Routes
 
     private JSONObject music;
 
-    public PostMusic(Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException
+    public PostMusic(Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException, NoIDSelectedException
     {
 
         onFinishedUpload = null;
         onFailedUpload = null;
 
         if(channelID <= 0)
-            doFailed();
+            throw new NoIDSelectedException();
 
         uploaded = new ArrayList<File>();
         unuploaded = new ArrayList<File>();

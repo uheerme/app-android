@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.caju.utils.exceptions.NoConnectionException;
+import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.getRequests.GetChannel;
 import com.caju.utils.getRequests.GetChannelMusic;
 import com.caju.utils.getRequests.GetMusic;
@@ -76,6 +77,10 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         {
             textView.setText("You have no connection.");
         }
+        catch (NoIDSelectedException e)
+        {
+            textView.setText("You have no ID.");
+        }
     }
 
     public void getChannelMusics(View view) {
@@ -101,6 +106,10 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         catch (NoConnectionException e)
         {
             textView.setText("You have no connection.");
+        }
+        catch (NoIDSelectedException e)
+        {
+            textView.setText("You have no ID.");
         }
     }
 
@@ -138,6 +147,10 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         catch (IOException e)
         {
             textView.setText("File not loaded.");
+        }
+        catch (NoIDSelectedException e)
+        {
+            textView.setText("You have no ID.");
         }
     }
 
@@ -249,6 +262,10 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
             catch (NoConnectionException e)
             {
                 textView.setText("You have no connection.");
+            }
+            catch (NoIDSelectedException e)
+            {
+                textView.setText("You have no ID.");
             }
 
         }

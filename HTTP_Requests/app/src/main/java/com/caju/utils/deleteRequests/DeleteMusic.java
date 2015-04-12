@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.caju.utils.exceptions.NoConnectionException;
+import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.interfaces.Routes;
@@ -25,14 +26,15 @@ public class DeleteMusic implements Routes {
 
     private JSONObject song;
 
-    public DeleteMusic(int musicID, Context context) throws NoConnectionException {
+    public DeleteMusic(int musicID, Context context) throws NoConnectionException, NoIDSelectedException
+    {
 
         this.id = musicID;
         onFinishedLoad = null;
         onFailedLoad = null;
 
         if(musicID <= 0)
-            doFailed();
+            throw new NoIDSelectedException();
 
         AsyncHttpClient client; //HTTP Client for the requests
 

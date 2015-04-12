@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.caju.utils.exceptions.NoConnectionException;
+import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.interfaces.Routes;
@@ -36,7 +37,7 @@ public class GetMusic implements Routes {
     private boolean song_is_downloaded;
     private String filename;
 
-    public GetMusic(int musicID, Context context) throws NoConnectionException, IOException
+    public GetMusic(int musicID, Context context) throws NoConnectionException, IOException, NoIDSelectedException
     {
         this.id = musicID;
         this.context = context;
@@ -44,7 +45,7 @@ public class GetMusic implements Routes {
         onFailedLoad = null;
 
         if(musicID <= 0)
-            doFailed();
+            throw new NoIDSelectedException();
 
         song_is_downloaded = (new File(context.getFileStreamPath(id + ".mp3").getPath()).exists());
 
