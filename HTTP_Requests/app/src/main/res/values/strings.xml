@@ -17,5 +17,6 @@
     <string name="request_method">CAJU.SETTINGS.APP.TYPE_REQUEST</string>
     <string name="fetch_channel_musics"><![CDATA[TAP HERE -> CHANNEL MUSICS]]></string>
     <string name="upload_music"><![CDATA[TAP HERE -> UPLOAD MUSIC]]></string>
+    <string name="fetch_music"><![CDATA[TAP HERE -> MUSIC FILE]]></string>
 
 </resources>

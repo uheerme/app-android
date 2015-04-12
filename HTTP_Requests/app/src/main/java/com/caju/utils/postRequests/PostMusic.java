@@ -24,7 +24,6 @@ import java.util.ArrayList;
 public class PostMusic implements Routes
 {
     private String resultResponse;
-    private String errorResponse;
 
     private ArrayList<File> uploaded;
     private ArrayList<File> unuploaded;
@@ -82,7 +81,7 @@ public class PostMusic implements Routes
                 http_params.put("ChannelID", channelID);
                 try
                 {
-                    http_params.put("Music", f, "audio/mp3");
+                    http_params.put("Music", f, "audio/mpeg");
                 } catch (FileNotFoundException e)
                 {
                     uploaded.remove(f);
@@ -115,7 +114,6 @@ public class PostMusic implements Routes
                     @Override
                     public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable)
                     {
-                        errorResponse = new String(errorResponse);
                         doFailed();
                     }
 
@@ -142,11 +140,6 @@ public class PostMusic implements Routes
         return resultResponse;
     }
 
-    public String getErrorResponse()
-    {
-        return errorResponse;
-    }
-
     public void setOnLoadFinishedListener(OnFinishedListener listener)
     {
         onFinishedUpload = listener;
@@ -166,7 +159,6 @@ public class PostMusic implements Routes
 
     private void doFailed()
     {
-        System.out.println(errorResponse);
         if(onFailedUpload != null)
             onFailedUpload.onLoadFailed();
     }

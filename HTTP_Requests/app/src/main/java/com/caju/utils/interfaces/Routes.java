@@ -9,9 +9,9 @@ public interface Routes {
     static final String MUSIC_SUB_ROUTE = "/musics/";
     static final String PLAY_SUB_ROUTE = "/play/";
 
-    static final String STREAM_END_ROUTE = "stream";
-    static final String DEACTIVATE_END_ROUTE = "deactivate";
-    static final String NOW_END_ROUTE = "now";
+    static final String STREAM_END_ROUTE = "/stream";
+    static final String DEACTIVATE_END_ROUTE = "/deactivate";
+    static final String NOW_END_ROUTE = "/now";
 
     static final String SKIP = "skip=";
     static final String TAKE = "take=";

@@ -49,6 +49,8 @@ public class GetChannelMusics implements Routes {
                 {
                     if(statusCode == 200)
                     {
+                        if(response.charAt(0) == '[')
+                            response = response.substring(1,response.length()-1);
                         resultResponse = new String(response);
                         try
                         {
@@ -64,7 +66,6 @@ public class GetChannelMusics implements Routes {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable)
                 {
-                    errorResponse = new String(errorResponse);
                     doFailed();
                 }
 

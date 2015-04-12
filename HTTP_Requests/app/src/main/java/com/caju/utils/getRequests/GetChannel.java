@@ -64,7 +64,6 @@ public class GetChannel implements Routes {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable)
                 {
-                    errorResponse = new String(errorResponse);
                     doFailed();
                 }
 
@@ -92,6 +91,7 @@ public class GetChannel implements Routes {
     {
         return resultResponse;
     }
+
 
     public void setOnLoadFinishedListener(OnFinishedListener listener)
     {

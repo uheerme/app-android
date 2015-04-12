@@ -3,31 +3,44 @@ package com.caju.utils.getRequests;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Environment;
 
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.interfaces.Routes;
 import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class GetMusic implements Routes {
 
+    private Context context;
+
+    private byte[] binaryResponse;
     private String resultResponse;
     private int id;
 
     private OnFinishedListener onFinishedLoad;
     private OnFailedListener onFailedLoad;
 
-    private JSONObject channel;
+    private JSONObject song;
 
-    public GetMusic(int channelID, Context context) throws NoConnectionException {
+    private String filename;
 
-        this.id = channelID;
+    public GetMusic(int musicID, Context context) throws NoConnectionException, IOException
+    {
+        this.id = musicID;
+        this.context = context;
         onFinishedLoad = null;
         onFailedLoad = null;
 
@@ -42,20 +55,21 @@ public class GetMusic implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(CHANNEL_ROUTE + id, new TextHttpResponseHandler()
+            client.get(MUSIC_ROUTE + id, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)
                 {
                     if(statusCode == 200)
                     {
+                        System.out.println(response);
                         resultResponse = new String(response);
                         try
                         {
-                            channel = new JSONObject(response);
+                            song = new JSONObject(response);
                         } catch (JSONException e)
                         {
-                            channel = null;
+                            song = null;
                             System.err.println(response);
                         }
                     }
@@ -64,17 +78,26 @@ public class GetMusic implements Routes {
                 @Override
                 public void onFailure(int statusCode, Header[] headers, String errorResponse, Throwable throwable)
                 {
-                    errorResponse = new String(errorResponse);
                     doFailed();
                 }
 
+            });
+            client.get(MUSIC_ROUTE + id + STREAM_END_ROUTE, new AsyncHttpResponseHandler()
+            {
                 @Override
-                public void onFinish()
+                public void onSuccess(int statusCode, Header[] headers, byte[] response)
                 {
-                    if(channel != null)
-                        doFinished();
-                    else
-                        doFailed();
+                    if(statusCode == 200)
+                    {
+                        binaryResponse = response;
+                        doPartialFinished();
+                    }
+                }
+
+                @Override
+                public void onFailure(int statusCode, Header[] headers,byte[] errorResponse, Throwable throwable)
+                {
+                    doFailed();
                 }
 
             });
@@ -86,11 +109,14 @@ public class GetMusic implements Routes {
         }
     }
 
-
-
     public String getResultResponse()
     {
         return resultResponse;
+    }
+
+    public String getFilename()
+    {
+        return filename;
     }
 
     public void setOnLoadFinishedListener(OnFinishedListener listener)
@@ -101,6 +127,39 @@ public class GetMusic implements Routes {
     public void setOnLoadFailedListener(OnFailedListener listener)
     {
         onFailedLoad = listener;
+    }
+
+
+    private void doPartialFinished()
+    {
+        if(song == null)
+            doFailed();
+        try
+        {
+            FileOutputStream fos = context.openFileOutput(song.getString("Name"), Context.MODE_PRIVATE);
+            fos.write(binaryResponse);
+            fos.close();
+            filename = song.getString("Name");
+            System.out.println(filename);
+
+        } catch (FileNotFoundException e)
+        {
+            System.out.println("COULD NOT CREATE DOWNLOADED FILE");
+            e.printStackTrace();
+            doFailed();
+        } catch (JSONException e)
+        {
+            System.out.println("JSON OBJECT DOESN'T HAVE NAME PROPERTY");
+            e.printStackTrace();
+            doFailed();
+        } catch (IOException e)
+        {
+            System.out.println("COULD NOT CREATE NEW FILE IN THE FOLDER");
+            e.printStackTrace();
+            doFailed();
+        }
+
+        doFinished();
     }
 
     private void doFinished()

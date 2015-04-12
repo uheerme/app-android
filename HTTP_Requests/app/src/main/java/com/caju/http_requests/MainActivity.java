@@ -3,6 +3,7 @@ package com.caju.http_requests;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.app.ActionBarActivity;
@@ -16,11 +17,13 @@ import android.widget.TextView;
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.getRequests.GetChannel;
 import com.caju.utils.getRequests.GetChannelMusics;
+import com.caju.utils.getRequests.GetMusic;
 import com.caju.utils.interfaces.OnFailedListener;
 import com.caju.utils.interfaces.OnFinishedListener;
 import com.caju.utils.postRequests.PostMusic;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends ActionBarActivity implements OnFinishedListener, OnFailedListener {
@@ -28,12 +31,13 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     private SharedPreferences app_settings;
     private SharedPreferences.Editor editor;
 
-    private EditText channelNumber;
+    private EditText number;
     private TextView textView;
 
     private GetChannel channel;
     private GetChannelMusics channelMusics;
     private PostMusic postMusic;
+    private GetMusic getMusic;
     private int lastButton;
 
     @Override
@@ -42,7 +46,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         setContentView(R.layout.activity_main);
 
         //Finding important elements in the layout
-        channelNumber = (EditText) findViewById(R.id.channel_id);
+        number = (EditText) findViewById(R.id.channel_id);
         textView = (TextView) findViewById(R.id.result_container);
     }
 
@@ -51,7 +55,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         lastButton = 1;
         // Gets the URL from the UI's text field.
         int id;
-        String s_id = channelNumber.getText().toString();
+        String s_id = number.getText().toString();
         try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
 
         try
@@ -70,7 +74,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         lastButton = 2;
         // Gets the URL from the UI's text field.
         int id;
-        String s_id = channelNumber.getText().toString();
+        String s_id = number.getText().toString();
         try
         {
             id = Integer.parseInt(s_id);
@@ -104,6 +108,29 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         }
         intent.setType("audio/*");
         startActivityForResult(intent, 10);
+    }
+
+    public void getMusic(View view) {
+        lastButton = 4;
+        // Gets the URL from the UI's text field.
+        int id;
+        String s_id = number.getText().toString();
+        try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
+
+        try
+        {
+            getMusic = new GetMusic(id, getApplicationContext());
+            getMusic.setOnLoadFinishedListener(this);
+            getMusic.setOnLoadFailedListener(this);
+        }
+        catch (NoConnectionException e)
+        {
+            textView.setText("You have no connection.");
+        }
+        catch (IOException e)
+        {
+            textView.setText("File not loaded.");
+        }
     }
 
     @Override
@@ -156,12 +183,34 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
             else
                 textView.setText("This shouldn't happen");
         }
+        else if(lastButton == 4){
+            if(getMusic.getResultResponse() != null)
+                textView.setText(getMusic.getResultResponse());
+            else
+                textView.setText("This shouldn't happen");
+
+            File file = new File(getFileStreamPath(getMusic.getFilename()).getPath());
+            Uri u = Uri.fromFile(file);
+            MediaPlayer mediaPlayer = new MediaPlayer();
+            try
+            {
+                System.out.println(mediaPlayer);
+                mediaPlayer.setDataSource(this,u);
+                mediaPlayer.prepare();
+                mediaPlayer.start();
+                
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     @Override
     public void onLoadFailed() {
         System.out.println("Executing OnLoadFailed");
-        textView.setText("Unable to retrieve information from Channel.");
+        textView.setText("Something went wrong in op " + lastButton);
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent resultData)
@@ -179,7 +228,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
             }
 
             int id;
-            String s_id = channelNumber.getText().toString();
+            String s_id = number.getText().toString();
             try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
 
             try {
