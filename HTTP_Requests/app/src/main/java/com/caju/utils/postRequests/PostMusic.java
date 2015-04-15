@@ -42,7 +42,7 @@ public class PostMusic implements Routes
 
     private JSONObject song;
 
-    public PostMusic(final Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException, NoIDSelectedException
+    public PostMusic(Context context, int channelID, ArrayList<String> song_paths) throws NoConnectionException, NoIDSelectedException
     {
         this.context = context;
         onFinishedUpload = null;
@@ -116,26 +116,11 @@ public class PostMusic implements Routes
                                 song = new JSONObject(response);
                                 song_JSONs.add(song);
                                 song_IDs.add(song.getInt("Id"));
-                                //copying file from external to internal storage
-                                FileOutputStream fos = context.openFileOutput(song.getString("Id") + ".mp3", Context.MODE_PRIVATE);
-                                FileInputStream fis = new FileInputStream(song_file);
-                                while(fis.available() > 0){
-                                    try{ fos.write(fis.read()); }
-                                    catch (IOException e)
-                                    { System.err.println("FILE COPIED?");}
-                                }
-                                fos.close();
-                                fis.close();
+                                doCopyFileToInternalStorage();
 
                             } catch (JSONException e)
                             {
-                                System.err.println(response);
-                            } catch (FileNotFoundException e)
-                            {
-                                System.err.println("FILE TO BE COPIED TO INTERNAL STORAGE NOT FOUND");
-                            } catch (IOException e)
-                            {
-                                System.err.println("FILE NOT COPIED PROPERLY");
+                                System.err.println("ERROR WHEN PARSING JSON");
                                 e.printStackTrace();
                             }
                         }
@@ -163,6 +148,42 @@ public class PostMusic implements Routes
             throw new NoConnectionException("No network connection available.");
         }
         System.out.println("Constructor PostMusic Finished");
+    }
+
+    public void doCopyFileToInternalStorage()
+    {
+        try
+        {
+            //copying file from external to internal storage
+            FileOutputStream fos = context.openFileOutput(song.getString("Id") + ".mp3", Context.MODE_PRIVATE);
+            FileInputStream fis = new FileInputStream(song_file);
+            while(fis.available() > 0)
+            {
+                try { fos.write(fis.read()); }
+                catch (IOException e)
+                {
+                    System.err.println("FILE COULD NOT BE COPIED");
+                    e.printStackTrace();
+                }
+            }
+            fos.close();
+            fis.close();
+        }
+        catch (JSONException e)
+        {
+            System.err.println("ERROR WHEN PARSING JSON");
+            e.printStackTrace();
+        }
+        catch (FileNotFoundException e)
+        {
+            System.err.println("FILE TO BE COPIED TO INTERNAL STORAGE NOT FOUND");
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            System.err.println("FILE NOT COPIED PROPERLY");
+            e.printStackTrace();
+        }
     }
 
     public String getResultResponse()

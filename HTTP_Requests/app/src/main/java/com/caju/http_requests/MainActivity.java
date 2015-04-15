@@ -147,6 +147,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         catch (IOException e)
         {
             textView.setText("File not loaded.");
+            e.printStackTrace();
         }
         catch (NoIDSelectedException e)
         {
@@ -224,6 +225,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
             } catch (IOException e)
             {
+                System.err.println("SONG COULD NOT BE PREPARED AND PLAYED");
                 e.printStackTrace();
             }
 
