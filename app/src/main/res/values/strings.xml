@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HTTP_Requests</string>
+    <string name="app_name">Uheer</string>
     <string name="result_container">Request will be parsed here</string>
     <string name="action_settings">Settings</string>
     <string name="type_here_channel_ID">Type Channel ID here</string>
