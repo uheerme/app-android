@@ -2,7 +2,7 @@ package com.caju.utils.interfaces;
 
 public interface Routes {
 
-    static final String ROUTE = "http://54.207.33.242/api";
+    static final String ROUTE = "http://uheer.me/api";
 
     static final String CHANNEL_ROUTE = ROUTE+"/channels/";
     static final String MUSIC_ROUTE = ROUTE+"/musics/";
