@@ -47,7 +47,7 @@ public class GetChannel implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(CHANNEL_ROUTE + id, new TextHttpResponseHandler()
+            client.get(CHANNELS + id, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)

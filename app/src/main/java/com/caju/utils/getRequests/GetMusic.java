@@ -61,7 +61,7 @@ public class GetMusic implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(MUSIC_ROUTE + id, new TextHttpResponseHandler()
+            client.get(MUSICS + id, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)
@@ -96,7 +96,7 @@ public class GetMusic implements Routes {
             }
             else
             {
-                client.get(MUSIC_ROUTE + id + STREAM_END_ROUTE, new AsyncHttpResponseHandler()
+                client.get(MUSICS + id + STREAM, new AsyncHttpResponseHandler()
                 {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] response)

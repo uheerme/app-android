@@ -103,7 +103,7 @@ public class PostMusic implements Routes
 
                 //starting a connection with server
                 client = new AsyncHttpClient();
-                client.post(MUSIC_ROUTE, http_params, new TextHttpResponseHandler()
+                client.post(MUSICS, http_params, new TextHttpResponseHandler()
                 {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String response)

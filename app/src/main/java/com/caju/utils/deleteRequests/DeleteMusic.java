@@ -47,7 +47,7 @@ public class DeleteMusic implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.delete(MUSIC_ROUTE + id, new TextHttpResponseHandler()
+            client.delete(MUSICS + id, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)

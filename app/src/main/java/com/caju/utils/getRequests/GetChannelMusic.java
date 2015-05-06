@@ -15,7 +15,6 @@ import com.loopj.android.http.TextHttpResponseHandler;
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class GetChannelMusic implements Routes {
 
@@ -48,7 +47,7 @@ public class GetChannelMusic implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(CHANNEL_ROUTE + id + MUSIC_SUB_ROUTE, new TextHttpResponseHandler()
+            client.get(CHANNELS + id + MUSIC_SUB_ROUTE, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)

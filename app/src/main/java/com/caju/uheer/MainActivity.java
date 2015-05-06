@@ -46,8 +46,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
     private GetMusic getMusic;
     private PostMusic postMusic;
 
-
-
     private MediaPlayer mediaPlayer;
 
     @Override
@@ -66,21 +64,20 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         // Gets the URL from the UI's text field.
         int id;
         String s_id = number.getText().toString();
-        try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
+        try {
+            id = Integer.parseInt(s_id);
+        } catch (NumberFormatException e) {
+            id = 0;
+        }
 
-        try
-        {
+        try {
             getChannel = new GetChannel(id, getApplicationContext());
             getChannel.setOnLoadFinishedListener(this);
             getChannel.setOnLoadFailedListener(this);
             getStatusNow = new GetStatusNow(getApplicationContext());
-        }
-        catch (NoConnectionException e)
-        {
+        } catch (NoConnectionException e) {
             textView.setText("You have no connection.");
-        }
-        catch (NoIDSelectedException e)
-        {
+        } catch (NoIDSelectedException e) {
             textView.setText("You have no ID.");
         }
     }
@@ -90,27 +87,19 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         // Gets the URL from the UI's text field.
         int id;
         String s_id = number.getText().toString();
-        try
-        {
+        try {
             id = Integer.parseInt(s_id);
-        }
-        catch (NumberFormatException e)
-        {
+        } catch (NumberFormatException e) {
             id = 0;
         }
 
-        try
-        {
+        try {
             getChannelMusic = new GetChannelMusic(id, getApplicationContext());
             getChannelMusic.setOnLoadFinishedListener(this);
             getChannelMusic.setOnLoadFailedListener(this);
-        }
-        catch (NoConnectionException e)
-        {
+        } catch (NoConnectionException e) {
             textView.setText("You have no connection.");
-        }
-        catch (NoIDSelectedException e)
-        {
+        } catch (NoIDSelectedException e) {
             textView.setText("You have no ID.");
         }
     }
@@ -121,8 +110,7 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-        }
-        else{
+        } else {
             intent = new Intent(Intent.ACTION_PICK);
         }
         intent.setType("audio/*");
@@ -134,25 +122,22 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         // Gets the URL from the UI's text field.
         int id;
         String s_id = number.getText().toString();
-        try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
+        try {
+            id = Integer.parseInt(s_id);
+        } catch (NumberFormatException e) {
+            id = 0;
+        }
 
-        try
-        {
+        try {
             getMusic = new GetMusic(id, getApplicationContext());
             getMusic.setOnLoadFinishedListener(this);
             getMusic.setOnLoadFailedListener(this);
-        }
-        catch (NoConnectionException e)
-        {
+        } catch (NoConnectionException e) {
             textView.setText("You have no connection.");
-        }
-        catch (IOException e)
-        {
+        } catch (IOException e) {
             textView.setText("File not loaded.");
             e.printStackTrace();
-        }
-        catch (NoIDSelectedException e)
-        {
+        } catch (NoIDSelectedException e) {
             textView.setText("You have no ID.");
         }
     }
@@ -189,44 +174,39 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
             else
                 textView.setText("This shouldn't happen");
         }*/
-        if(lastButtonClicked == 1){
-            if(getChannel.getResultResponse() != null)
+        if (lastButtonClicked == 1) {
+            if (getChannel.getResultResponse() != null)
                 textView.setText(getChannel.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
-        }
-        else if(lastButtonClicked == 2){
-            if(getChannelMusic.getResultResponse() != null)
+        } else if (lastButtonClicked == 2) {
+            if (getChannelMusic.getResultResponse() != null)
                 textView.setText(getChannelMusic.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
-        }
-        else if(lastButtonClicked == 3){
-            if(postMusic.getResultResponse() != null)
+        } else if (lastButtonClicked == 3) {
+            if (postMusic.getResultResponse() != null)
                 textView.setText(postMusic.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
-        }
-        else if(lastButtonClicked == 4){
-            if(getMusic.getResultResponse() != null)
+        } else if (lastButtonClicked == 4) {
+            if (getMusic.getResultResponse() != null)
                 textView.setText(getMusic.getResultResponse());
             else
                 textView.setText("This shouldn't happen");
 
             File file = new File(getFileStreamPath(getMusic.getFilename()).getPath());
             Uri u = Uri.fromFile(file);
-            if(mediaPlayer != null)
+            if (mediaPlayer != null)
                 mediaPlayer.release();
             mediaPlayer = new MediaPlayer();
-            try
-            {
-                mediaPlayer.setDataSource(this,u);
+            try {
+                mediaPlayer.setDataSource(this, u);
                 mediaPlayer.prepare();
                 //mediaPlayer.seekTo(30*1000);
                 mediaPlayer.start();
 
-            } catch (IOException e)
-            {
+            } catch (IOException e) {
                 System.err.println("SONG COULD NOT BE PREPARED AND PLAYED");
                 e.printStackTrace();
             }
@@ -239,9 +219,9 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         System.out.println("Executing OnLoadFailed");
         textView.setText("Something went wrong in op " + lastButtonClicked);
     }
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent resultData)
-    {
+    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
 
         if (requestCode == 10 && resultCode == Activity.RESULT_OK) {
             Uri uri = null;
@@ -254,19 +234,19 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
             int id;
             String s_id = number.getText().toString();
-            try { id = Integer.parseInt(s_id); } catch (NumberFormatException e) { id = 0; }
+            try {
+                id = Integer.parseInt(s_id);
+            } catch (NumberFormatException e) {
+                id = 0;
+            }
 
             try {
-                postMusic = new PostMusic(getApplicationContext(),id,files);
+                postMusic = new PostMusic(getApplicationContext(), id, files);
                 postMusic.setOnLoadFinishedListener(this);
                 postMusic.setOnLoadFailedListener(this);
-            }
-            catch (NoConnectionException e)
-            {
+            } catch (NoConnectionException e) {
                 textView.setText("You have no connection.");
-            }
-            catch (NoIDSelectedException e)
-            {
+            } catch (NoIDSelectedException e) {
                 textView.setText("You have no ID.");
             }
 
