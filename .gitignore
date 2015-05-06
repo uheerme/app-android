@@ -3,4 +3,6 @@
 build/
 .idea/
 .gradle
-/local.properties
+*/local.properties
+app/app.iml
+/*.iml

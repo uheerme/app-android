@@ -2,9 +2,11 @@ package com.caju.utils.interfaces;
 
 public interface Routes {
 
-    static final String CHANNEL_ROUTE = "http://54.69.27.129/api/channels/";
-    static final String MUSIC_ROUTE = "http://54.69.27.129/api/musics/";
-    static final String STATUS_ROUTE = "http://54.69.27.129/api/status/";
+    static final String ROUTE = "http://54.207.33.242/api";
+
+    static final String CHANNEL_ROUTE = ROUTE+"/channels/";
+    static final String MUSIC_ROUTE = ROUTE+"/musics/";
+    static final String STATUS_ROUTE = ROUTE+"/status/";
 
     static final String MUSIC_SUB_ROUTE = "/musics/";
     static final String PLAY_SUB_ROUTE = "/play/";
