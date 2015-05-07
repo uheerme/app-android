@@ -4,11 +4,11 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
+import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
+import com.caju.uheer.infrastructure.interfaces.Routes;
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
-import com.caju.utils.interfaces.OnFailedListener;
-import com.caju.utils.interfaces.OnFinishedListener;
-import com.caju.utils.interfaces.Routes;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
@@ -16,7 +16,7 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-public class GetActiveChannels implements Routes {
+public class GetActiveChannels {
 
     private String resultResponse;
 
@@ -42,7 +42,7 @@ public class GetActiveChannels implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(CHANNEL_ROUTE + ACTIVE_SUB_ROUTE, new TextHttpResponseHandler()
+            client.get(Routes.CHANNELS + Routes.ACTIVE, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)

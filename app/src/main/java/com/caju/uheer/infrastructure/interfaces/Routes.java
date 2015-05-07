@@ -12,7 +12,9 @@ public interface Routes {
     String PLAY_SUB_ROUTE = "/play/";
 
     String STREAM = "/stream";
+    String ACTIVE = "/active";
     String DEACTIVATE = "/deactivate";
+
     String NOW = "/now";
 
     String SKIP = "skip=";

@@ -1,16 +1,17 @@
-package com.caju.uheer;
+package com.caju.uheer.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.caju.uheer.R;
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.getRequests.GetActiveChannels;
 import com.caju.utils.getRequests.GetStatusNow;
-import com.caju.utils.interfaces.OnFailedListener;
-import com.caju.utils.interfaces.OnFinishedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -1,4 +1,4 @@
-package com.caju.uheer;
+package com.caju.uheer.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.caju.uheer.R;
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.getRequests.GetChannel;
