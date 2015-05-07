@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.caju.uheer"
         minSdkVersion 14
-        targetSdkVersion 21
+        targetSdkVersion 22
         versionCode 2
         versionName "2.0"
     }
@@ -21,13 +21,14 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/LICENSE'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/notice.txt'
     }
-
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:appcompat-v7:22.1.1'
     compile 'com.loopj.android:android-async-http:1.4.6'
 
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
