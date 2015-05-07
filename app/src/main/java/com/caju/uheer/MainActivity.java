@@ -1,7 +1,5 @@
 package com.caju.uheer;
 
-import com.caju.uheer.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,8 +20,8 @@ import com.caju.utils.getRequests.GetChannel;
 import com.caju.utils.getRequests.GetChannelMusic;
 import com.caju.utils.getRequests.GetMusic;
 import com.caju.utils.getRequests.GetStatusNow;
-import com.caju.utils.interfaces.OnFailedListener;
-import com.caju.utils.interfaces.OnFinishedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
 import com.caju.utils.postRequests.PostMusic;
 
 import java.io.File;
