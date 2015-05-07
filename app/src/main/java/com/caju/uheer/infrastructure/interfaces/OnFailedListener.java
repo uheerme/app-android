@@ -1,4 +1,4 @@
-package com.caju.utils.interfaces;
+package com.caju.uheer.infrastructure.interfaces;
 
 public interface OnFailedListener
 {

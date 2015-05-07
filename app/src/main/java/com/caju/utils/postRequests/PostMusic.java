@@ -7,9 +7,9 @@ import android.os.Environment;
 
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
-import com.caju.utils.interfaces.OnFailedListener;
-import com.caju.utils.interfaces.OnFinishedListener;
-import com.caju.utils.interfaces.Routes;
+import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
+import com.caju.uheer.infrastructure.interfaces.Routes;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.RequestParams;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -103,7 +103,7 @@ public class PostMusic implements Routes
 
                 //starting a connection with server
                 client = new AsyncHttpClient();
-                client.post(MUSIC_ROUTE, http_params, new TextHttpResponseHandler()
+                client.post(MUSICS, http_params, new TextHttpResponseHandler()
                 {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, String response)

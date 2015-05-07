@@ -6,16 +6,15 @@ import android.net.NetworkInfo;
 
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
-import com.caju.utils.interfaces.OnFailedListener;
-import com.caju.utils.interfaces.OnFinishedListener;
-import com.caju.utils.interfaces.Routes;
+import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
+import com.caju.uheer.infrastructure.interfaces.Routes;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.TextHttpResponseHandler;
 
 import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class GetChannelMusic implements Routes {
 
@@ -48,7 +47,7 @@ public class GetChannelMusic implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(CHANNEL_ROUTE + id + MUSIC_SUB_ROUTE, new TextHttpResponseHandler()
+            client.get(CHANNELS + id + MUSIC_SUB_ROUTE, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)

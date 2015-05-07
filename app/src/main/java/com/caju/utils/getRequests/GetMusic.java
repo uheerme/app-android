@@ -6,9 +6,9 @@ import android.net.NetworkInfo;
 
 import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
-import com.caju.utils.interfaces.OnFailedListener;
-import com.caju.utils.interfaces.OnFinishedListener;
-import com.caju.utils.interfaces.Routes;
+import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
+import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
+import com.caju.uheer.infrastructure.interfaces.Routes;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.TextHttpResponseHandler;
@@ -61,7 +61,7 @@ public class GetMusic implements Routes {
         {
             //starting a connection with server
             client = new AsyncHttpClient();
-            client.get(MUSIC_ROUTE + id, new TextHttpResponseHandler()
+            client.get(MUSICS + id, new TextHttpResponseHandler()
             {
                 @Override
                 public void onSuccess(int statusCode, Header[] headers, String response)
@@ -96,7 +96,7 @@ public class GetMusic implements Routes {
             }
             else
             {
-                client.get(MUSIC_ROUTE + id + STREAM_END_ROUTE, new AsyncHttpResponseHandler()
+                client.get(MUSICS + id + STREAM, new AsyncHttpResponseHandler()
                 {
                     @Override
                     public void onSuccess(int statusCode, Header[] headers, byte[] response)
