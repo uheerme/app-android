@@ -54,6 +54,15 @@
         android:onClick="getMusic"
         android:text="@string/fetch_music" />
 
+    <Button
+        android:id="@+id/game_night"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:onClick="gameNightTest"
+        android:text="@string/game_night" />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"

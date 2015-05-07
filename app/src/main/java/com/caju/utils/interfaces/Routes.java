@@ -10,6 +10,7 @@ public interface Routes {
 
     static final String MUSIC_SUB_ROUTE = "/musics/";
     static final String PLAY_SUB_ROUTE = "/play/";
+    static final String ACTIVE_SUB_ROUTE = "/active/";
 
     static final String STREAM_END_ROUTE = "/stream";
     static final String DEACTIVATE_END_ROUTE = "/deactivate";

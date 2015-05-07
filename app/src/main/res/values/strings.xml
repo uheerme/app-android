@@ -3,8 +3,10 @@
     <string name="result_container">Request will be parsed here</string>
     <string name="action_settings">Settings</string>
     <string name="type_here_channel_ID">Type Channel ID here</string>
-    <string name="fetch_channel">Tap Here -> Channel Info</string>
+    <string name="fetch_channel">Channel Info</string>
     <string name="type_here_method_content">Type method content here</string>
+    <string name="channel1">Channel 1</string>
+    <string name="channel2">Channel 2</string>
     <string-array name="request_method_list">
         <item>CREATE</item>
         <item>DELETE</item>
@@ -15,8 +17,9 @@
     <!-- Don't Translate-->
     <string name="app_settings_pref_file">CAJU.SETTINGS.APP</string>
     <string name="request_method">CAJU.SETTINGS.APP.TYPE_REQUEST</string>
-    <string name="fetch_channel_musics"><![CDATA[TAP HERE -> CHANNEL MUSICS]]></string>
-    <string name="upload_music"><![CDATA[TAP HERE -> UPLOAD MUSIC]]></string>
-    <string name="fetch_music"><![CDATA[TAP HERE -> MUSIC FILE]]></string>
+    <string name="fetch_channel_musics"><![CDATA[CHANNEL MUSICS]]></string>
+    <string name="upload_music"><![CDATA[UPLOAD MUSIC]]></string>
+    <string name="fetch_music"><![CDATA[MUSIC FILE]]></string>
+    <string name="game_night"><![CDATA[Game Night Test]]></string>
 
 </resources>
