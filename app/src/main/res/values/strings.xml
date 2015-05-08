@@ -4,7 +4,7 @@
     <string name="result_container">Request will be parsed here</string>
     <string name="action_settings">Settings</string>
     <string name="type_here_channel_ID">Type Channel ID here</string>
-    <string name="fetch_channel">Channel Info</string>
+    <string name="channels">Channels</string>
     <string name="type_here_method_content">Type method content here</string>
     <string name="channel1">Channel 1</string>
     <string name="channel2">Channel 2</string>

@@ -1,5 +1,6 @@
 package com.caju.uheer.activities;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -10,8 +11,6 @@ import com.caju.utils.exceptions.NoConnectionException;
 import com.caju.utils.exceptions.NoIDSelectedException;
 import com.caju.utils.getRequests.GetActiveChannels;
 import com.caju.utils.getRequests.GetStatusNow;
-import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
-import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +18,7 @@ import org.json.JSONException;
 /**
  * Created by Jp on 06/05/2015.
  */
-public class GameNightActivity extends ActionBarActivity implements OnFinishedListener, OnFailedListener {
+public class GameNightActivity extends Activity {
     private int request;
     private GetActiveChannels getActiveChannels;
     private GetStatusNow getStatusNow;
@@ -34,8 +33,6 @@ public class GameNightActivity extends ActionBarActivity implements OnFinishedLi
         try
         {
             getActiveChannels = new GetActiveChannels(getApplicationContext());
-            getActiveChannels.setOnLoadFinishedListener(this);
-            getActiveChannels.setOnLoadFailedListener(this);
             getStatusNow = new GetStatusNow(getApplicationContext());
         }
         catch (NoConnectionException e)
@@ -60,7 +57,6 @@ public class GameNightActivity extends ActionBarActivity implements OnFinishedLi
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     public void onLoadFinished() {
         if(request == 1){
             if(getActiveChannels.getResultResponse() != null) {
@@ -81,7 +77,6 @@ public class GameNightActivity extends ActionBarActivity implements OnFinishedLi
         }
     }
 
-    @Override
     public void onLoadFailed() {
         Log.e("onLoadFailed", "Executing OnLoadFailed");
         Log.e("onLoadFailed", "Something went wrong in request " + request);

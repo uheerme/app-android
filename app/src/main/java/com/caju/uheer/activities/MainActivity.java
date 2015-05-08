@@ -21,15 +21,13 @@ import com.caju.utils.getRequests.GetChannel;
 import com.caju.utils.getRequests.GetChannelMusic;
 import com.caju.utils.getRequests.GetMusic;
 import com.caju.utils.getRequests.GetStatusNow;
-import com.caju.uheer.infrastructure.interfaces.OnFailedListener;
-import com.caju.uheer.infrastructure.interfaces.OnFinishedListener;
 import com.caju.utils.postRequests.PostMusic;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends ActionBarActivity implements OnFinishedListener, OnFailedListener {
+public class MainActivity extends Activity {
 
     private SharedPreferences app_settings;
     private SharedPreferences.Editor editor;
@@ -71,8 +69,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
         try {
             getChannel = new GetChannel(id, getApplicationContext());
-            getChannel.setOnLoadFinishedListener(this);
-            getChannel.setOnLoadFailedListener(this);
             getStatusNow = new GetStatusNow(getApplicationContext());
         } catch (NoConnectionException e) {
             textView.setText("You have no connection.");
@@ -94,8 +90,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
         try {
             getChannelMusic = new GetChannelMusic(id, getApplicationContext());
-            getChannelMusic.setOnLoadFinishedListener(this);
-            getChannelMusic.setOnLoadFailedListener(this);
         } catch (NoConnectionException e) {
             textView.setText("You have no connection.");
         } catch (NoIDSelectedException e) {
@@ -129,8 +123,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
         try {
             getMusic = new GetMusic(id, getApplicationContext());
-            getMusic.setOnLoadFinishedListener(this);
-            getMusic.setOnLoadFailedListener(this);
         } catch (NoConnectionException e) {
             textView.setText("You have no connection.");
         } catch (IOException e) {
@@ -146,6 +138,10 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
         Intent intent = new Intent(this, GameNightActivity.class);
         startActivity(intent);
+    }
+
+    public void goToChannelsActivity(View view) {
+        startActivity(new Intent(this, ChannelsActivity.class));
     }
 
     @Override
@@ -170,7 +166,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
     /* This method is called after GetChannel is finished */
     public void onLoadFinished() {
         System.out.println("Executing OnLoadFinished");
@@ -220,7 +215,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
         }
     }
 
-    @Override
     public void onLoadFailed() {
         System.out.println("Executing OnLoadFailed");
         textView.setText("Something went wrong in op " + lastButtonClicked);
@@ -248,8 +242,6 @@ public class MainActivity extends ActionBarActivity implements OnFinishedListene
 
             try {
                 postMusic = new PostMusic(getApplicationContext(), id, files);
-                postMusic.setOnLoadFinishedListener(this);
-                postMusic.setOnLoadFailedListener(this);
             } catch (NoConnectionException e) {
                 textView.setText("You have no connection.");
             } catch (NoIDSelectedException e) {

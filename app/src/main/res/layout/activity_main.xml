@@ -9,50 +9,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/channel_id"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/type_here_channel_ID"
-        android:textAlignment="center"
-        android:inputType="number"
-        android:textSize="20sp" />
-
     <Button
-        android:id="@+id/fetch_channel"
+        android:id="@+id/channels"
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
-        android:onClick="getChannel"
-        android:text="@string/fetch_channel" />
-
-    <Button
-        android:id="@+id/fetch_channel_musics"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:onClick="getChannelMusics"
-        android:text="@string/fetch_channel_musics" />
-
-    <Button
-        android:id="@+id/upload_music"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:onClick="postMusic"
-        android:text="@string/upload_music" />
-
-    <Button
-        android:id="@+id/fetch_music"
-        android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:layout_marginLeft="50dp"
-        android:layout_marginRight="50dp"
-        android:onClick="getMusic"
-        android:text="@string/fetch_music" />
+        android:onClick="goToChannelsActivity"
+        android:text="@string/channels" />
 
     <Button
         android:id="@+id/game_night"
@@ -62,20 +26,6 @@
         android:layout_marginRight="50dp"
         android:onClick="gameNightTest"
         android:text="@string/game_night" />
-
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-            android:id="@+id/result_container"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/result_container"
-            android:textSize="20sp" />
-
-    </ScrollView>
 
 
 </LinearLayout>
