@@ -44,7 +44,7 @@ public class GameNightActivity extends Activity {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-                channels = restTemplate.getForObject(Routes.CHANNELS + Routes.ACTIVE, Channel[].class);
+                channels = restTemplate.getForObject(Routes.CHANNELS + "/active", Channel[].class);
             } catch (Exception e) {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
@@ -71,7 +71,7 @@ public class GameNightActivity extends Activity {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-                currentTimeViewModel = restTemplate.getForObject(Routes.NOW, CurrentTimeViewModel.class);
+                currentTimeViewModel = restTemplate.getForObject(Routes.STATUS + "now/", CurrentTimeViewModel.class);
             } catch (Exception e) {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
@@ -81,7 +81,11 @@ public class GameNightActivity extends Activity {
 
         @Override
         protected void onPostExecute(CurrentTimeViewModel currentTimeViewModel) {
-            Log.d("GameNightActivity", currentTimeViewModel.Now.toString());
+            if (currentTimeViewModel.Now != null) {
+                Log.d("GameNightActivity", currentTimeViewModel.Now.toString());
+            } else {
+                Log.d("GameNightActivity", "currentTimeViewModel.Now is null!");
+            }
 
             currentTime = currentTimeViewModel;
         }
