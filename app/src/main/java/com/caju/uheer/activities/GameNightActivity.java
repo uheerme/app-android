@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.core.CurrentTimeViewModel;
-import com.caju.uheer.infrastructure.interfaces.Routes;
+import com.caju.uheer.interfaces.Routes;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -49,13 +49,12 @@ public class GameNightActivity extends Activity {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
 
-            return channels;
+            return activeChannels = channels;
         }
 
         @Override
         protected void onPostExecute(Channel[] channels) {
-            activeChannels = channels;
-
+            Log.d("GameNightActivity", "Active channels retrieved!");
             for (Channel channel : channels) {
                 Log.d("GameNightActivity", channel.Name);
             }
@@ -76,7 +75,7 @@ public class GameNightActivity extends Activity {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
 
-            return currentTimeViewModel;
+            return currentTime = currentTimeViewModel;
         }
 
         @Override
@@ -86,8 +85,6 @@ public class GameNightActivity extends Activity {
             } else {
                 Log.d("GameNightActivity", "currentTimeViewModel.Now is null!");
             }
-
-            currentTime = currentTimeViewModel;
         }
     }
 }

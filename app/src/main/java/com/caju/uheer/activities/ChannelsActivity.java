@@ -9,7 +9,7 @@ import android.view.MenuItem;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.infrastructure.interfaces.Routes;
+import com.caju.uheer.interfaces.Routes;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
