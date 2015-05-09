@@ -17,7 +17,7 @@ public class Channel {
     public int CurrentId;
     public Date CurrentStartTime;
 
-    public List<Music> Musics;
+    public Music[] Musics;
 
     public Date DateCreated;
     public Date DateUpdated;

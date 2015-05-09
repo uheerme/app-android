@@ -38,9 +38,9 @@ public class ListenActivity extends AppCompatActivity {
     }
 
     protected void onChannelLoad() {
-        Uri musicStreamUri = Uri.parse(Routes.MUSICS + channel.Musics.get(0).Id + "/stream");
-
-        player.play(musicStreamUri);
+        player
+                .take(channel)
+                .start();
     }
 
     @Override
