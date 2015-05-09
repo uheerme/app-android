@@ -1,7 +1,7 @@
 package com.caju.uheer.core;
 
-import java.security.Timestamp;
+import java.util.Date;
 
 public class CurrentTimeViewModel {
-    public Timestamp Now;
+    public Date Now;
 }
