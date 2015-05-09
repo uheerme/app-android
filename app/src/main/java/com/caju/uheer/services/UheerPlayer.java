@@ -30,11 +30,24 @@ public class UheerPlayer {
             player.stop();
         }
 
+        Log.d("UheerPlayer", "Starting to play " + musicUrl.toString());
+
         try {
             player.setDataSource(context, musicUrl);
             player.prepareAsync();
-            player.seekTo(startingAt);
-            player.start();
+
+            if (startingAt > 0) {
+                player.seekTo(startingAt);
+            }
+
+            player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    player.start();
+                }
+            });
+
+            Log.d("UheerPlayer", "The music has started!");
         } catch (IOException e) {
             Log.e("UheerPlayer", e.getMessage());
         } catch (Exception e) {

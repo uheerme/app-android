@@ -5,6 +5,8 @@ import java.util.Date;
 public class Music {
     public int Id;
 
+    public int ChannelId;
+
     public String Name;
     public int SizeInBytes;
     public int LengthInMilliseconds;
