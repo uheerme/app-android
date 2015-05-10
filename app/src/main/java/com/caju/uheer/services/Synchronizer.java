@@ -96,6 +96,8 @@ public class Synchronizer {
             }
         }
 
+        Log.d("Synchronizer", "Synchronization complete!");
+
         // If there is a callback, invoke it passing the timeline in seconds, which represents the current position of the song's playment.
         if (listener != null) {
             listener.onSynchronized(timeline);

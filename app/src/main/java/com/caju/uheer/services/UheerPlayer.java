@@ -80,7 +80,7 @@ public class UheerPlayer {
     }
 
     protected UheerPlayer play(final int startingAt) {
-        Music music = playsetIterator.getCurrent();
+        final Music music = playsetIterator.getCurrent();
         if (music == null) {
             Log.e("UheerPlayer", "Play attempt on a channel which is stalled.");
             return this;
@@ -92,24 +92,21 @@ public class UheerPlayer {
             player.stop();
         }
 
-        Log.d("UheerPlayer", "Starting to play " + streamUrl.toString());
-
         try {
+            Log.d("UheerPlayer", "Preparing to buffer " + streamUrl.toString());
             player.setDataSource(context, streamUrl);
             player.prepareAsync();
-
-            if (startingAt > 0) {
-                player.seekTo(startingAt);
-            }
 
             startTime = new Date().getTime();
 
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-//                    int timeFrame = (int)(new Date().getTime() - startTime);
-//
-//                    player.seekTo(player.getCurrentPosition() + timeFrame);
+                    if (startingAt > 0) {
+                        player.seekTo(startingAt);
+                    }
+
+                    Log.d("UheerPlayer", music.Name + " will begin to play!");
                     player.start();
                 }
             });
