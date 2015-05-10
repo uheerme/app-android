@@ -16,7 +16,6 @@ import java.util.Date;
 public class UheerPlayer {
     private Context context;
     private MediaPlayer player;
-    private long startTime;
 
     private Channel channel;
     private PlaysetIterator playsetIterator;
@@ -99,16 +98,17 @@ public class UheerPlayer {
             player.setDataSource(context, streamUrl);
             player.prepareAsync();
 
-            startTime = new Date().getTime();
+            final long preparationStartTime = new Date().getTime();
 
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    if (startingAt > 0) {
-                        player.seekTo(startingAt);
-                    }
-
                     Log.d("UheerPlayer", music.Name + " will begin to play!");
+
+                    // Let's start the song at the startingAt value + preparation time-frame.
+                    int timeline = startingAt + (int) (new Date().getTime() - preparationStartTime);
+
+                    player.seekTo(timeline);
                     player.start();
                 }
             });
@@ -123,8 +123,6 @@ public class UheerPlayer {
                     synchronizer.translatePlayset();
                 }
             });
-
-            Log.d("UheerPlayer", "The music has started!");
         } catch (IOException e) {
             Log.e("UheerPlayer", e.toString());
         } catch (Exception e) {
