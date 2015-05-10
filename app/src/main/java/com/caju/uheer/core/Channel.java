@@ -1,7 +1,6 @@
 package com.caju.uheer.core;
 
 import java.util.Date;
-import java.util.List;
 
 public class Channel {
 
@@ -22,4 +21,7 @@ public class Channel {
     public Date DateCreated;
     public Date DateUpdated;
     public Date DateDeactivated;
+
+    @Override
+    public String toString(){ return this.Name;}
 }
