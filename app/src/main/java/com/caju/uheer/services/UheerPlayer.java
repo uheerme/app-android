@@ -11,10 +11,12 @@ import com.caju.uheer.interfaces.Routes;
 import com.caju.uheer.services.exceptions.UheerPlayerException;
 
 import java.io.IOException;
+import java.util.Date;
 
 public class UheerPlayer {
     private Context context;
     private MediaPlayer player;
+    private long startTime;
 
     private Channel channel;
     private PlaysetIterator playsetIterator;
@@ -52,27 +54,38 @@ public class UheerPlayer {
         }
 
         if (synchronizer == null) {
-            synchronizer = new Synchronizer(playsetIterator);
+            synchronizer = new Synchronizer(channel, playsetIterator);
         }
 
-        playsetIterator.restoreCurrentToOriginals();
+        Music current = playsetIterator
+                .restoreCurrentToOriginals()
+                .getCurrent();
 
-        Music current = playsetIterator.getCurrent();
         if (current == null) {
             Log.e("UheerPlayer", channel.Name + " is currently stalled.");
         }
 
-        /// TODO: receive music from Synchronizer.
-        Music music = channel.Musics[0];
+        Log.d("Synchronizer", "Let's start playing " + channel.Name + "!");
 
-        return play(music);
+        synchronizer.setOnSynchronizedListener(new Synchronizer.OnSynchronizedListener() {
+            @Override
+            public void onSynchronized(long startAt) {
+                play((int)startAt);
+            }
+        });
+
+        synchronizer.start();
+
+        return this;
     }
 
-    protected UheerPlayer play(Music music) {
-        return play(music, 0);
-    }
+    protected UheerPlayer play(final int startingAt) {
+        Music music = playsetIterator.getCurrent();
+        if (music == null) {
+            Log.e("UheerPlayer", "Play attempt on a channel which is stalled.");
+            return this;
+        }
 
-    protected UheerPlayer play(Music music, int startingAt) {
         Uri streamUrl = Uri.parse(Routes.MUSICS + music.Id + "/stream");
 
         if (player.isPlaying()) {
@@ -89,9 +102,14 @@ public class UheerPlayer {
                 player.seekTo(startingAt);
             }
 
+            startTime = new Date().getTime();
+
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
+//                    int timeFrame = (int)(new Date().getTime() - startTime);
+//
+//                    player.seekTo(player.getCurrentPosition() + timeFrame);
                     player.start();
                 }
             });
