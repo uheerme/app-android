@@ -92,6 +92,8 @@ public class UheerPlayer {
             player.stop();
         }
 
+        player.reset();
+
         try {
             Log.d("UheerPlayer", "Preparing to buffer " + streamUrl.toString());
             player.setDataSource(context, streamUrl);
@@ -124,9 +126,9 @@ public class UheerPlayer {
 
             Log.d("UheerPlayer", "The music has started!");
         } catch (IOException e) {
-            Log.e("UheerPlayer", e.getMessage());
+            Log.e("UheerPlayer", e.toString());
         } catch (Exception e) {
-            Log.e("UheerPlayer", e.getMessage());
+            Log.e("UheerPlayer", e.toString());
         }
 
         return this;
