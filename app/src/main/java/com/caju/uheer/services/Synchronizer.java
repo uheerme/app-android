@@ -3,138 +3,126 @@ package com.caju.uheer.services;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.caju.uheer.core.BackendStatus;
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.core.CurrentTimeViewModel;
 import com.caju.uheer.core.Music;
 import com.caju.uheer.interfaces.Routes;
+import com.caju.uheer.services.infrastructure.PlaylistItem;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Synchronizer {
-    private OnSynchronizedListener listener;
-    private PlaysetIterator playsetIterator;
+
+    private boolean isSynced;
+
     private Channel channel;
-    private int channelsLength;
+    private long totalPlaylistLength;
 
-    boolean _synchronized;
-    long localTime, remoteTime;
+    private long localTime;
+    private long remoteTime;
 
-    public interface OnSynchronizedListener {
-        public void onSynchronized(long startAt);
-    }
+    private ISyncedListener syncedListener;
+    public interface ISyncedListener { void onSyned(); }
 
-    public Synchronizer(Channel channel, PlaysetIterator playsetIterator) {
-        this.playsetIterator = playsetIterator;
+    public Synchronizer(Channel channel) {
         this.channel = channel;
+
+        totalPlaylistLength = 0;
+
+        for (Music music : channel.Musics) {
+            totalPlaylistLength += music.LengthInMilliseconds;
+        }
     }
 
-    public Synchronizer updateSynchronizedTime() {
-        long now = System.currentTimeMillis();
+    public Synchronizer updateTimes() {
+        long frame = new Date().getTime() - localTime;
 
-        long timeFrame = now - localTime;
-
-        localTime += timeFrame;
-        remoteTime += timeFrame;
+        localTime += frame;
+        remoteTime += frame;
 
         return this;
     }
 
-    public Synchronizer setOnSynchronizedListener(OnSynchronizedListener listener) {
-        this.listener = listener;
-        return this;
-    }
-
-    public Synchronizer start() {
+    public Synchronizer sync() {
         Log.d("Synchronizer", "Synchronization procedure method has started.");
 
-        _synchronized = false;
+        isSynced = false;
 
-        // Let's find the channel's length. This information will help us optimizing the
-        // sync operation performance when the channel has been on for many hours.
-        channelsLength = 0;
-        for (Music music : channel.Musics) {
-            channelsLength += music.LengthInMilliseconds;
-        }
-
-        new CristiansTask().execute();
+        new CristianTask().execute();
 
         return this;
     }
 
-    /// Translates all the time-frame gotten from the server and moves
-    /// the stack to the music that is currently being played.
-    public Synchronizer translatePlayset() {
-        this.updateSynchronizedTime();
+    public PlaylistItem findCurrent() {
+        updateTimes();
 
-        long startTime = channel.CurrentStartTime.getTime();
-        long timeline = this.remoteTime - startTime;
+        PlaylistItem item = PlaylistItem.currentOf(channel);
 
-        if (timeline > channelsLength && !channel.Loops) {
-            playsetIterator.kill();
-            return this;
+        long timeline = remoteTime - channel.CurrentStartTime.getTime();
+
+        // If the timeline is greater than thte playlist length and the
+        // channel doesn't loop, we now the channel is stalled!
+        if (timeline > totalPlaylistLength && !channel.Loops) {
+            return null;
         }
 
-        // The channel may have looped already and the cycle would put us in the exact same spot.
-        // We don't need to iterate throughout the entire list to check this. Instead, let's just consider the last one.
-        if (channelsLength > 0) {
-            timeline %= channelsLength;
+        // Disregards all loops that have occurred in the playlist.
+        timeline %= totalPlaylistLength;
+
+        while (timeline > item.getMusic().LengthInMilliseconds) {
+            timeline -= item.getMusic().LengthInMilliseconds;
+            item.next();
         }
 
-        Music current = playsetIterator.getCurrent();
+        item.setStartingAt(timeline);
 
-        while (timeline > current.LengthInMilliseconds) {
-            timeline -= current.LengthInMilliseconds;
+        return item;
+    }
 
-            current = playsetIterator.next().getCurrent();
-            if (current == null) {
-                return this;
-            }
-        }
-
-        Log.d("Synchronizer", "Synchronization complete!");
-
-        // If there is a callback, invoke it passing the timeline in seconds, which represents the current position of the song's playment.
-        if (listener != null) {
-            listener.onSynchronized(timeline);
-        }
+    public Synchronizer onSyncedListener(ISyncedListener listener) {
+        this.syncedListener = listener;
 
         return this;
     }
 
 
-    private class CristiansTask extends AsyncTask<Void, Void, CurrentTimeViewModel> {
+    private class CristianTask extends AsyncTask<Void, Void, Void> {
         @Override
-        protected CurrentTimeViewModel doInBackground(Void... params) {
-            CurrentTimeViewModel currentTimeViewModel = null;
-            localTime = System.currentTimeMillis();
-
+        protected Void doInBackground(Void... params) {
             try {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-                currentTimeViewModel = restTemplate.getForObject(Routes.STATUS + "now/", CurrentTimeViewModel.class);
+                localTime = System.currentTimeMillis();
+
+                BackendStatus response = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
+
+                long frame = System.currentTimeMillis() - localTime;
+
+                remoteTime = response.Now.getTime();
+                remoteTime += frame / 2;
+                localTime += frame / 2;
+
+                isSynced = true;
+
+                Log.d("Synchronizer", "The synchronization window was " + frame + "ms.");
+
             } catch (Exception e) {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
 
-            long timeFrame = System.currentTimeMillis() - localTime;
+            if (syncedListener != null) {
+                syncedListener.onSyned();
+            }
 
-            remoteTime = currentTimeViewModel.Now.getTime();
-            remoteTime += timeFrame / 2;
-            localTime += timeFrame / 2;
-
-            Log.d("Synchronizer", "The synchronization window was " + timeFrame + "ms.");
-            return currentTimeViewModel;
+            return null;
         }
-
-        @Override
-        protected void onPostExecute(CurrentTimeViewModel currentTimeViewModel) {
-            translatePlayset();
-        }
+    }
+    
+    public boolean isSynchronized() {
+        return isSynced;
     }
 }

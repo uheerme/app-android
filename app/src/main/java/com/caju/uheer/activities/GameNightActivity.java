@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.core.CurrentTimeViewModel;
+import com.caju.uheer.core.BackendStatus;
 import com.caju.uheer.interfaces.Routes;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -17,7 +17,7 @@ import org.springframework.web.client.RestTemplate;
 public class GameNightActivity extends Activity {
 
     private Channel[] activeChannels;
-    private CurrentTimeViewModel currentTime;
+    private BackendStatus currentTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,29 +61,29 @@ public class GameNightActivity extends Activity {
         }
     }
 
-    private class StatusNowTask extends AsyncTask<Void, Void, CurrentTimeViewModel> {
+    private class StatusNowTask extends AsyncTask<Void, Void, BackendStatus> {
         @Override
-        protected CurrentTimeViewModel doInBackground(Void... params) {
-            CurrentTimeViewModel currentTimeViewModel = null;
+        protected BackendStatus doInBackground(Void... params) {
+            BackendStatus backendStatus = null;
 
             try {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-                currentTimeViewModel = restTemplate.getForObject(Routes.STATUS + "now/", CurrentTimeViewModel.class);
+                backendStatus = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
             } catch (Exception e) {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
 
-            return currentTime = currentTimeViewModel;
+            return currentTime = backendStatus;
         }
 
         @Override
-        protected void onPostExecute(CurrentTimeViewModel currentTimeViewModel) {
-            if (currentTimeViewModel.Now != null) {
-                Log.d("GameNightActivity", currentTimeViewModel.Now.toString());
+        protected void onPostExecute(BackendStatus backendStatus) {
+            if (backendStatus.Now != null) {
+                Log.d("GameNightActivity", backendStatus.Now.toString());
             } else {
-                Log.d("GameNightActivity", "currentTimeViewModel.Now is null!");
+                Log.d("GameNightActivity", "backendStatus.Now is null!");
             }
         }
     }

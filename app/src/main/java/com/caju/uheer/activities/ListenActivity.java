@@ -27,7 +27,6 @@ public class ListenActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_listen);
 
-        player = new UheerPlayer(getApplicationContext());
 
         channel_id = getIntent().getIntExtra("channel_id", 0);
         if (channel_id > 0) {
@@ -38,8 +37,7 @@ public class ListenActivity extends AppCompatActivity {
     }
 
     protected void onChannelLoad() {
-        player
-                .take(channel)
+        player = new UheerPlayer(getApplicationContext(), channel)
                 .start();
     }
 

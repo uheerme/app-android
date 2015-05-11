@@ -8,7 +8,9 @@ import android.util.Log;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.core.Music;
 import com.caju.uheer.interfaces.Routes;
+import com.caju.uheer.services.exceptions.EndOfPlaylistException;
 import com.caju.uheer.services.exceptions.UheerPlayerException;
+import com.caju.uheer.services.infrastructure.PlaylistItem;
 
 import java.io.IOException;
 import java.util.Date;
@@ -17,75 +19,42 @@ public class UheerPlayer {
     private Context context;
     private MediaPlayer player;
 
-    private Channel channel;
-    private PlaysetIterator playsetIterator;
     private Synchronizer synchronizer;
 
-    public UheerPlayer(Context context) {
-        this(context, null);
-    }
+    private PlaylistItem currentOnPlay;
+    private long prepareFrame;
 
     public UheerPlayer(Context context, Channel channel) {
-        this(context, channel, new MediaPlayer());
-    }
-
-    public UheerPlayer(Context context, Channel channel, MediaPlayer player) {
         this.context = context;
-        this.channel = channel;
-        this.player = player;
-    }
 
-    public UheerPlayer stop() {
-        if (player.isPlaying()) {
-            player.stop();
-        }
-
-        return this;
+        this.synchronizer = new Synchronizer(channel);
+        this.player = new MediaPlayer();
     }
 
     public UheerPlayer start() {
-        if (channel == null) {
-            throw new UheerPlayerException("Cannot start an empty channel.");
-        }
-
-        if (playsetIterator == null) {
-            playsetIterator = new PlaysetIterator(channel);
-        }
-
-        if (synchronizer == null) {
-            synchronizer = new Synchronizer(channel, playsetIterator);
-        }
-
-        Music current = playsetIterator
-                .restoreCurrentToOriginals()
-                .getCurrent();
-
-        if (current == null) {
-            Log.e("UheerPlayer", channel.Name + " is currently stalled.");
-        }
-
-        Log.d("Synchronizer", "Let's start playing " + channel.Name + "!");
-
-        synchronizer.setOnSynchronizedListener(new Synchronizer.OnSynchronizedListener() {
+        synchronizer.onSyncedListener(new Synchronizer.ISyncedListener() {
             @Override
-            public void onSynchronized(long startAt) {
-                play((int)startAt);
+            public void onSyned() {
+                try {
+                    play(synchronizer.findCurrent());
+                } catch (EndOfPlaylistException e) {
+                    Log.d("UheerPlayer", "We've reached the end of the playlist!");
+                }
             }
         });
 
-        synchronizer.start();
+        synchronizer.sync();
 
         return this;
     }
 
-    protected UheerPlayer play(final int startingAt) {
-        final Music music = playsetIterator.getCurrent();
-        if (music == null) {
+    protected UheerPlayer play(PlaylistItem item) {
+        if (item.getMusic() == null) {
             Log.e("UheerPlayer", "Play attempt on a channel which is stalled.");
             return this;
         }
 
-        Uri streamUrl = Uri.parse(Routes.MUSICS + music.Id + "/stream");
+        Uri streamUrl = Uri.parse(Routes.MUSICS + item.getMusic().Id + "/stream");
 
         if (player.isPlaying()) {
             player.stop();
@@ -98,17 +67,23 @@ public class UheerPlayer {
             player.setDataSource(context, streamUrl);
             player.prepareAsync();
 
-            final long preparationStartTime = new Date().getTime();
+            currentOnPlay = item;
+            prepareFrame = new Date().getTime();
 
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    Log.d("UheerPlayer", music.Name + " will begin to play!");
+                    prepareFrame = new Date().getTime() - prepareFrame;
 
-                    // Let's start the song at the startingAt value + preparation time-frame.
-                    int timeline = startingAt + (int) (new Date().getTime() - preparationStartTime);
+                    Log.d("UheerPlayer", "The preparation frame was " + prepareFrame);
 
-                    player.seekTo(timeline);
+                    // It took us a while to prepare (prepareFrame).
+                    // Let's also consider this before playing.
+                    long startingAt = currentOnPlay.getStartingAt() + prepareFrame;
+
+                    Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " will start to play at " +startingAt +"!");
+
+                    player.seekTo((int) startingAt);
                     player.start();
                 }
             });
@@ -116,11 +91,13 @@ public class UheerPlayer {
             player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-                    Music music = playsetIterator.getCurrent();
-                    Log.d("UheerPlayer", music.Name + " completed!");
+                    Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " completed!");
 
-                    playsetIterator.restoreCurrentToOriginals();
-                    synchronizer.translatePlayset();
+                    try {
+                        play(synchronizer.findCurrent());
+                    } catch (EndOfPlaylistException e) {
+                        Log.d("UheerPlayer", "We've reached the end of the playlist!");
+                    }
                 }
             });
         } catch (IOException e) {
@@ -129,21 +106,6 @@ public class UheerPlayer {
             Log.e("UheerPlayer", e.toString());
         }
 
-        return this;
-    }
-
-    public UheerPlayer take(Channel channel) {
-        this.channel = channel;
-        return this;
-    }
-
-    public UheerPlayer take(PlaysetIterator playsetIterator) {
-        this.playsetIterator = playsetIterator;
-        return this;
-    }
-
-    public UheerPlayer take(Synchronizer synchronizer) {
-        this.synchronizer = synchronizer;
         return this;
     }
 }
