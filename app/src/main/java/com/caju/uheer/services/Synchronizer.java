@@ -12,8 +12,6 @@ import com.caju.uheer.services.infrastructure.PlaylistItem;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
-
 public class Synchronizer {
 
     private boolean isSynced;
@@ -21,8 +19,7 @@ public class Synchronizer {
     private Channel channel;
     private long totalPlaylistLength;
 
-    private long localTime;
-    private long remoteTime;
+    private long remoteAndLocalTimeDifference;
 
     private ISyncedListener syncedListener;
     public interface ISyncedListener { void onSyned(); }
@@ -37,15 +34,6 @@ public class Synchronizer {
         }
     }
 
-    public Synchronizer updateTimes() {
-        long frame = new Date().getTime() - localTime;
-
-        localTime += frame;
-        remoteTime += frame;
-
-        return this;
-    }
-
     public Synchronizer sync() {
         Log.d("Synchronizer", "Synchronization procedure method has started.");
 
@@ -57,13 +45,13 @@ public class Synchronizer {
     }
 
     public PlaylistItem findCurrent() {
-        updateTimes();
 
         PlaylistItem item = PlaylistItem.currentOf(channel);
 
+        long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
 
-        // If the timeline is greater than thte playlist length and the
+        // If the timeline is greater than the playlist length and the
         // channel doesn't loop, we now the channel is stalled!
         if (timeline > totalPlaylistLength && !channel.Loops) {
             return null;
@@ -96,19 +84,19 @@ public class Synchronizer {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-                localTime = System.currentTimeMillis();
+                long localTime = System.currentTimeMillis();
 
                 BackendStatus response = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
 
-                long frame = System.currentTimeMillis() - localTime;
+                long roundTimeTrip = System.currentTimeMillis() - localTime;
 
-                remoteTime = response.Now.getTime();
-                remoteTime += frame / 2;
-                localTime += frame / 2;
+                Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
+
+                remoteAndLocalTimeDifference = response.Now.getTime();
+                remoteAndLocalTimeDifference += roundTimeTrip / 2;
+                remoteAndLocalTimeDifference -= System.currentTimeMillis();
 
                 isSynced = true;
-
-                Log.d("Synchronizer", "The synchronization window was " + frame + "ms.");
 
             } catch (Exception e) {
                 Log.e("GameNightActivity", e.getMessage(), e);
