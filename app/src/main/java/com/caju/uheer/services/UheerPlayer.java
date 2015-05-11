@@ -6,10 +6,8 @@ import android.net.Uri;
 import android.util.Log;
 
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.core.Music;
 import com.caju.uheer.interfaces.Routes;
 import com.caju.uheer.services.exceptions.EndOfPlaylistException;
-import com.caju.uheer.services.exceptions.UheerPlayerException;
 import com.caju.uheer.services.infrastructure.PlaylistItem;
 
 import java.io.IOException;
@@ -22,7 +20,6 @@ public class UheerPlayer {
     private Synchronizer synchronizer;
 
     private PlaylistItem currentOnPlay;
-    private long prepareFrame;
 
     public UheerPlayer(Context context, Channel channel) {
         this.context = context;
@@ -36,7 +33,9 @@ public class UheerPlayer {
             @Override
             public void onSyned() {
                 try {
-                    play(synchronizer.findCurrent());
+                    PlaylistItem item = synchronizer.findCurrent();
+                    long prepareStart = new Date().getTime();
+                    play(item, prepareStart);
                 } catch (EndOfPlaylistException e) {
                     Log.d("UheerPlayer", "We've reached the end of the playlist!");
                 }
@@ -48,7 +47,7 @@ public class UheerPlayer {
         return this;
     }
 
-    protected UheerPlayer play(PlaylistItem item) {
+    protected UheerPlayer play(PlaylistItem item, final long prepareStart) {
         if (item.getMusic() == null) {
             Log.e("UheerPlayer", "Play attempt on a channel which is stalled.");
             return this;
@@ -68,23 +67,20 @@ public class UheerPlayer {
             player.prepareAsync();
 
             currentOnPlay = item;
-            prepareFrame = new Date().getTime();
 
             player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
-                    prepareFrame = new Date().getTime() - prepareFrame;
-
-                    Log.d("UheerPlayer", "The preparation frame was " + prepareFrame);
-
                     // It took us a while to prepare (prepareFrame).
                     // Let's also consider this before playing.
+                    long prepareFrame = new Date().getTime() - prepareStart;
                     long startingAt = currentOnPlay.getStartingAt() + prepareFrame;
-
-                    Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " will start to play at " +startingAt +"!");
 
                     player.seekTo((int) startingAt);
                     player.start();
+
+                    Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " will start to play at " +startingAt +"!");
+                    Log.d("UheerPlayer", "The preparation frame was " + prepareFrame);
                 }
             });
 
@@ -94,7 +90,8 @@ public class UheerPlayer {
                     Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " completed!");
 
                     try {
-                        play(synchronizer.findCurrent());
+                        long prepareStart = new Date().getTime();
+                        play(synchronizer.findCurrent(), prepareStart);
                     } catch (EndOfPlaylistException e) {
                         Log.d("UheerPlayer", "We've reached the end of the playlist!");
                     }
