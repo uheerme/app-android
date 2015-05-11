@@ -75,6 +75,10 @@ public class Synchronizer {
         }
 
         GlobalVariables.playingSong = item.getMusic();
+
+        //Recalculating timeline to get better precision.
+        timeline += System.currentTimeMillis() - remoteTime + remoteAndLocalTimeDifference;
+
         item.setStartingAt(timeline);
 
         return item;
@@ -85,7 +89,6 @@ public class Synchronizer {
 
         return this;
     }
-
 
     private class CristianTask extends AsyncTask<Void, Void, Void> {
         @Override
@@ -103,7 +106,6 @@ public class Synchronizer {
                     long roundTimeTrip = System.currentTimeMillis() - localTime;
 
                     Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
-                    GlobalVariables.roundTimeTrip = roundTimeTrip;
 
                     remoteAndLocalTimeDifference = response.Now.getTime();
                     remoteAndLocalTimeDifference += roundTimeTrip / 2;
@@ -121,6 +123,7 @@ public class Synchronizer {
                     sum += rttAndRemote.get(rtt.get(i));
                 }
                 remoteAndLocalTimeDifference = sum/RTT_NUMBER_TO_CALC_AVARAGE;
+                GlobalVariables.roundTimeTrip = (long)rtt.get(0);
 
                 isSynced = true;
 
