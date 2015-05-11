@@ -1,15 +1,17 @@
 package com.caju.uheer.activities;
 
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
+import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.interfaces.Routes;
 import com.caju.uheer.services.UheerPlayer;
 
@@ -39,6 +41,10 @@ public class ListenActivity extends AppCompatActivity {
     protected void onChannelLoad() {
         player = new UheerPlayer(getApplicationContext(), channel)
                 .start();
+        TextView quality = (TextView)findViewById(R.id.quality);
+        quality.setText("Round Time Trip was "+ GlobalVariables.roundTimeTrip+" ms (Sync quality).");
+        TextView channelNameTextView = (TextView)findViewById(R.id.channel_name);
+        channelNameTextView.setText(channel.Name);
     }
 
     @Override
@@ -48,12 +54,20 @@ public class ListenActivity extends AppCompatActivity {
         return true;
     }
 
+    public void getGlobals(View view){
+        TextView quality = (TextView)findViewById(R.id.quality);
+        quality.setText("Round Time Trip was "+ GlobalVariables.roundTimeTrip+" ms (Sync quality)..");
+        TextView songNameTextView = (TextView)findViewById(R.id.song_name);
+        songNameTextView.setText(GlobalVariables.playingSong.Id+" - "+GlobalVariables.playingSong.Name);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
+        getGlobals(new View(getApplicationContext()));
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {

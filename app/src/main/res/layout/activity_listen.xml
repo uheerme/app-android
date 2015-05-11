@@ -7,6 +7,36 @@
     tools:context="com.caju.uheer.activities.ListenActivity">
 
     <TextView android:text="@string/listening" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:id="@+id/listening"
+        android:layout_height="wrap_content"
+        android:onClick="getGlobals"
+    />
+
+    <TextView
+        android:id="@+id/quality"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="getGlobals"
+        android:text="quality"
+        android:layout_below="@+id/listening"
+        />
+
+    <TextView
+        android:id="@+id/channel_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="getGlobals"
+        android:text="channelName"
+        android:layout_below="@+id/quality"
+        />
+
+    <TextView
+        android:id="@+id/song_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="getGlobals"
+        android:text="song name"
+        android:layout_below="@+id/channel_name"
+        />
 
 </RelativeLayout>

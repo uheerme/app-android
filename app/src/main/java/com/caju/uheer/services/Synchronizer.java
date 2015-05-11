@@ -6,6 +6,7 @@ import android.util.Log;
 import com.caju.uheer.core.BackendStatus;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.core.Music;
+import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.interfaces.Routes;
 import com.caju.uheer.services.infrastructure.PlaylistItem;
 
@@ -65,6 +66,7 @@ public class Synchronizer {
             item.next();
         }
 
+        GlobalVariables.playingSong = item.getMusic();
         item.setStartingAt(timeline);
 
         return item;
@@ -91,6 +93,7 @@ public class Synchronizer {
                 long roundTimeTrip = System.currentTimeMillis() - localTime;
 
                 Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
+                GlobalVariables.roundTimeTrip= roundTimeTrip;
 
                 remoteAndLocalTimeDifference = response.Now.getTime();
                 remoteAndLocalTimeDifference += roundTimeTrip / 2;
