@@ -13,7 +13,15 @@ import com.caju.uheer.services.infrastructure.PlaylistItem;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 public class Synchronizer {
+
+    final static int CHRISTIAN_ITERATION_NUMBER = 10;
+    final static int RTT_NUMBER_TO_CALC_AVARAGE = 3;
 
     private boolean isSynced;
 
@@ -86,18 +94,33 @@ public class Synchronizer {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
-                long localTime = System.currentTimeMillis();
+                HashMap<Long, Long> rttAndRemote = new HashMap<Long, Long>();
+                for(int i=0; i<CHRISTIAN_ITERATION_NUMBER; i++) {
+                    long localTime = System.currentTimeMillis();
 
-                BackendStatus response = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
+                    BackendStatus response = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
 
-                long roundTimeTrip = System.currentTimeMillis() - localTime;
+                    long roundTimeTrip = System.currentTimeMillis() - localTime;
 
-                Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
-                GlobalVariables.roundTimeTrip= roundTimeTrip;
+                    Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
+                    GlobalVariables.roundTimeTrip = roundTimeTrip;
 
-                remoteAndLocalTimeDifference = response.Now.getTime();
-                remoteAndLocalTimeDifference += roundTimeTrip / 2;
-                remoteAndLocalTimeDifference -= System.currentTimeMillis();
+                    remoteAndLocalTimeDifference = response.Now.getTime();
+                    remoteAndLocalTimeDifference += roundTimeTrip / 2;
+                    remoteAndLocalTimeDifference -= System.currentTimeMillis();
+                    rttAndRemote.put(roundTimeTrip, remoteAndLocalTimeDifference);
+                }
+
+                Log.d("rttAndRemote", rttAndRemote.toString());
+                List rtt = new ArrayList(rttAndRemote.keySet());
+                Collections.sort(rtt);
+                Log.d("sorted rtt", rtt.toString());
+                long sum = 0;
+                for(int i=0; i<RTT_NUMBER_TO_CALC_AVARAGE; i++){
+                    Log.d(i+" pick", rttAndRemote.get(rtt.get(i)).toString());
+                    sum += rttAndRemote.get(rtt.get(i));
+                }
+                remoteAndLocalTimeDifference = sum/RTT_NUMBER_TO_CALC_AVARAGE;
 
                 isSynced = true;
 
