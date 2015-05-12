@@ -59,6 +59,45 @@ public class Synchronizer {
     public PlaylistItem findCurrent() {
 
         PlaylistItem item = PlaylistItem.currentOf(channel);
+        Log.d("findCurrent currentOf", item.getMusic().Id+" - "+item.getMusic().Name);
+
+        long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
+        long timeline = remoteTime - channel.CurrentStartTime.getTime();
+        Log.d("findCurrent timeline1", ""+timeline);
+        Log.d("findCurrent remLocalDif", ""+remoteAndLocalTimeDifference);
+        Log.d("findCurrent remoteTime", ""+remoteTime);
+        Log.d("findCurr channCurrTime", ""+channel.CurrentStartTime.getTime());
+
+        // If the timeline is greater than the playlist length and the
+        // channel doesn't loop, we now the channel is stalled!
+        if (timeline > totalPlaylistLength && !channel.Loops) {
+            return null;
+        }
+
+        // Disregards all loops that have occurred in the playlist.
+        timeline %= totalPlaylistLength;
+
+        while (timeline > item.getMusic().LengthInMilliseconds) {
+            timeline -= item.getMusic().LengthInMilliseconds;
+            Log.d("findCurrent timeline2", ""+timeline);
+            item.next();
+        }
+
+        GlobalVariables.playingSong = item.getMusic();
+
+        //Recalculating timeline to get better precision.
+        timeline += System.currentTimeMillis() - remoteTime + remoteAndLocalTimeDifference;
+        Log.d("findCurrent timeline3", ""+timeline);
+
+        item.setStartingAt(timeline);
+
+        Log.d("sync findCurrent", "I'm returning "+item.getMusic().Id+" - "+item.getMusic().Name);
+        return item;
+    }
+
+    public PlaylistItem nextItem(PlaylistItem item){
+        PlaylistItem currentOfChannel = PlaylistItem.currentOf(channel);
+        item.next();
 
         long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
@@ -72,9 +111,10 @@ public class Synchronizer {
         // Disregards all loops that have occurred in the playlist.
         timeline %= totalPlaylistLength;
 
-        while (timeline > item.getMusic().LengthInMilliseconds) {
-            timeline -= item.getMusic().LengthInMilliseconds;
-            item.next();
+        while (currentOfChannel.getMusic().Id != item.getMusic().Id) {
+            timeline -= currentOfChannel.getMusic().LengthInMilliseconds;
+            Log.d("sync nextItem", ""+timeline);
+            currentOfChannel.next();
         }
 
         GlobalVariables.playingSong = item.getMusic();
@@ -84,6 +124,7 @@ public class Synchronizer {
 
         item.setStartingAt(timeline);
 
+        Log.d("sync nextItem", "I'm returning "+item.getMusic().Id+" - "+item.getMusic().Name);
         return item;
     }
 

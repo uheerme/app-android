@@ -76,7 +76,16 @@ public class UheerPlayer {
                     long prepareFrame = new Date().getTime() - prepareStart;
                     long startingAt = currentOnPlay.getStartingAt() + prepareFrame;
 
-                    player.seekTo((int) startingAt);
+                    if(startingAt < 0) {
+                        try {
+                            Log.d("UheerPlayer","Player is waiting "+(-startingAt)+" ms to start song.");
+                            player.wait((int)-startingAt);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }else {
+                        player.seekTo((int) startingAt);
+                    }
                     player.start();
 
                     Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " will start to play at " +startingAt +"!");
@@ -90,8 +99,9 @@ public class UheerPlayer {
                     Log.d("UheerPlayer", currentOnPlay.getMusic().Name + " completed!");
 
                     try {
+                        PlaylistItem item = synchronizer.nextItem(currentOnPlay);
                         long prepareStart = new Date().getTime();
-                        play(synchronizer.findCurrent(), prepareStart);
+                        play(item, prepareStart);
                     } catch (EndOfPlaylistException e) {
                         Log.d("UheerPlayer", "We've reached the end of the playlist!");
                     }
