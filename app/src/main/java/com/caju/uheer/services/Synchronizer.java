@@ -13,10 +13,13 @@ import com.caju.uheer.services.infrastructure.PlaylistItem;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 public class Synchronizer {
 
@@ -97,17 +100,23 @@ public class Synchronizer {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ", Locale.US);
+
                 HashMap<Long, Long> rttAndRemote = new HashMap<Long, Long>();
                 for(int i=0; i<CHRISTIAN_ITERATION_NUMBER; i++) {
                     long localTime = System.currentTimeMillis();
 
-                    BackendStatus response = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
+                    BackendStatus rawResponse = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
+                    Log.d("response raw", rawResponse.Now.toString());
+
+                    Date responseNow = formatter.parse(rawResponse.Now.toString().replaceAll("(\\.[0-9]{3})[0-9]*(Z$)","$1+0000"));
 
                     long roundTimeTrip = System.currentTimeMillis() - localTime;
 
                     Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
 
-                    remoteAndLocalTimeDifference = response.Now.getTime();
+                    Log.d("response date", responseNow.toString());
+                    remoteAndLocalTimeDifference = responseNow.getTime();
                     remoteAndLocalTimeDifference += roundTimeTrip / 2;
                     remoteAndLocalTimeDifference -= System.currentTimeMillis();
                     rttAndRemote.put(roundTimeTrip, remoteAndLocalTimeDifference);
