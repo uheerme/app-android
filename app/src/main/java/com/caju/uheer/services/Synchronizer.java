@@ -29,21 +29,19 @@ public class Synchronizer {
     private boolean isSynced;
 
     private Channel channel;
-    private long totalPlaylistLength;
 
     private long remoteAndLocalTimeDifference;
 
     private ISyncedListener syncedListener;
-    public interface ISyncedListener { void onSyned(); }
+
+    public interface ISyncedListener {
+        void onSyned();
+    }
 
     public Synchronizer(Channel channel) {
         this.channel = channel;
 
-        totalPlaylistLength = 0;
-
-        for (Music music : channel.Musics) {
-            totalPlaylistLength += music.LengthInMilliseconds;
-        }
+        channel.analyzePlaylist();
     }
 
     public Synchronizer sync() {
@@ -58,74 +56,39 @@ public class Synchronizer {
 
     public PlaylistItem findCurrent() {
 
-        PlaylistItem item = PlaylistItem.currentOf(channel);
-        Log.d("findCurrent currentOf", item.getMusic().Id+" - "+item.getMusic().Name);
-
-        long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
-        long timeline = remoteTime - channel.CurrentStartTime.getTime();
-        Log.d("findCurrent timeline1", ""+timeline);
-        Log.d("findCurrent remLocalDif", ""+remoteAndLocalTimeDifference);
-        Log.d("findCurrent remoteTime", ""+remoteTime);
-        Log.d("findCurr channCurrTime", ""+channel.CurrentStartTime.getTime());
-
-        // If the timeline is greater than the playlist length and the
-        // channel doesn't loop, we now the channel is stalled!
-        if (timeline > totalPlaylistLength && !channel.Loops) {
-            return null;
-        }
-
-        // Disregards all loops that have occurred in the playlist.
-        timeline %= totalPlaylistLength;
-
-        while (timeline > item.getMusic().LengthInMilliseconds) {
-            timeline -= item.getMusic().LengthInMilliseconds;
-            Log.d("findCurrent timeline2", ""+timeline);
-            item.next();
-        }
-
-        GlobalVariables.playingSong = item.getMusic();
-
-        //Recalculating timeline to get better precision.
-        timeline += System.currentTimeMillis() - remoteTime + remoteAndLocalTimeDifference;
-        Log.d("findCurrent timeline3", ""+timeline);
-
-        item.setStartingAt(timeline);
-
-        Log.d("sync findCurrent", "I'm returning "+item.getMusic().Id+" - "+item.getMusic().Name);
-        return item;
-    }
-
-    public PlaylistItem nextItem(PlaylistItem item){
-        PlaylistItem currentOfChannel = PlaylistItem.currentOf(channel);
-        item.next();
+        Log.d("Synchronizer", "Initial current: " + channel.current);
 
         long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
 
+        Log.d("findCurrent timeline1", "" + timeline);
+        Log.d("findCurrent remLocalDif", "" + remoteAndLocalTimeDifference);
+        Log.d("findCurrent remoteTime", "" + remoteTime);
+        Log.d("findCurr channCurrTime", "" + channel.CurrentStartTime.getTime());
+
         // If the timeline is greater than the playlist length and the
         // channel doesn't loop, we now the channel is stalled!
-        if (timeline > totalPlaylistLength && !channel.Loops) {
+        if (timeline > channel.LengthInMilliseconds && !channel.Loops) {
             return null;
         }
 
         // Disregards all loops that have occurred in the playlist.
-        timeline %= totalPlaylistLength;
+        timeline %= channel.LengthInMilliseconds;
 
-        while (currentOfChannel.getMusic().Id != item.getMusic().Id) {
-            timeline -= currentOfChannel.getMusic().LengthInMilliseconds;
-            Log.d("sync nextItem", ""+timeline);
-            currentOfChannel.next();
+        while (timeline > channel.current.LengthInMilliseconds) {
+            timeline -= channel.current.LengthInMilliseconds;
+            channel.next();
+            Log.d("Timeline reduced", "" + timeline);
         }
 
-        GlobalVariables.playingSong = item.getMusic();
+        GlobalVariables.playingSong = channel.current;
 
         //Recalculating timeline to get better precision.
         timeline += System.currentTimeMillis() - remoteTime + remoteAndLocalTimeDifference;
 
-        item.setStartingAt(timeline);
+        Log.d("Synchronizer", "Current found: " + channel.current + ", starting at " + timeline);
 
-        Log.d("sync nextItem", "I'm returning "+item.getMusic().Id+" - "+item.getMusic().Name);
-        return item;
+        return new PlaylistItem(channel.current, timeline);
     }
 
     public Synchronizer onSyncedListener(ISyncedListener listener) {
@@ -138,19 +101,20 @@ public class Synchronizer {
         @Override
         protected Void doInBackground(Void... params) {
             try {
-                RestTemplate restTemplate = new RestTemplate();
-                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                RestTemplate serializer = new RestTemplate();
+                serializer.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ", Locale.US);
 
                 HashMap<Long, Long> rttAndRemote = new HashMap<Long, Long>();
-                for(int i=0; i<CHRISTIAN_ITERATION_NUMBER; i++) {
+
+                for (int i = 0; i < CHRISTIAN_ITERATION_NUMBER; i++) {
                     long localTime = System.currentTimeMillis();
 
-                    BackendStatus rawResponse = restTemplate.getForObject(Routes.STATUS + "now/", BackendStatus.class);
+                    BackendStatus rawResponse = serializer.getForObject(Routes.STATUS + "now/", BackendStatus.class);
                     Log.d("response raw", rawResponse.Now.toString());
 
-                    Date responseNow = formatter.parse(rawResponse.Now.toString().replaceAll("(\\.[0-9]{3})[0-9]*(Z$)","$1+0000"));
+                    Date responseNow = formatter.parse(rawResponse.Now.toString().replaceAll("(\\.[0-9]{3})[0-9]*(Z$)", "$1+0000"));
 
                     long roundTimeTrip = System.currentTimeMillis() - localTime;
 
@@ -164,16 +128,20 @@ public class Synchronizer {
                 }
 
                 Log.d("rttAndRemote", rttAndRemote.toString());
+
                 List rtt = new ArrayList(rttAndRemote.keySet());
                 Collections.sort(rtt);
+
                 Log.d("sorted rtt", rtt.toString());
+
                 long sum = 0;
-                for(int i=0; i<RTT_NUMBER_TO_CALC_AVARAGE; i++){
-                    Log.d(i+" pick", rttAndRemote.get(rtt.get(i)).toString());
+                for (int i = 0; i < RTT_NUMBER_TO_CALC_AVARAGE; i++) {
+                    Log.d(i + " pick", rttAndRemote.get(rtt.get(i)).toString());
                     sum += rttAndRemote.get(rtt.get(i));
                 }
-                remoteAndLocalTimeDifference = sum/RTT_NUMBER_TO_CALC_AVARAGE;
-                GlobalVariables.roundTimeTrip = (long)rtt.get(0);
+
+                remoteAndLocalTimeDifference = sum / RTT_NUMBER_TO_CALC_AVARAGE;
+                GlobalVariables.roundTimeTrip = (long) rtt.get(0);
 
                 isSynced = true;
 
@@ -188,7 +156,7 @@ public class Synchronizer {
             return null;
         }
     }
-    
+
     public boolean isSynchronized() {
         return isSynced;
     }
