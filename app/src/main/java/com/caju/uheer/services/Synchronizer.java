@@ -56,7 +56,7 @@ public class Synchronizer {
 
     public PlaylistItem findCurrent() {
 
-        Log.d("Synchronizer", "Initial current: " + channel.current);
+        Log.d("Initial current", channel.current.toString());
 
         long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
@@ -86,7 +86,7 @@ public class Synchronizer {
         //Recalculating timeline to get better precision.
         timeline += System.currentTimeMillis() - remoteTime + remoteAndLocalTimeDifference;
 
-        Log.d("Synchronizer", "Current found: " + channel.current + ", starting at " + timeline);
+        Log.d("Current found", channel.current + ", starting at " + timeline);
 
         return new PlaylistItem(channel.current, timeline);
     }
@@ -106,24 +106,26 @@ public class Synchronizer {
 
                 SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSZ", Locale.US);
 
-                HashMap<Long, Long> rttAndRemote = new HashMap<Long, Long>();
+                HashMap<Long, Long> rttAndRemote = new HashMap<>();
 
                 for (int i = 0; i < CHRISTIAN_ITERATION_NUMBER; i++) {
                     long localTime = System.currentTimeMillis();
 
                     BackendStatus rawResponse = serializer.getForObject(Routes.STATUS + "now/", BackendStatus.class);
-                    Log.d("response raw", rawResponse.Now.toString());
+                    Log.d("response raw", rawResponse.Now);
 
-                    Date responseNow = formatter.parse(rawResponse.Now.toString().replaceAll("(\\.[0-9]{3})[0-9]*(Z$)", "$1+0000"));
+                    Date responseNow = formatter.parse(rawResponse.Now.replaceAll("(\\.[0-9]{3})[0-9]*(Z$)", "$1+0000"));
 
                     long roundTimeTrip = System.currentTimeMillis() - localTime;
 
                     Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
 
                     Log.d("response date", responseNow.toString());
+
                     remoteAndLocalTimeDifference = responseNow.getTime();
                     remoteAndLocalTimeDifference += roundTimeTrip / 2;
                     remoteAndLocalTimeDifference -= System.currentTimeMillis();
+
                     rttAndRemote.put(roundTimeTrip, remoteAndLocalTimeDifference);
                 }
 
