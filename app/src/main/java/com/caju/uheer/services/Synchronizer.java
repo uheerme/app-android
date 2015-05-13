@@ -74,11 +74,6 @@ public class Synchronizer {
             channel.next();
         }
 
-        GlobalVariables.playingSong = channel.current;
-
-        //Recalculating timeline to get better precision.
-        timeline += System.currentTimeMillis() - remoteTime + remoteAndLocalTimeDifference;
-
         Log.d("Current found", channel.current + ", starting at " + timeline);
 
         return new SyncItem(channel.current, timeline);

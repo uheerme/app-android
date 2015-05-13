@@ -27,6 +27,7 @@ public class Streamer {
     }
 
     public StreamItem stream(Music music) {
+        Log.d("Stream request", music.toString());
 
         // Tries to get the stream, if it has already started.
         StreamItem item = streams.get(new Integer(music.Id));
@@ -34,6 +35,8 @@ public class Streamer {
         // That's the first time the streaming is being done.
         if (item == null) {
             new StreamTask().execute(music);
+        } else {
+            Log.d("Stream", "Stream found");
         }
 
         return item;
