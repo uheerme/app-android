@@ -36,7 +36,7 @@ public class UheerPlayer {
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
-                        streamFollowing(1);
+                        streamFollowing(3);
                     }
                 });
 
@@ -119,7 +119,7 @@ public class UheerPlayer {
                 public void onCompletion(MediaPlayer mp) {
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
-                    streamFollowing(1);
+                    streamFollowing(3);
                 }
             });
 
