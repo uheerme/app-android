@@ -2,12 +2,10 @@ package com.caju.uheer.services;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
 
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.interfaces.Routes;
 import com.caju.uheer.services.exceptions.EndOfPlaylistException;
 import com.caju.uheer.services.exceptions.NoneNextMusicException;
 import com.caju.uheer.services.infrastructure.PlayItem;
@@ -36,7 +34,7 @@ public class UheerPlayer {
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
-                        streamFollowing(1);
+                        streamFollowing(0);
                     }
                 });
 
@@ -78,8 +76,6 @@ public class UheerPlayer {
 
         final long prepareStart = new Date().getTime();
 
-        Uri streamUrl = Uri.parse(Routes.MUSICS + item.sync.music.Id + "/stream");
-
         if (player.isPlaying()) {
             player.stop();
         }
@@ -87,8 +83,6 @@ public class UheerPlayer {
         player.reset();
 
         try {
-            Log.d("UheerPlayer", "Preparing to buffer " + streamUrl.toString());
-
             player.setDataSource(new FileInputStream(item.stream.file).getFD());
             player.prepare();
 
@@ -119,7 +113,7 @@ public class UheerPlayer {
                 public void onCompletion(MediaPlayer mp) {
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
-                    streamFollowing(1);
+                    streamFollowing(0);
                 }
             });
 

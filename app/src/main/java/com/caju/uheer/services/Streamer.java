@@ -2,7 +2,6 @@ package com.caju.uheer.services;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 
 import com.caju.uheer.core.Music;
@@ -70,14 +69,19 @@ public class Streamer {
                 FileOutputStream output = new FileOutputStream(file);
 
                 // Transfers data in input to output.
-                int c;
+                byte data[] = new byte[1024];
+                int total =0;
+                int count;
 
-                while ((c = input.read()) != -1) {
-                    output.write(c);
+                while ((count = input.read(data)) != -1) {
+                    total += count;
+                    Log.d("StreamItem","Total downloaded " + total);
+                    output.write(data, 0,count );
                 }
 
-                input.close();
+                output.flush();
                 output.close();
+                input.close();
 
                 return item;
 

@@ -71,6 +71,8 @@ public class Channel {
             throw new EndOfPlaylistException();
         }
 
+        CurrentStartTime.setTime(CurrentStartTime.getTime() + current.LengthInMilliseconds);
+
         currentIndex = nextIndex % Musics.length;
         current = Musics[currentIndex];
         CurrentId = current.Id;
