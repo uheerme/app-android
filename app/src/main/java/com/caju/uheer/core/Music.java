@@ -13,4 +13,9 @@ public class Music {
 
     public Date DateCreated;
     public Date DateUpdated;
+
+    @Override
+    public String toString() {
+        return "#" + Id + " " + Name;
+    }
 }
