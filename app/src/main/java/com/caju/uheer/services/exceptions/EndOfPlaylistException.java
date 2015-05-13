@@ -4,7 +4,7 @@ package com.caju.uheer.services.exceptions;
  * {@code EndOfPlaylistException} is the superclass of all classes that represent
  * exceptional conditions which occur as a result of a UheerPlayer instance operation.
  */
-public class EndOfPlaylistException extends NextMusicDoesNotExistException {
+public class EndOfPlaylistException extends NoneNextMusicException {
     /**
      * Constructs a new {@code EndOfPlaylistException} that includes the current stack
      * trace.

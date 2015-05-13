@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.caju.uheer.core.Music;
 import com.caju.uheer.interfaces.Routes;
-import com.caju.uheer.services.infrastructure.MusicStreamItem;
+import com.caju.uheer.services.infrastructure.StreamItem;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -21,16 +21,16 @@ public class Streamer {
 
     private final Context context;
     private IStreamingListener listener;
-    private HashMap<Integer, MusicStreamItem> streams = new HashMap<>();
+    private HashMap<Integer, StreamItem> streams = new HashMap<>();
 
     public Streamer(Context context) {
         this.context = context;
     }
 
-    public MusicStreamItem stream(Music music) {
+    public StreamItem stream(Music music) {
 
         // Tries to get the stream, if it has already started.
-        MusicStreamItem item = streams.get(new Integer(music.Id));
+        StreamItem item = streams.get(new Integer(music.Id));
 
         // That's the first time the streaming is being done.
         if (item == null) {
@@ -41,18 +41,18 @@ public class Streamer {
     }
 
     public interface IStreamingListener {
-        public void onFinished(MusicStreamItem item);
+        void onFinished(StreamItem item);
     }
 
-    public Streamer setStreamingListener(IStreamingListener listener) {
+    public Streamer setListener(IStreamingListener listener) {
         this.listener = listener;
         return this;
     }
 
-    private class StreamTask extends AsyncTask<Music, Void, MusicStreamItem> {
+    private class StreamTask extends AsyncTask<Music, Void, StreamItem> {
 
         @Override
-        protected MusicStreamItem doInBackground(Music... params) {
+        protected StreamItem doInBackground(Music... params) {
             Music music = params[0];
 
             try {
@@ -60,12 +60,10 @@ public class Streamer {
                 InputStream input = new URL(Routes.MUSICS + music.Id + "/stream").openStream();
 
                 // Creates the file.
-                File file = new File(
-                        context.getExternalFilesDir(Environment.DIRECTORY_MUSIC),
-                        music.Name);
+                File file = new File(context.getFilesDir() + "/" + music.Id + music.Name);
 
                 // Informs Streamer that we're downloading this file.
-                MusicStreamItem item = new MusicStreamItem(music, file, this);
+                StreamItem item = new StreamItem(music, file, this);
 
                 streams.put(new Integer(item.music.Id), item);
 
@@ -81,8 +79,6 @@ public class Streamer {
                 input.close();
                 output.close();
 
-                item.finished = true;
-
                 return item;
 
             } catch (NullPointerException | IOException e) {
@@ -92,7 +88,7 @@ public class Streamer {
         }
 
         @Override
-        protected void onPostExecute(MusicStreamItem item) {
+        protected void onPostExecute(StreamItem item) {
             if (listener != null) {
                 listener.onFinished(item);
             }

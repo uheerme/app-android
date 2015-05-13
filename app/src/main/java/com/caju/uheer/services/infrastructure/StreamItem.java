@@ -6,20 +6,14 @@ import com.caju.uheer.core.Music;
 
 import java.io.File;
 
-public class MusicStreamItem {
+public class StreamItem {
     public Music music;
     public File file;
-    public boolean finished;
     public AsyncTask streamTask;
 
-    public MusicStreamItem(Music music, File file, AsyncTask streamTask) {
-        this(music, file, streamTask, false);
-    }
-
-    public MusicStreamItem(Music music, File file, AsyncTask streamTask, boolean finished) {
+    public StreamItem(Music music, File file, AsyncTask streamTask) {
         this.music = music;
         this.file = file;
         this.streamTask = streamTask;
-        this.finished = finished;
     }
 }

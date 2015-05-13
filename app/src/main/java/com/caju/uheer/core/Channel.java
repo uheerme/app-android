@@ -1,7 +1,7 @@
 package com.caju.uheer.core;
 
 import com.caju.uheer.services.exceptions.EndOfPlaylistException;
-import com.caju.uheer.services.exceptions.NextMusicDoesNotExistException;
+import com.caju.uheer.services.exceptions.NoneNextMusicException;
 
 import java.util.Date;
 
@@ -53,9 +53,13 @@ public class Channel {
         return this;
     }
 
+    public Music peak(int count) {
+        return Musics[(currentIndex + count) % Musics.length];
+    }
+
     public Music next() {
         if (currentIndex == -1) {
-            throw new NextMusicDoesNotExistException();
+            throw new NoneNextMusicException();
         }
 
         int nextIndex = currentIndex + 1;

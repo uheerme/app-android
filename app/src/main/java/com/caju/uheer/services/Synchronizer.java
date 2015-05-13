@@ -5,10 +5,9 @@ import android.util.Log;
 
 import com.caju.uheer.core.BackendStatus;
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.core.Music;
 import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.interfaces.Routes;
-import com.caju.uheer.services.infrastructure.PlaylistItem;
+import com.caju.uheer.services.infrastructure.SyncItem;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -32,10 +31,10 @@ public class Synchronizer {
 
     private long remoteAndLocalTimeDifference;
 
-    private ISyncedListener syncedListener;
+    private ISyncListener listener;
 
-    public interface ISyncedListener {
-        void onSyned();
+    public interface ISyncListener {
+        void onFinished();
     }
 
     public Synchronizer(Channel channel) {
@@ -54,17 +53,12 @@ public class Synchronizer {
         return this;
     }
 
-    public PlaylistItem findCurrent() {
+    public SyncItem findCurrent() {
 
         Log.d("Initial current", channel.current.toString());
 
         long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
-
-        Log.d("findCurrent timeline1", "" + timeline);
-        Log.d("findCurrent remLocalDif", "" + remoteAndLocalTimeDifference);
-        Log.d("findCurrent remoteTime", "" + remoteTime);
-        Log.d("findCurr channCurrTime", "" + channel.CurrentStartTime.getTime());
 
         // If the timeline is greater than the playlist length and the
         // channel doesn't loop, we now the channel is stalled!
@@ -78,7 +72,6 @@ public class Synchronizer {
         while (timeline > channel.current.LengthInMilliseconds) {
             timeline -= channel.current.LengthInMilliseconds;
             channel.next();
-            Log.d("Timeline reduced", "" + timeline);
         }
 
         GlobalVariables.playingSong = channel.current;
@@ -88,11 +81,11 @@ public class Synchronizer {
 
         Log.d("Current found", channel.current + ", starting at " + timeline);
 
-        return new PlaylistItem(channel.current, timeline);
+        return new SyncItem(channel.current, timeline);
     }
 
-    public Synchronizer onSyncedListener(ISyncedListener listener) {
-        this.syncedListener = listener;
+    public Synchronizer setListener(ISyncListener listener) {
+        this.listener = listener;
 
         return this;
     }
@@ -151,8 +144,8 @@ public class Synchronizer {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
 
-            if (syncedListener != null) {
-                syncedListener.onSyned();
+            if (listener != null) {
+                listener.onFinished();
             }
 
             return null;
