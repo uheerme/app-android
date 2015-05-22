@@ -29,7 +29,6 @@ public class ListenActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_listen);
 
-
         channel_id = getIntent().getIntExtra("channel_id", 0);
         if (channel_id > 0) {
             new GetChannelTask().execute();
@@ -41,9 +40,9 @@ public class ListenActivity extends AppCompatActivity {
     protected void onChannelLoad() {
         player = new UheerPlayer(getApplicationContext(), channel)
                 .start();
-        TextView quality = (TextView)findViewById(R.id.quality);
-        quality.setText("Round Time Trip was "+ GlobalVariables.roundTimeTrip+" ms (Sync quality).");
-        TextView channelNameTextView = (TextView)findViewById(R.id.channel_name);
+        TextView quality = (TextView) findViewById(R.id.quality);
+        quality.setText("Round Time Trip was " + GlobalVariables.roundTimeTrip + " ms (Sync quality).");
+        TextView channelNameTextView = (TextView) findViewById(R.id.channel_name);
         channelNameTextView.setText(channel.Name);
     }
 
@@ -54,11 +53,11 @@ public class ListenActivity extends AppCompatActivity {
         return true;
     }
 
-    public void getGlobals(View view){
-        TextView quality = (TextView)findViewById(R.id.quality);
-        quality.setText("Round Time Trip was "+ GlobalVariables.roundTimeTrip+" ms (Sync quality)..");
-        TextView songNameTextView = (TextView)findViewById(R.id.song_name);
-        songNameTextView.setText(GlobalVariables.playingSong.Id+" - "+GlobalVariables.playingSong.Name);
+    public void getGlobals(View view) {
+        TextView quality = (TextView) findViewById(R.id.quality);
+        quality.setText("Round Time Trip was " + GlobalVariables.roundTimeTrip + " ms (Sync quality)..");
+        TextView songNameTextView = (TextView) findViewById(R.id.song_name);
+        songNameTextView.setText(GlobalVariables.playingSong.Id + " - " + GlobalVariables.playingSong.Name);
     }
 
     @Override
