@@ -22,8 +22,8 @@ import java.util.Locale;
 
 public class Synchronizer {
 
-    final static int CHRISTIAN_ITERATION_NUMBER = 10;
-    final static int RTT_NUMBER_TO_CALC_AVARAGE = 3;
+    final static int CHRISTIAN_EXECUTION_COUNT = 10;
+    final static int RTT_USED_COUNT = 3;
 
     private boolean isSynced;
 
@@ -54,9 +54,6 @@ public class Synchronizer {
     }
 
     public SyncItem findCurrent() {
-
-        Log.d("Initial current", channel.current.toString());
-
         long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
 
@@ -85,6 +82,10 @@ public class Synchronizer {
         return this;
     }
 
+    public boolean isSynchronized() {
+        return isSynced;
+    }
+
     private class CristianTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
@@ -96,45 +97,34 @@ public class Synchronizer {
 
                 HashMap<Long, Long> rttAndRemote = new HashMap<>();
 
-                for (int i = 0; i < CHRISTIAN_ITERATION_NUMBER; i++) {
+                for (int i = 0; i < CHRISTIAN_EXECUTION_COUNT; i++) {
                     long localTime = System.currentTimeMillis();
 
-                    BackendStatus rawResponse = serializer.getForObject(Routes.STATUS + "now/", BackendStatus.class);
-                    Log.d("response raw", rawResponse.Now);
+                    BackendStatus response = serializer.getForObject(Routes.STATUS + "now/", BackendStatus.class);
 
-                    Date responseNow = formatter.parse(rawResponse.Now.replaceAll("(\\.[0-9]{3})[0-9]*(Z$)", "$1+0000"));
+                    Date formattedDate = formatter.parse(response.Now.replaceAll("(\\.[0-9]{3})[0-9]*(Z$)", "$1+0000"));
 
                     long roundTimeTrip = System.currentTimeMillis() - localTime;
 
-                    Log.d("Synchronizer", "The Round Time Trip was " + roundTimeTrip + "ms.");
-
-                    Log.d("response date", responseNow.toString());
-
-                    remoteAndLocalTimeDifference = responseNow.getTime();
+                    remoteAndLocalTimeDifference = formattedDate.getTime();
                     remoteAndLocalTimeDifference += roundTimeTrip / 2;
                     remoteAndLocalTimeDifference -= System.currentTimeMillis();
 
                     rttAndRemote.put(roundTimeTrip, remoteAndLocalTimeDifference);
                 }
 
-                Log.d("rttAndRemote", rttAndRemote.toString());
-
                 List rtt = new ArrayList(rttAndRemote.keySet());
                 Collections.sort(rtt);
 
-                Log.d("sorted rtt", rtt.toString());
-
                 long sum = 0;
-                for (int i = 0; i < RTT_NUMBER_TO_CALC_AVARAGE; i++) {
-                    Log.d(i + " pick", rttAndRemote.get(rtt.get(i)).toString());
+                for (int i = 0; i < RTT_USED_COUNT; i++) {
                     sum += rttAndRemote.get(rtt.get(i));
                 }
 
-                remoteAndLocalTimeDifference = sum / RTT_NUMBER_TO_CALC_AVARAGE;
+                remoteAndLocalTimeDifference = sum / RTT_USED_COUNT;
                 GlobalVariables.roundTimeTrip = (long) rtt.get(0);
 
                 isSynced = true;
-
             } catch (Exception e) {
                 Log.e("GameNightActivity", e.getMessage(), e);
             }
@@ -145,9 +135,5 @@ public class Synchronizer {
 
             return null;
         }
-    }
-
-    public boolean isSynchronized() {
-        return isSynced;
     }
 }

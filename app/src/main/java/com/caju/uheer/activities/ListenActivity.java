@@ -40,6 +40,7 @@ public class ListenActivity extends AppCompatActivity {
     protected void onChannelLoad() {
         player = new UheerPlayer(getApplicationContext(), channel)
                 .start();
+
         TextView quality = (TextView) findViewById(R.id.quality);
         quality.setText("Round Time Trip was " + GlobalVariables.roundTimeTrip + " ms (Sync quality).");
         TextView channelNameTextView = (TextView) findViewById(R.id.channel_name);

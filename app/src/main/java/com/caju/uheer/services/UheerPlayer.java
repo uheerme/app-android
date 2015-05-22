@@ -34,7 +34,7 @@ public class UheerPlayer {
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
-                        streamFollowing(0);
+                        streamFollowing(3);
                     }
                 });
 
@@ -43,15 +43,14 @@ public class UheerPlayer {
                     @Override
                     public void onFinished(StreamItem item) {
                         try {
-
                             SyncItem currentOnRemote = synchronizer.findCurrent();
+                            Log.d("currentOnRemote", currentOnRemote.toString());
                             StreamItem currentStream = streamer.stream(currentOnRemote.music);
 
                             if (currentStream != null && currentStream.streamTask.getStatus()
                                     == AsyncTask.Status.FINISHED) {
-                                play(new PlayItem(item, currentOnRemote));
+                                play(new PlayItem(currentStream, currentOnRemote));
                             }
-
                         } catch (EndOfPlaylistException e) {
                             Log.d("UheerPlayer", "We've reached the end of the playlist!");
                         } catch (NoneNextMusicException e) {
@@ -68,7 +67,6 @@ public class UheerPlayer {
     }
 
     protected UheerPlayer play(PlayItem item) {
-
         if (item.sync.music == null) {
             Log.e("UheerPlayer", "Play attempt on a channel which is stalled.");
             return this;
@@ -113,7 +111,7 @@ public class UheerPlayer {
                 public void onCompletion(MediaPlayer mp) {
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
-                    streamFollowing(0);
+                    streamFollowing(3);
                 }
             });
 

@@ -73,13 +73,12 @@ public class Streamer {
 
                 // Transfers data in input to output.
                 byte data[] = new byte[1024];
-                int total =0;
+                int total = 0;
                 int count;
 
                 while ((count = input.read(data)) != -1) {
                     total += count;
-                    Log.d("StreamItem","Total downloaded " + total);
-                    output.write(data, 0,count );
+                    output.write(data, 0, count);
                 }
 
                 output.flush();
