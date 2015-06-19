@@ -2,7 +2,6 @@ package com.caju.uheer.services;
 
 import android.content.Context;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.caju.uheer.core.Channel;
@@ -47,8 +46,7 @@ public class UheerPlayer {
                             Log.d("currentOnRemote", currentOnRemote.toString());
                             StreamItem currentStream = streamer.stream(currentOnRemote.music);
 
-                            if (currentStream != null && currentStream.streamTask.getStatus()
-                                    == AsyncTask.Status.FINISHED) {
+                            if (currentStream != null ) {
                                 play(new PlayItem(currentStream, currentOnRemote));
                             }
                         } catch (EndOfPlaylistException e) {
