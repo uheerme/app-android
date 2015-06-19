@@ -64,8 +64,11 @@ public class Synchronizer {
         }
 
         // Disregards all loops that have occurred in the playlist.
-        timeline %= channel.LengthInMilliseconds;
-
+        if (channel.LengthInMilliseconds) {
+            timeline %= channel.LengthInMilliseconds;
+            channel.CurrentStartTime.setTime(CurrentStartTime.getTime() + channel.LengthInMilliseconds);
+        }
+        
         while (timeline > channel.current.LengthInMilliseconds) {
             timeline -= channel.current.LengthInMilliseconds;
             channel.next();
