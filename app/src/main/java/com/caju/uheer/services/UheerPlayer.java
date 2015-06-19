@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.util.Log;
 
 import com.caju.uheer.core.Channel;
+import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.services.exceptions.EndOfPlaylistException;
 import com.caju.uheer.services.exceptions.NoneNextMusicException;
 import com.caju.uheer.services.infrastructure.PlayItem;
@@ -83,6 +84,7 @@ public class UheerPlayer {
             player.prepare();
 
             currentOnPlay = item;
+            GlobalVariables.playingSong = currentOnPlay.sync.music;
 
             // It took us a while to prepare (prepareFrame).
             // Let's also consider this before playing.

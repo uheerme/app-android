@@ -5,22 +5,23 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.caju.uheer.core.Music;
+import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.interfaces.Routes;
 import com.caju.uheer.services.infrastructure.StreamItem;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.HashMap;
+import java.net.URLConnection;
 
 
 public class Streamer {
 
     private final Context context;
     private IStreamingListener listener;
-    private HashMap<Integer, StreamItem> streams = new HashMap<>();
 
     public Streamer(Context context) {
         this.context = context;
@@ -30,14 +31,10 @@ public class Streamer {
         Log.d("Stream request", music.toString());
 
         // Tries to get the stream, if it has already started.
-        StreamItem item = streams.get(new Integer(music.Id));
+        File file = new File(context.getFilesDir() + "/" + music.Id + music.Name);
+        StreamItem item = new StreamItem(music, file, null);
 
-        // That's the first time the streaming is being done.
-        if (item == null) {
-            new StreamTask().execute(music);
-        } else {
-            Log.d("Stream", "Stream found");
-        }
+        new StreamTask().execute(music);
 
         return item;
     }
@@ -58,8 +55,15 @@ public class Streamer {
             Music music = params[0];
 
             try {
+                // Get file's length
+                URL url = new URL(Routes.MUSICS + music.Id + "/stream");
+                URLConnection conection= url.openConnection();
+                conection.connect();
+                int fileLength = conection.getContentLength();
+                Log.d("fileLength",""+fileLength);
+
                 // Opens stream for the songs URL.
-                InputStream input = new URL(Routes.MUSICS + music.Id + "/stream").openStream();
+                InputStream input = new BufferedInputStream(url.openStream());
 
                 // Creates the file.
                 File file = new File(context.getFilesDir() + "/" + music.Id + music.Name);
@@ -67,17 +71,21 @@ public class Streamer {
                 // Informs Streamer that we're downloading this file.
                 StreamItem item = new StreamItem(music, file, this);
 
-                streams.put(new Integer(item.music.Id), item);
+                // If the file already exists we don't need to download
+                if(file.exists())
+                    return item;
 
                 FileOutputStream output = new FileOutputStream(file);
 
                 // Transfers data in input to output.
                 byte data[] = new byte[1024];
-                int total = 0;
+                int downloaded = 0;
                 int count;
 
                 while ((count = input.read(data)) != -1) {
-                    total += count;
+                    downloaded += count;
+                    Log.d("Downloaded progress",""+downloaded*100/fileLength);
+                    GlobalVariables.downloadProgress = downloaded*100/fileLength;
                     output.write(data, 0, count);
                 }
 
