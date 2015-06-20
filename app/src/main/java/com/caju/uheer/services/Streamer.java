@@ -74,7 +74,7 @@ public class Streamer {
                 StreamItem item = new StreamItem(music, file, this);
 
                 // If the file already exists we don't need to download
-                if(file.exists())
+                if(file.exists() && file.length() == fileLength)
                     return item;
 
                 FileOutputStream output = new FileOutputStream(file);
