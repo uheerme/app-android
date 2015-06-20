@@ -13,6 +13,8 @@ import com.caju.uheer.services.infrastructure.StreamItem;
 import com.caju.uheer.services.infrastructure.SyncItem;
 
 import java.io.FileInputStream;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class UheerPlayer {
     private final Context context;
@@ -22,6 +24,8 @@ public class UheerPlayer {
     private final Channel channel;
 
     private PlayItem currentOnPlay;
+
+    private static final int rePlayTime = 20; //Seconds
 
     public UheerPlayer(Context context, final Channel channel) {
         this.context = context;
@@ -45,7 +49,7 @@ public class UheerPlayer {
                     public void onFinished(StreamItem streamedItem) {
                         try {
                             SyncItem currentOnRemote = synchronizer.findCurrent();
-                            if(streamedItem.music == currentOnRemote.music && !player.isPlaying()){
+                            if(streamedItem.music == currentOnRemote.music){
                                 Log.d("UheerPlayer", "play");
                                 play(new PlayItem(streamedItem, currentOnRemote));
                                 streamer.stream(channel.peak(1));
@@ -61,6 +65,8 @@ public class UheerPlayer {
 
     public UheerPlayer start() {
         synchronizer.sync();
+        playAgainEvery(rePlayTime);
+        Log.d("UheerPlayer start", "playAgainEvery "+rePlayTime);
 
         return this;
     }
@@ -121,4 +127,15 @@ public class UheerPlayer {
 
         return this;
     }
+
+    private void playAgainEvery(int seconds){
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                streamer.stream(channel.peak(0));
+            }
+        }, seconds*1000, seconds*1000);
+    }
+
 }
