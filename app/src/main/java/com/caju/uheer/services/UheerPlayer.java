@@ -13,7 +13,6 @@ import com.caju.uheer.services.infrastructure.StreamItem;
 import com.caju.uheer.services.infrastructure.SyncItem;
 
 import java.io.FileInputStream;
-import java.util.Date;
 
 public class UheerPlayer {
     private final Context context;
@@ -24,7 +23,7 @@ public class UheerPlayer {
 
     private PlayItem currentOnPlay;
 
-    public UheerPlayer(Context context, Channel channel) {
+    public UheerPlayer(Context context, final Channel channel) {
         this.context = context;
         this.channel = channel;
 
@@ -34,21 +33,22 @@ public class UheerPlayer {
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
-                        streamFollowing(3);
+                        SyncItem actualSong = synchronizer.findCurrent();
+                        streamer.stream(actualSong.music);
+                        Log.d("Synchronizer finished", "started stream "+actualSong.toString());
                     }
                 });
 
         this.streamer = new Streamer(context)
                 .setListener(new Streamer.IStreamingListener() {
                     @Override
-                    public void onFinished(StreamItem item) {
+                    public void onFinished(StreamItem streamedItem) {
                         try {
                             SyncItem currentOnRemote = synchronizer.findCurrent();
-                            Log.d("currentOnRemote", currentOnRemote.toString());
-                            StreamItem currentStream = streamer.stream(currentOnRemote.music);
-
-                            if (currentStream != null ) {
-                                play(new PlayItem(currentStream, currentOnRemote));
+                            if(streamedItem.music == currentOnRemote.music && !player.isPlaying()){
+                                Log.d("UheerPlayer", "play");
+                                play(new PlayItem(streamedItem, currentOnRemote));
+                                streamer.stream(channel.peak(1));
                             }
                         } catch (EndOfPlaylistException e) {
                             Log.d("UheerPlayer", "We've reached the end of the playlist!");
@@ -71,8 +71,6 @@ public class UheerPlayer {
             return this;
         }
 
-        final long prepareStart = new Date().getTime();
-
         if (player.isPlaying()) {
             player.stop();
         }
@@ -86,10 +84,11 @@ public class UheerPlayer {
             currentOnPlay = item;
             GlobalVariables.playingSong = currentOnPlay.sync.music;
 
-            // It took us a while to prepare (prepareFrame).
+            // It took us a while to prepare.
             // Let's also consider this before playing.
-            long prepareFrame = new Date().getTime() - prepareStart;
-            long startingAt = currentOnPlay.sync.startingAt + prepareFrame;
+            currentOnPlay.sync = synchronizer.findCurrent();
+
+            long startingAt = currentOnPlay.sync.startingAt;
 
             try {
                 if (startingAt < 0) {
@@ -104,31 +103,20 @@ public class UheerPlayer {
             player.start();
 
             Log.d("UheerPlayer", currentOnPlay.sync.music + " will start to play at " + startingAt + "ms!");
-            Log.d("preparation frame", "" + prepareFrame);
 
             player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
-                    streamFollowing(3);
+                    channel.next();
+
+                    streamer.stream(channel.peak(0));
                 }
             });
 
         } catch (Exception e) {
             Log.e("UheerPlayer", e.toString());
-        }
-
-        return this;
-    }
-
-    protected UheerPlayer streamFollowing(int count) {
-        synchronizer.findCurrent();
-
-        // stream the next three songs,
-        // inclusive with the current.
-        for (int i = 0; i < count; i++) {
-            streamer.stream(channel.peak(i));
         }
 
         return this;

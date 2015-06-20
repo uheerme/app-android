@@ -9,4 +9,5 @@ public class GlobalVariables {
     public static long roundTimeTrip;
     public static Music playingSong;
     public static int downloadProgress;
+    public static int counter = 0;
 }

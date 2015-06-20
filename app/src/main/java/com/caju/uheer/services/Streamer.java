@@ -29,6 +29,8 @@ public class Streamer {
 
     public StreamItem stream(Music music) {
         Log.d("Stream request", music.toString());
+        Log.d("Stream request", ""+(GlobalVariables.counter++));
+        Log.d("Stream request", "currentThread "+Thread.currentThread().getId()+" - "+Thread.currentThread().getName());
 
         // Tries to get the stream, if it has already started.
         File file = new File(context.getFilesDir() + "/" + music.Id + music.Name);
@@ -103,6 +105,7 @@ public class Streamer {
 
         @Override
         protected void onPostExecute(StreamItem item) {
+            Log.d("onPostExecute", "Streamer");
             if (listener != null) {
                 listener.onFinished(item);
             }
