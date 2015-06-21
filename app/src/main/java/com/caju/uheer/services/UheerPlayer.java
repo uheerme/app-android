@@ -164,7 +164,7 @@ public class UheerPlayer {
                     if (Math.abs(expectedPosition - actualPosition) < maxDelayAllowedInMilliseconds) continue;
 
                     Log.d("PlayerResync", "resynchronizing...");
-                    player.seekTo((int)expectedPosition);
+                    player.seekTo((int)(expectedPosition + .5 * (expectedPosition - actualPosition)));
                 }
             } catch (InterruptedException e) { }
             return null;
