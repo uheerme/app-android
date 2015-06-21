@@ -58,9 +58,10 @@ public class ListenActivity extends AppCompatActivity {
         TextView quality = (TextView) findViewById(R.id.quality);
         quality.setText("Round Time Trip was " + GlobalVariables.roundTimeTrip + " ms (Sync quality)..");
         TextView songNameTextView = (TextView) findViewById(R.id.song_name);
-        songNameTextView.setText(GlobalVariables.playingSong.Id + " - " + GlobalVariables.playingSong.Name);
+        if (GlobalVariables.playingSong != null)
+            songNameTextView.setText(GlobalVariables.playingSong.Id + " - " + GlobalVariables.playingSong.Name);
         TextView progressTextView = (TextView) findViewById(R.id.progress);
-        progressTextView.setText("Progress: "+GlobalVariables.downloadProgress+"%");
+        progressTextView.setText("Progress: " + GlobalVariables.downloadProgress + "%");
     }
 
     @Override
