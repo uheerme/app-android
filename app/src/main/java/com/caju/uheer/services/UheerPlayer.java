@@ -36,6 +36,8 @@ public class UheerPlayer {
                 if (currentOnPlay != null && currentOnPlay.sync != null)
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
+                currentOnPlay = null;
+
                 softPlay();
             }
         });
@@ -44,9 +46,7 @@ public class UheerPlayer {
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
-                        SyncItem actualSong = synchronizer.findCurrent();
-                        streamer.stream(actualSong.music);
-                        Log.d("Synchronizer finished", "started stream " + actualSong.toString());
+                        softPlay();
                     }
                 });
 
@@ -63,9 +63,9 @@ public class UheerPlayer {
 
     public UheerPlayer start() {
         synchronizer.sync();
-        if (resyncService.getStatus() != AsyncTask.Status.RUNNING) {
-            resyncService.execute();
-        }
+//        if (resyncService.getStatus() != AsyncTask.Status.RUNNING) {
+//            resyncService.execute();
+//        }
 
         return this;
     }
@@ -75,11 +75,13 @@ public class UheerPlayer {
             SyncItem sync = synchronizer.findCurrent();
             StreamItem stream = streamer.stream(sync.music);
 
-            if (stream.streamTask.getStatus() == AsyncTask.Status.FINISHED) {
-                play(new PlayItem(stream, sync));
+            // Does nothing when the player is already playing the expected song or when the download hasn't finished yet.
+            if (currentOnPlay != null && sync.music == currentOnPlay.sync.music || !stream.finished) return;
 
-                streamer.stream(channel.peak(1));
-            }
+            play(new PlayItem(stream, sync));
+
+            streamer.stream(channel.peak(1));
+
         } catch (EndOfPlaylistException e) {
             Log.d("UheerPlayer", "We've reached the end of the playlist!");
         } catch (NoneNextMusicException e) {
