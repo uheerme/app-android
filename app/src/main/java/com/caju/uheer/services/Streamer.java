@@ -38,7 +38,7 @@ public class Streamer {
     protected File getMusicFile(Music music) {
         return new File(getMusicPath((music)));
     }
-    
+
     public StreamItem stream(Music music) {
         Log.d("Stream request", music.toString() + " " + (GlobalVariables.counter++));
 
@@ -69,7 +69,7 @@ public class Streamer {
         return this;
     }
 
-    protected class StreamTask extends AsyncTask<Music, Void, StreamItem> {
+    private class StreamTask extends AsyncTask<Music, Void, StreamItem> {
 
         @Override
         protected StreamItem doInBackground(Music... params) {
@@ -87,33 +87,33 @@ public class Streamer {
                 File file = getMusicFile(music);
 
                 // Informs Streamer that we're downloading this file.
-                StreamItem item = new StreamItem(music, file, this);
+                StreamItem item = new StreamItem(music, file, this, true);
 
-                // If the file already exists we don't need to download
-                if (file.exists() && file.length() == length) {
-                    Log.d("StreamTask", "An old copy of the song was found. Stream is unnecessary.");
-                    return item;
+                // If the file already exists we don't need to download it again.
+                if (!file.exists() || file.length() != length) {
+                    // Opens stream for the songs URL.
+                    InputStream input = new BufferedInputStream(url.openStream());
+                    FileOutputStream output = new FileOutputStream(file);
+
+                    // Transfers data in input to output.
+                    byte data[] = new byte[1024];
+                    int downloaded = 0;
+                    int count;
+
+                    Log.d("Streamer", "Streaming " + music.Name);
+
+                    while ((count = input.read(data)) != -1) {
+                        downloaded += count;
+                        GlobalVariables.downloadProgress = downloaded * 100 / length;
+                        output.write(data, 0, count);
+                    }
+
+                    output.flush();
+                    output.close();
+                    input.close();
                 }
 
-                // Opens stream for the songs URL.
-                InputStream input = new BufferedInputStream(url.openStream());
-                FileOutputStream output = new FileOutputStream(file);
-
-                // Transfers data in input to output.
-                byte data[] = new byte[1024];
-                int downloaded = 0;
-                int count;
-
-                while ((count = input.read(data)) != -1) {
-                    downloaded += count;
-                    GlobalVariables.downloadProgress = downloaded * 100 / length;
-                    output.write(data, 0, count);
-                }
-
-                output.flush();
-                output.close();
-                input.close();
-
+                streams.put(new Integer(music.Id), item);
                 return item;
 
             } catch (NullPointerException | IOException e) {
@@ -126,9 +126,7 @@ public class Streamer {
         protected void onPostExecute(StreamItem item) {
             Log.d("Streamer", "Finished stream of" + item.music.Name);
 
-            if (listener != null) {
-                listener.onFinished();
-            }
+            if (listener != null) listener.onFinished();
         }
     }
 }
