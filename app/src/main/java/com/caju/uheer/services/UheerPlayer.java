@@ -62,6 +62,14 @@ public class UheerPlayer {
         this.resyncService = new AsyncPlayerResync();
     }
 
+    public UheerPlayer dispose() {
+        resyncService.cancel(true);
+        player.stop();
+        currentOnPlay = null;
+
+        return this;
+    }
+
     public UheerPlayer start() {
         synchronizer.sync();
 
@@ -141,7 +149,7 @@ public class UheerPlayer {
 
     private class AsyncPlayerResync extends AsyncTask {
         private static final int executionPeriodInSeconds = 10;
-        private static final long maxDelayAllowedInMilliseconds = 100;
+        private static final long maxDelayAllowedInMilliseconds = 200;
 
         @Override
         protected Object doInBackground(Object[] params) {
@@ -155,10 +163,9 @@ public class UheerPlayer {
                     long expectedPosition = synchronizer.findCurrent().startingAt;
                     long actualPosition = player.getCurrentPosition();
 
-                    Log.d("PlayerResync", "Resynchronization service is on, baby.");
+                    Log.d("PlayerResync", "Resynchronization service will execute!");
                     Log.d("PlayerResync", expectedPosition + " was expected, "
-                            + actualPosition+ " is the actual. Difference is "
-                            + (expectedPosition - actualPosition));
+                            + actualPosition+ " is the actual. Difference is " + (expectedPosition - actualPosition));
 
                     // Does nothing when delay is bellow the maximum allowed.
                     if (Math.abs(expectedPosition - actualPosition) < maxDelayAllowedInMilliseconds) continue;

@@ -37,6 +37,12 @@ public class ListenActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        player.dispose();
+    }
+
     protected void onChannelLoad() {
         player = new UheerPlayer(getApplicationContext(), channel)
                 .start();
