@@ -73,12 +73,7 @@ public class UheerPlayer {
     public UheerPlayer start() {
         synchronizer.sync();
 
-        // Checking the version is necessary, as threads execution behavior changes by android's version.
-        // See <http://stackoverflow.com/questions/9119627/android-sdk-asynctask-doinbackground-not-running-subclass>.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            resyncService.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        else
-            resyncService.execute();
+        resyncService.execute();
 
         return this;
     }
