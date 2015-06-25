@@ -133,8 +133,6 @@ public class UheerPlayer {
 
             player.start();
 
-            Log.d("UheerPlayer", "Hello!");
-
             resyncService = new AsyncPlayerResync();
             resyncService.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
@@ -173,12 +171,7 @@ public class UheerPlayer {
                             difference > player.getDuration() - player.getCurrentPosition()) continue;
 
                     Log.d("PlayerResync", "resynchronizing...");
-
-                    // Only inject an delay if the player is late compared to the expected position,
-                    // as the player is the only object that delays the execution.
-                    double delayInjected = (difference > 0) ? .5 * (expectedPosition - actualPosition) : 0;
-
-                    player.seekTo((int) (expectedPosition + delayInjected));
+                    player.seekTo((int)(expectedPosition + .5 * (expectedPosition - actualPosition)));
                 }
             } catch (InterruptedException e) {
             }
