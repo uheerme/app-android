@@ -3,7 +3,6 @@ package com.caju.uheer.services;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.util.Log;
 
 import com.caju.uheer.core.Channel;
@@ -24,7 +23,7 @@ public class UheerPlayer {
     private final Synchronizer synchronizer;
     private final MediaPlayer player;
     private PlayItem currentOnPlay;
-    private final AsyncPlayerResync resyncService;
+    private AsyncPlayerResync resyncService;
 
     public UheerPlayer(Context context, final Channel channel) {
         this.context = context;
@@ -37,6 +36,7 @@ public class UheerPlayer {
                 if (currentOnPlay != null && currentOnPlay.sync != null)
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
+                if (resyncService != null) resyncService.cancel(true);
                 currentOnPlay = null;
 
                 softPlay();
@@ -59,11 +59,11 @@ public class UheerPlayer {
                     }
                 });
 
-        this.resyncService = new AsyncPlayerResync();
+        resyncService = null;
     }
 
     public UheerPlayer dispose() {
-        resyncService.cancel(true);
+        if (resyncService != null) resyncService.cancel(true);
         player.stop();
         currentOnPlay = null;
 
@@ -72,13 +72,6 @@ public class UheerPlayer {
 
     public UheerPlayer start() {
         synchronizer.sync();
-
-        // Checking the version is necessary, as threads execution behavior changes by android's version.
-        // See <http://stackoverflow.com/questions/9119627/android-sdk-asynctask-doinbackground-not-running-subclass>.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB)
-            resyncService.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        else
-            resyncService.execute();
 
         return this;
     }
@@ -112,6 +105,7 @@ public class UheerPlayer {
             player.stop();
         }
 
+        if (resyncService != null) resyncService.cancel(true);
         player.reset();
 
         try {
@@ -139,6 +133,11 @@ public class UheerPlayer {
 
             player.start();
 
+            Log.d("UheerPlayer", "Hello!");
+
+            resyncService = new AsyncPlayerResync();
+            resyncService.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
             Log.d("UheerPlayer", currentOnPlay.sync.music + " will start to play at " + startingAt + "ms!");
         } catch (Exception e) {
             Log.e("UheerPlayer", e.toString());
@@ -150,6 +149,7 @@ public class UheerPlayer {
     private class AsyncPlayerResync extends AsyncTask {
         private static final int executionPeriodInSeconds = 10;
         private static final long maxDelayAllowedInMilliseconds = 200;
+        private static final double deltaErrorInfluence = .5;
 
         @Override
         protected Object doInBackground(Object[] params) {
@@ -162,18 +162,26 @@ public class UheerPlayer {
 
                     long expectedPosition = synchronizer.findCurrent().startingAt;
                     long actualPosition = player.getCurrentPosition();
+                    long difference = expectedPosition - actualPosition;
 
                     Log.d("PlayerResync", "Resynchronization service will execute!");
                     Log.d("PlayerResync", expectedPosition + " was expected, "
-                            + actualPosition+ " is the actual. Difference is " + (expectedPosition - actualPosition));
+                            + actualPosition + " is the actual. Difference is " + difference + ".");
 
-                    // Does nothing when delay is bellow the maximum allowed.
-                    if (Math.abs(expectedPosition - actualPosition) < maxDelayAllowedInMilliseconds) continue;
+                    // Does nothing when delay is bellow the maximum allowed or if our adjustment would overflow the song's duration.
+                    if (Math.abs(difference) < maxDelayAllowedInMilliseconds ||
+                            difference > player.getDuration() - player.getCurrentPosition()) continue;
 
                     Log.d("PlayerResync", "resynchronizing...");
-                    player.seekTo((int)(expectedPosition + .5 * (expectedPosition - actualPosition)));
+
+                    // Only inject an delay if the player is late compared to the expected position,
+                    // as the player is the only object that delays the execution.
+                    double delayInjected = (difference > 0) ? .5 * (expectedPosition - actualPosition) : 0;
+
+                    player.seekTo((int) (expectedPosition + delayInjected));
                 }
-            } catch (InterruptedException e) { }
+            } catch (InterruptedException e) {
+            }
             return null;
         }
     }
