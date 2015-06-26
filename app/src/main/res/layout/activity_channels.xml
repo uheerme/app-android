@@ -30,4 +30,30 @@
             android:layout_weight="0.5" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/ip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:lines="1"
+    />
+    <TextView
+        android:id="@+id/mac"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/ip"
+        android:layout_alignLeft="@id/ip"
+        android:layout_above="@id/ip"
+        android:lines="1"
+    />
+    <TextView
+        android:id="@+id/ssid"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/mac"
+        android:layout_alignLeft="@id/mac"
+        android:layout_above="@id/mac"
+        android:lines="1"
+    />
 </RelativeLayout>

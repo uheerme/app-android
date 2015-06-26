@@ -1,6 +1,9 @@
 package com.caju.uheer.activities;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +14,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
@@ -33,6 +37,8 @@ public class ChannelsActivity extends AppCompatActivity {
         channelListView = (ListView)findViewById(R.id.channelListView);
 
         new AllChannelsTask().execute();
+
+        getWifiInformation();
     }
 
     @Override
@@ -88,6 +94,29 @@ public class ChannelsActivity extends AppCompatActivity {
                     startActivity(intent);
                 }
             });
+        }
+    }
+
+    void getWifiInformation(){
+        Log.d("getWifiInformation","Getting wifi information");
+        WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+        Log.d("getWifiInformation","2");
+        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+        Log.d("getWifiInformation","3");
+        if(wifiInfo != null) {
+            if(wifiInfo.getBSSID() != null) {
+                Log.d("getWifiInformation", wifiInfo.getBSSID());
+                TextView ssidTextView = (TextView) findViewById(R.id.ssid);
+                ssidTextView.setText(wifiInfo.getSSID());
+            }
+            if(wifiInfo.getMacAddress() !=null) {
+                TextView macTextView = (TextView) findViewById(R.id.mac);
+                macTextView.setText(wifiInfo.getMacAddress());
+            }
+            if(wifiInfo.getIpAddress() != 0) {
+                TextView ipTextView = (TextView) findViewById(R.id.ip);
+                ipTextView.setText("" + wifiInfo.getIpAddress());
+            }
         }
     }
 }
