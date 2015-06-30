@@ -25,14 +25,11 @@ public class Synchronizer {
     final static int CHRISTIAN_EXECUTION_COUNT = 10;
     final static int RTT_USED_COUNT = 3;
 
-    private boolean isSynced;
+    protected Channel channel;
+    protected boolean isSynced;
+    protected long remoteAndLocalTimeDifference;
 
-    private Channel channel;
-
-    private long remoteAndLocalTimeDifference;
-
-    private ISyncListener listener;
-
+    protected ISyncListener listener;
     public interface ISyncListener {
         void onFinished();
     }
@@ -43,18 +40,21 @@ public class Synchronizer {
         channel.analyzePlaylist();
     }
 
+    public long getRemoteTime() {
+        return remoteAndLocalTimeDifference + System.currentTimeMillis();
+    }
+
     public Synchronizer sync() {
         Log.d("Synchronizer", "Synchronization procedure method has started.");
 
         isSynced = false;
-
         new CristianTask().execute();
 
         return this;
     }
 
     public SyncItem findCurrent() {
-        long remoteTime = remoteAndLocalTimeDifference + System.currentTimeMillis();
+        long remoteTime = getRemoteTime();
         long timeline = remoteTime - channel.CurrentStartTime.getTime();
 
         // If the timeline is greater than the playlist length and the
@@ -91,9 +91,9 @@ public class Synchronizer {
         return isSynced;
     }
 
-    private class CristianTask extends AsyncTask<Void, Void, Void> {
+    protected class CristianTask extends AsyncTask {
         @Override
-        protected Void doInBackground(Void... params) {
+        protected Object doInBackground(Object[] params) {
             try {
                 RestTemplate serializer = new RestTemplate();
                 serializer.getMessageConverters().add(new MappingJackson2HttpMessageConverter());

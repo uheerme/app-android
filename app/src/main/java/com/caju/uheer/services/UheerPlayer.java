@@ -2,6 +2,7 @@ package com.caju.uheer.services;
 
 import android.content.Context;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import com.caju.uheer.core.Channel;
@@ -13,62 +14,85 @@ import com.caju.uheer.services.infrastructure.StreamItem;
 import com.caju.uheer.services.infrastructure.SyncItem;
 
 import java.io.FileInputStream;
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class UheerPlayer {
     private final Context context;
+    private final Channel channel;
+
     private final Streamer streamer;
     private final Synchronizer synchronizer;
     private final MediaPlayer player;
-    private final Channel channel;
-
     private PlayItem currentOnPlay;
-
-    private static final int rePlayTime = 20; //Seconds
+    private AsyncPlayerResync resyncService;
 
     public UheerPlayer(Context context, final Channel channel) {
         this.context = context;
         this.channel = channel;
 
         this.player = new MediaPlayer();
+        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                if (currentOnPlay != null && currentOnPlay.sync != null)
+                    Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
+
+                if (resyncService != null) resyncService.cancel(true);
+                currentOnPlay = null;
+
+                softPlay();
+            }
+        });
 
         this.synchronizer = new Synchronizer(channel)
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
-                        SyncItem actualSong = synchronizer.findCurrent();
-                        streamer.stream(actualSong.music);
-                        Log.d("Synchronizer finished", "started stream "+actualSong.toString());
+                        softPlay();
                     }
                 });
 
         this.streamer = new Streamer(context)
                 .setListener(new Streamer.IStreamingListener() {
                     @Override
-                    public void onFinished(StreamItem streamedItem) {
-                        try {
-                            SyncItem currentOnRemote = synchronizer.findCurrent();
-                            if(streamedItem.music == currentOnRemote.music){
-                                Log.d("UheerPlayer", "play");
-                                play(new PlayItem(streamedItem, currentOnRemote));
-                                streamer.stream(channel.peak(1));
-                            }
-                        } catch (EndOfPlaylistException e) {
-                            Log.d("UheerPlayer", "We've reached the end of the playlist!");
-                        } catch (NoneNextMusicException e) {
-                            Log.e("UheerPlayer", e.toString(), e);
-                        }
+                    public void onFinished() {
+                        softPlay();
                     }
                 });
+
+        resyncService = null;
+    }
+
+    public UheerPlayer dispose() {
+        if (resyncService != null) resyncService.cancel(true);
+        player.stop();
+        currentOnPlay = null;
+
+        return this;
     }
 
     public UheerPlayer start() {
         synchronizer.sync();
-        playAgainEvery(rePlayTime);
-        Log.d("UheerPlayer start", "playAgainEvery "+rePlayTime);
 
         return this;
+    }
+
+    protected void softPlay() {
+        try {
+            SyncItem sync = synchronizer.findCurrent();
+            StreamItem stream = streamer.stream(sync.music);
+
+            // Does nothing when the player is already playing the expected song or when the download hasn't finished yet.
+            if (currentOnPlay != null && sync.music == currentOnPlay.sync.music || !stream.finished) return;
+
+            play(new PlayItem(stream, sync));
+
+            streamer.stream(channel.peak(1));
+
+        } catch (EndOfPlaylistException e) {
+            Log.d("UheerPlayer", "We've reached the end of the playlist!");
+        } catch (NoneNextMusicException e) {
+            Log.e("UheerPlayer", e.toString(), e);
+        }
     }
 
     protected UheerPlayer play(PlayItem item) {
@@ -81,6 +105,7 @@ public class UheerPlayer {
             player.stop();
         }
 
+        if (resyncService != null) resyncService.cancel(true);
         player.reset();
 
         try {
@@ -108,19 +133,10 @@ public class UheerPlayer {
 
             player.start();
 
+            resyncService = new AsyncPlayerResync();
+            resyncService.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
             Log.d("UheerPlayer", currentOnPlay.sync.music + " will start to play at " + startingAt + "ms!");
-
-            player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
-
-                    channel.next();
-
-                    streamer.stream(channel.peak(0));
-                }
-            });
-
         } catch (Exception e) {
             Log.e("UheerPlayer", e.toString());
         }
@@ -128,14 +144,38 @@ public class UheerPlayer {
         return this;
     }
 
-    private void playAgainEvery(int seconds){
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                streamer.stream(channel.peak(0));
-            }
-        }, seconds*1000, seconds*1000);
-    }
+    private class AsyncPlayerResync extends AsyncTask {
+        private static final int executionPeriodInSeconds = 10;
+        private static final long maxDelayAllowedInMilliseconds = 200;
+        private static final double deltaErrorInfluence = .5;
 
+        @Override
+        protected Object doInBackground(Object[] params) {
+            try {
+                while (true) {
+                    Thread.sleep(executionPeriodInSeconds * 1000);
+
+                    // Does nothing when player isn't playing.
+                    if (!player.isPlaying()) continue;
+
+                    long expectedPosition = synchronizer.findCurrent().startingAt;
+                    long actualPosition = player.getCurrentPosition();
+                    long difference = expectedPosition - actualPosition;
+
+                    Log.d("PlayerResync", "Resynchronization service will execute!");
+                    Log.d("PlayerResync", expectedPosition + " was expected, "
+                            + actualPosition + " is the actual. Difference is " + difference + ".");
+
+                    // Does nothing when delay is bellow the maximum allowed or if our adjustment would overflow the song's duration.
+                    if (Math.abs(difference) < maxDelayAllowedInMilliseconds ||
+                            difference > player.getDuration() - player.getCurrentPosition()) continue;
+
+                    Log.d("PlayerResync", "resynchronizing...");
+                    player.seekTo((int)(expectedPosition + .5 * (expectedPosition - actualPosition)));
+                }
+            } catch (InterruptedException e) {
+            }
+            return null;
+        }
+    }
 }

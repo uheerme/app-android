@@ -6,10 +6,6 @@ public class SyncItem {
     public Music music;
     public long startingAt;
 
-    public SyncItem(Music music) {
-        this(music, 0);
-    }
-
     public SyncItem(Music music, long startingAt) {
         this.music = music;
         this.startingAt = startingAt;
