@@ -22,17 +22,30 @@ import java.util.HashMap;
 public class Streamer {
 
     protected final Context context;
+    private static File musicDir;
     protected IStreamingListener listener;
 
     protected HashMap<Integer, StreamItem> streams;
 
+    private static final int NOT_VERIFIED = -1;
+    private long dirSize = NOT_VERIFIED;
+    private static final int MAX_DIR_SIZE = 300;
+    // An unhandled error happens if a song bigger than the MAX_DIR_SIZE is played.
+
     public Streamer(Context context) {
         this.context = context;
         this.streams = new HashMap<>();
+        this.musicDir = context.getFilesDir();
+
+        // Get music direcory size
+        if(dirSize == NOT_VERIFIED){
+            new GetDirSizeTask().execute();
+            Log.d("Dir verified", "size: "+dirSize);
+        }
     }
 
     protected String getMusicPath(Music music) {
-        return context.getFilesDir() + "/" + music.Id + music.Name;
+        return musicDir + "/" + music.Id + music.Name;
     }
 
     protected File getMusicFile(Music music) {
@@ -111,6 +124,13 @@ public class Streamer {
                     output.flush();
                     output.close();
                     input.close();
+
+                    // sum file to folder in mega bytes.
+                    if(dirSize != NOT_VERIFIED) {
+                        dirSize += downloaded / 1000000;
+                    }
+                    Log.d("File Added", "file: " + downloaded / 1000000 + "MB, " + "dirSize: " + dirSize + "MB");
+                    new DeleteOldSongsTask().execute();
                 }
 
                 streams.put(new Integer(music.Id), item);
@@ -127,6 +147,61 @@ public class Streamer {
             Log.d("Streamer", "Finished stream of" + item.music.Name);
 
             if (listener != null) listener.onFinished();
+        }
+    }
+
+    private class DeleteOldSongsTask extends AsyncTask{
+        @Override
+        protected Object doInBackground(Object[] params){
+            while(dirSize > MAX_DIR_SIZE) {  // Directory is bigger than it should.
+                // Delete the oldest one
+                File[] fileList = musicDir.listFiles();
+                File fileToDelete = fileList[0]; //Initializing fileToDelete with the first.
+                for(int i=1; i<fileList.length; i++){
+                    if(!fileList[i].isDirectory() && fileList[i].lastModified() < fileToDelete.lastModified()){
+                        fileToDelete = fileList[i];
+                    }
+                }
+
+                long deletedFileSize = fileToDelete.length();
+                String deletedFileName = fileToDelete.getName();
+                if(fileToDelete.delete()){
+                    dirSize -= deletedFileSize/1000000;
+                    Log.d("File deleted", deletedFileName);
+                }else{
+                    Log.e("DeleteOldSongsTask", "Failed to delete old song.");
+                }
+            }
+            return null;
+        }
+    }
+
+    private class GetDirSizeTask extends AsyncTask {
+        @Override
+        protected Object doInBackground(Object[] params) {
+            dirSize = getDirSize(musicDir);
+            Log.d("Dir verified", "size: "+dirSize);
+            return null;
+        }
+    }
+
+    private long getDirSize(File dir){
+        if(!dir.exists()) {
+            return 0;
+        }else{
+            long totalSize = 0;
+            File[] fileList = dir.listFiles();
+            for(int i=0; i<fileList.length; i++){
+                //Recursive call if it's a directory
+                if(fileList[i].isDirectory()){
+                    totalSize += getDirSize(fileList[i]);
+                }else{
+                    // Sum the file size in bytes
+                    totalSize += fileList[i].length();
+                }
+            }
+            // return size in MB
+            return totalSize/1000000;
         }
     }
 }
