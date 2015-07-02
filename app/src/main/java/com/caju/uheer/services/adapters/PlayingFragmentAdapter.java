@@ -1,4 +1,4 @@
-package com.caju.uheer.debug;
+package com.caju.uheer.services.adapters;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
@@ -10,12 +10,12 @@ import com.caju.uheer.activities.PlayingFragment;
 import com.caju.uheer.core.ActiveChannels;
 import com.caju.uheer.core.Channel;
 
-public class SampleAdapter extends FragmentPagerAdapter
+public class PlayingFragmentAdapter extends FragmentPagerAdapter
 {
     final int CHANNELS_TO_SHOW = 3;
     private Context context;
 
-    public SampleAdapter(FragmentManager fm, Context context) {
+    public PlayingFragmentAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.context = context;
     }

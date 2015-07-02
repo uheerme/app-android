@@ -1,8 +1,5 @@
 package com.caju.uheer.activities;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,13 +14,7 @@ import com.caju.uheer.R;
 import com.caju.uheer.core.ActiveChannels;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.core.Music;
-import com.caju.uheer.debug.SampleAdapter;
-import com.caju.uheer.interfaces.Routes;
 
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
-
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**

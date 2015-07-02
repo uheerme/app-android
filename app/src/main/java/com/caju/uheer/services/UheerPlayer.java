@@ -23,6 +23,8 @@ public class UheerPlayer {
     private final MediaPlayer player;
     private final Channel channel;
 
+    Timer startAgain;
+
     private PlayItem currentOnPlay;
 
     private static final int rePlayTime = 20; //Seconds
@@ -129,13 +131,23 @@ public class UheerPlayer {
     }
 
     private void playAgainEvery(int seconds){
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        startAgain = new Timer();
+        startAgain.scheduleAtFixedRate(new TimerTask()
+        {
             @Override
-            public void run() {
+            public void run()
+            {
                 streamer.stream(channel.peak(0));
             }
-        }, seconds*1000, seconds*1000);
+        }, seconds * 1000, seconds * 1000);
+    }
+
+    public void stop(){
+        player.pause();
+        player.stop();
+        player.reset();
+        startAgain.cancel();
+
     }
 
 }

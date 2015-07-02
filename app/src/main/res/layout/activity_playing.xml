@@ -55,12 +55,14 @@
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/myFAB"
+        android:id="@+id/playOrStopFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:clickable="true"
-        android:src="@drawable/uheer_logo"
+        android:visibility="gone"
+        android:src="@drawable/ic_play_arrow_black_24dp"
+        android:onClick="playOrStopChannel"
         app:elevation="4dp"
         app:borderWidth="0dp"
         app:layout_anchor="@id/linear_layout_fab_view"
