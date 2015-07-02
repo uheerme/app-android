@@ -76,6 +76,16 @@ public class UheerPlayer {
         return this;
     }
 
+    public void stop(){
+        if(player != null){
+            player.pause();
+            player.stop();
+            player.reset();
+        }
+        if(resyncService != null)
+            resyncService.cancel(true);
+    }
+
     protected void softPlay() {
         try {
             SyncItem sync = synchronizer.findCurrent();
