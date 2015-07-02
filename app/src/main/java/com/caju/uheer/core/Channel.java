@@ -3,11 +3,9 @@ package com.caju.uheer.core;
 import com.caju.uheer.services.exceptions.EndOfPlaylistException;
 import com.caju.uheer.services.exceptions.NoneNextMusicException;
 
-import java.io.Serializable;
 import java.util.Date;
 
-public class Channel
-{
+public class Channel {
 
     private int currentIndex;
 

@@ -29,7 +29,6 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:appcompat-v7:22.1.1'
-    compile 'com.android.support:design:22.2.0'
     compile 'com.loopj.android:android-async-http:1.4.6'
 
     compile 'org.springframework.android:spring-android-rest-template:1.0.1.RELEASE'
