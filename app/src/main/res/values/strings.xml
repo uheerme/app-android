@@ -15,13 +15,7 @@
     <string name="fetch_music"><![CDATA[MUSIC FILE]]></string>
     <string name="game_night"><![CDATA[Game Night Test]]></string>
     <string name="title_activity_listen">ListenActivity</string>
-    <string name="title_activity_start">uheer</string>
-    <string name="title_activity_playing">uheer layout 2</string>
-
-    <string name="title_section1">Section 1</string>
-    <string name="title_section2">Section 2</string>
-    <string name="title_section3">Section 3</string>
-
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_playing">uheer New Layout</string>
+    <string name="title_activity_main">uheer Old Layout</string>
 
 </resources>
