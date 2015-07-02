@@ -22,6 +22,13 @@ public class UheerPlayer {
     private final Streamer streamer;
     private final Synchronizer synchronizer;
     private final MediaPlayer player;
+<<<<<<< HEAD
+=======
+    private final Channel channel;
+
+    Timer startAgain;
+
+>>>>>>> camilo-new-layout
     private PlayItem currentOnPlay;
     private AsyncPlayerResync resyncService;
 
@@ -144,6 +151,7 @@ public class UheerPlayer {
         return this;
     }
 
+<<<<<<< HEAD
     private class AsyncPlayerResync extends AsyncTask {
         private static final int executionPeriodInSeconds = 10;
         private static final long maxDelayAllowedInMilliseconds = 200;
@@ -177,5 +185,25 @@ public class UheerPlayer {
             }
             return null;
         }
+=======
+    private void playAgainEvery(int seconds){
+        startAgain = new Timer();
+        startAgain.scheduleAtFixedRate(new TimerTask()
+        {
+            @Override
+            public void run()
+            {
+                streamer.stream(channel.peak(0));
+            }
+        }, seconds * 1000, seconds * 1000);
+    }
+
+    public void stop(){
+        player.pause();
+        player.stop();
+        player.reset();
+        startAgain.cancel();
+
+>>>>>>> camilo-new-layout
     }
 }
