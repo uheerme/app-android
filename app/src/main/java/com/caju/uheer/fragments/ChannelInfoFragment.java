@@ -52,7 +52,7 @@ public class ChannelInfoFragment extends Fragment
                              Bundle savedInstanceState)
     {
 
-        View view = inflater.inflate(R.layout.fragment_playing, container, false);
+        View view = inflater.inflate(R.layout.fragment_channel_info, container, false);
         TextView channelName = (TextView) view.findViewById(R.id.channel_name_in_playing);
         channelName.setText(mChannel.Name);
         TextView owner = (TextView) view.findViewById(R.id.channel_owner_in_playing);

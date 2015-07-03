@@ -17,5 +17,6 @@
     <string name="title_activity_listen">ListenActivity</string>
     <string name="title_activity_playing">uheer New Layout</string>
     <string name="title_activity_main">uheer Old Layout</string>
+    <string name="no_connection">You have no connection.</string>
 
 </resources>

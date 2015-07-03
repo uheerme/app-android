@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.ActiveChannels;
@@ -30,8 +30,8 @@ public class PlayingActivity extends FragmentActivity
     TabLayout tabsContainer;
     FloatingActionButton playAndStopFAB;
 
-    LinearLayout linearLayoutInsideLoadingFragment;
-    ImageView imageInsideLoadingFragment;
+    FrameLayout loadingFragment;
+    FrameLayout errorFragment;
 
     private UheerPlayer player;
     int currentPlaying;
@@ -48,8 +48,8 @@ public class PlayingActivity extends FragmentActivity
         tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
         tabsContainer = (TabLayout) findViewById(R.id.sliding_tabs);
         playAndStopFAB = (FloatingActionButton) findViewById(R.id.playOrStopFAB);
-        linearLayoutInsideLoadingFragment = (LinearLayout) findViewById(R.id.empty_channel_image_in_playing);
-        imageInsideLoadingFragment = (ImageView) findViewById(R.id.loading_or_error_playing);
+        loadingFragment = (FrameLayout) findViewById(R.id.loading_image_in_Playing_Activity);
+        errorFragment = (FrameLayout) findViewById(R.id.error_image_in_Playing_Activity);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setTitle("uheer");
@@ -115,7 +115,6 @@ public class PlayingActivity extends FragmentActivity
             ActiveChannels.setActiveChannels(channels);
             if(channels != null)
             {
-                linearLayoutInsideLoadingFragment.setVisibility(View.GONE);
                 tabsInfoContainer.setVisibility(View.VISIBLE);
                 playAndStopFAB.setVisibility(View.VISIBLE);
 
@@ -125,7 +124,8 @@ public class PlayingActivity extends FragmentActivity
                 // Give the TabLayout the ViewPager
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
             } else {
-                imageInsideLoadingFragment.setImageDrawable(getResources().getDrawable(R.drawable.black_error_icon));
+                loadingFragment.setVisibility(View.GONE);
+                errorFragment.setVisibility(View.VISIBLE);
             }
 
         }

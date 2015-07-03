@@ -8,14 +8,10 @@ import android.view.ViewGroup;
 
 import com.caju.uheer.R;
 
-
-/**
- * A placeholder fragment containing a simple view.
- */
-public class LoadingImageFragment extends Fragment
+public class ErrorFragment extends Fragment
 {
 
-    public LoadingImageFragment()
+    public ErrorFragment()
     {
     }
 
@@ -23,6 +19,6 @@ public class LoadingImageFragment extends Fragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState)
     {
-        return inflater.inflate(R.layout.fragment_playing_loading, container, false);
+        return inflater.inflate(R.layout.fragment_error, container, false);
     }
 }
