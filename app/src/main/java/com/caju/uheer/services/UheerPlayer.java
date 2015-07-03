@@ -82,7 +82,7 @@ public class UheerPlayer {
             return false;
     }
 
-    public static void start() {
+    private static void start() {
         synchronizer.sync();
     }
 
