@@ -2,6 +2,7 @@ package com.caju.uheer.activities;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.ActiveChannels;
@@ -43,7 +45,7 @@ public class PlayingActivity extends FragmentActivity
         setContentView(R.layout.activity_playing);
 
         currentPlaying = 1;
-        new fetchActiveChannelsAndMusicTask().execute();
+        final AsyncTask fetching = new fetchActiveChannelsAndMusicTask().execute();
 
         tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
         tabsContainer = (TabLayout) findViewById(R.id.sliding_tabs);
@@ -54,6 +56,18 @@ public class PlayingActivity extends FragmentActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setTitle("uheer");
         toolbar.setTitleTextColor(Color.WHITE);
+
+        //timeout for AsyncTask of 5 seconds
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if(fetching.getStatus() == AsyncTask.Status.RUNNING)
+                    fetching.cancel(true);
+            }
+        }, 5000);
     }
 
     public void playOrStopChannel(View view)
@@ -127,8 +141,17 @@ public class PlayingActivity extends FragmentActivity
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
             } else {
                 errorFragment.setVisibility(View.VISIBLE);
+                TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
+                error_message.setText(R.string.no_connection);
             }
+        }
 
+        @Override
+        protected void onCancelled() {
+            loadingFragment.setVisibility(View.GONE);
+            errorFragment.setVisibility(View.VISIBLE);
+            TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
+            error_message.setText(R.string.slow_connection);
         }
     }
 
