@@ -77,7 +77,7 @@
         android:clickable="true"
         android:visibility="gone"
         android:src="@drawable/white_stop_icon"
-        android:onClick="playOrStopChannel"
+        android:onClick="playOrStop"
         app:elevation="4dp"
         app:borderWidth="0dp"
         app:layout_anchor="@id/linear_layout_fab_view"

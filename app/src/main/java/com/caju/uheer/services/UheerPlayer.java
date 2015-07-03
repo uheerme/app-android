@@ -86,6 +86,13 @@ public class UheerPlayer {
             resyncService.cancel(true);
     }
 
+    public boolean isPlaying(){
+        if(player != null)
+            return player.isPlaying();
+        else
+            return false;
+    }
+
     protected void softPlay() {
         try {
             SyncItem sync = synchronizer.findCurrent();

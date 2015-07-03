@@ -12,7 +12,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
@@ -36,7 +35,6 @@ public class PlayingActivity extends FragmentActivity
     FrameLayout errorFragment;
 
     private UheerPlayer player;
-    int currentPlaying;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -44,7 +42,6 @@ public class PlayingActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
-        currentPlaying = 1;
         final AsyncTask fetching = new fetchActiveChannelsAndMusicTask().execute();
 
         tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
@@ -54,7 +51,7 @@ public class PlayingActivity extends FragmentActivity
         errorFragment = (FrameLayout) findViewById(R.id.error_image_in_Playing_Activity);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        toolbar.setTitle("uheer");
+        toolbar.setTitle(R.string.app_name);
         toolbar.setTitleTextColor(Color.WHITE);
 
         //timeout for AsyncTask of 5 seconds
@@ -70,25 +67,19 @@ public class PlayingActivity extends FragmentActivity
         }, 5000);
     }
 
-    public void playOrStopChannel(View view)
+    public void playOrStop(View view)
     {
 
-        int currentFragment = tabsInfoContainer.getCurrentItem();
+        int currentTab = tabsInfoContainer.getCurrentItem();
         Log.d("Current", "Current Fragment:" + String.valueOf(tabsInfoContainer.getCurrentItem()));
-        if(player != null)
+        if(player != null && player.isPlaying()){
             player.stop();
-
-        if(currentFragment == currentPlaying)
-        {
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_play_icon));
-            currentPlaying = 1;
-            return;
+        } else {
+            player = new UheerPlayer(getApplicationContext(),
+                    ActiveChannels.getActiveChannel(currentTab)).start();
+            playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
-
-        currentPlaying = currentFragment;
-        player = new UheerPlayer(getApplicationContext(),
-                ActiveChannels.getActiveChannel(currentFragment)).start();
-        playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
     }
 
     class fetchActiveChannelsAndMusicTask extends AsyncTask<Void, Void, Channel[]>
@@ -135,10 +126,12 @@ public class PlayingActivity extends FragmentActivity
                 playAndStopFAB.setVisibility(View.VISIBLE);
 
                 tabsInfoContainer.setAdapter(new PlayingFragmentAdapter(getSupportFragmentManager(), PlayingActivity.this));
-                tabsInfoContainer.addOnPageChangeListener(new PlayingActivity.onHorizontalSwypeListener());
+                tabsInfoContainer.addOnPageChangeListener(new onSwypeWithinPlayingListener());
 
-                // Give the TabLayout the ViewPager
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
+
+                //Start Playing
+                playOrStop(null);
             } else {
                 errorFragment.setVisibility(View.VISIBLE);
                 TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
@@ -155,24 +148,26 @@ public class PlayingActivity extends FragmentActivity
         }
     }
 
-    class onHorizontalSwypeListener implements ViewPager.OnPageChangeListener{
+    class onSwypeWithinPlayingListener implements ViewPager.OnPageChangeListener{
 
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
         {
-            Log.d("Page","1" + String.valueOf(position));
         }
 
         @Override
         public void onPageSelected(int position)
         {
-            Log.d("Page","2" + String.valueOf(position));
+            Log.d("Tab Selected","Selected " + String.valueOf(position));
+            if(player != null && player.isPlaying())
+                player.stop();
+            player = new UheerPlayer(getApplicationContext(),
+                    ActiveChannels.getActiveChannel(position)).start();
         }
 
         @Override
         public void onPageScrollStateChanged(int state)
         {
-            Log.d("Page","3" + String.valueOf(state));
         }
     }
 }
