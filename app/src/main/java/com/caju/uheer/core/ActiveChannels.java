@@ -1,7 +1,8 @@
 package com.caju.uheer.core;
 
 /**
- * Created by camilo on 30/06/15.
+ * This class maintains the current information of the Active Channels
+ * instead of requesting to server every time it is needed.
  */
 public class ActiveChannels
 {

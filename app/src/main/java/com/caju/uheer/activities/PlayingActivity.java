@@ -40,14 +40,17 @@ public class PlayingActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
-        final AsyncTask fetching = new fetchActiveChannelsAndMusicTask().execute();
+        //It is final because it is accessed within another subclass.
+        final AsyncTask fetchingInfo = new fetchActiveChannelsAndMusicTask().execute();
 
+        //Associate Views with class objects for subsequent manipulation
         tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
         tabsContainer = (TabLayout) findViewById(R.id.sliding_tabs);
         playAndStopFAB = (FloatingActionButton) findViewById(R.id.playOrStopFAB);
         loadingFragment = (FrameLayout) findViewById(R.id.loading_image_in_Playing_Activity);
         errorFragment = (FrameLayout) findViewById(R.id.error_image_in_Playing_Activity);
 
+        //Inflate toolbar with app name
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
         toolbar.setTitleTextColor(Color.WHITE);
@@ -59,16 +62,15 @@ public class PlayingActivity extends FragmentActivity
             @Override
             public void run()
             {
-                if(fetching.getStatus() == AsyncTask.Status.RUNNING)
-                    fetching.cancel(true);
+                if(fetchingInfo.getStatus() == AsyncTask.Status.RUNNING)
+                    fetchingInfo.cancel(true);
             }
         }, 5000);
     }
 
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-    }
+    /*
+        This routine is called when the floating button is pressed
+     */
 
     public void playOrStop(View view)
     {
@@ -86,6 +88,10 @@ public class PlayingActivity extends FragmentActivity
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
     }
+
+    /*
+        This AsyncTask fetches the currently active channels and their song list.
+     */
 
     class fetchActiveChannelsAndMusicTask extends AsyncTask<Void, Void, Channel[]>
     {
@@ -130,20 +136,23 @@ public class PlayingActivity extends FragmentActivity
                 tabsInfoContainer.setVisibility(View.VISIBLE);
                 playAndStopFAB.setVisibility(View.VISIBLE);
 
+                //set Adapter that creates the Channel Info Fragments
                 tabsInfoContainer.setAdapter(new PlayingFragmentAdapter(getSupportFragmentManager(), PlayingActivity.this));
                 tabsInfoContainer.addOnPageChangeListener(new onSwypeWithinPlayingListener());
 
+                //bind the tabs with their fragment (page)
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
 
                 //Start Playing
                 int currentTab = tabsInfoContainer.getCurrentItem();
                 if (!UheerPlayer.isInitiated()) {
                     UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0));
-                //In the case the app was closed with the back button
+                //This is necessary in the case the app was closed with the back button
                 } else if (UheerPlayer.currentChannelId() != ActiveChannels.getActiveChannel(currentTab).Id ) {
                     UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
                 }
             } else {
+                //No channels were retrieved
                 errorFragment.setVisibility(View.VISIBLE);
                 TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
                 error_message.setText(R.string.no_connection);
@@ -166,7 +175,9 @@ public class PlayingActivity extends FragmentActivity
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
         {
         }
-
+        /*
+            This callback is called every time a page is fully selected and visible.
+         */
         @Override
         public void onPageSelected(int position)
         {
