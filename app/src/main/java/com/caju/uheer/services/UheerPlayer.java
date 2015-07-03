@@ -16,34 +16,44 @@ import com.caju.uheer.services.infrastructure.SyncItem;
 import java.io.FileInputStream;
 
 public class UheerPlayer {
-    private final Context context;
-    private final Channel channel;
+    private static Context context = null;
+    private static Channel channel = null;
 
-    private final Streamer streamer;
-    private final Synchronizer synchronizer;
-    private final MediaPlayer player;
-    private PlayItem currentOnPlay;
-    private AsyncPlayerResync resyncService;
+    private static Streamer streamer;
+    private static Synchronizer synchronizer;
+    private static MediaPlayer player;
+    private static PlayItem currentOnPlay;
+    private static AsyncPlayerResync resyncService;
 
-    public UheerPlayer(Context context, final Channel channel) {
-        this.context = context;
-        this.channel = channel;
+    public static boolean initPlayer(Context context,Channel channel) {
 
-        this.player = new MediaPlayer();
+        if(UheerPlayer.context != null || UheerPlayer.channel != null)
+            return false;
+
+        UheerPlayer.context = context;
+        UheerPlayer.channel = channel;
+
+        if(UheerPlayer.player != null){
+            UheerPlayer.player.stop();
+            UheerPlayer.player.release();
+        }
+
+        player = new MediaPlayer();
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 if (currentOnPlay != null && currentOnPlay.sync != null)
                     Log.d("UheerPlayer", currentOnPlay.sync.music + " completed!");
 
-                if (resyncService != null) resyncService.cancel(true);
+                if (resyncService != null)
+                    resyncService.cancel(true);
                 currentOnPlay = null;
 
                 softPlay();
             }
         });
 
-        this.synchronizer = new Synchronizer(channel)
+        synchronizer = new Synchronizer(channel)
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
                     public void onFinished() {
@@ -51,7 +61,7 @@ public class UheerPlayer {
                     }
                 });
 
-        this.streamer = new Streamer(context)
+        streamer = new Streamer(context)
                 .setListener(new Streamer.IStreamingListener() {
                     @Override
                     public void onFinished() {
@@ -60,36 +70,52 @@ public class UheerPlayer {
                 });
 
         resyncService = null;
+        start();
+
+        return true;
     }
 
-    public UheerPlayer dispose() {
-        if (resyncService != null)
-            resyncService.cancel(true);
-        player.stop();
-        player.reset();
-        currentOnPlay = null;
-
-        return this;
+    public static boolean isInitiated(){
+        if(context != null && channel != null)
+            return true;
+        else
+            return false;
     }
 
-    public UheerPlayer start() {
+    private static void start() {
         synchronizer.sync();
-
-        return this;
     }
 
-    public void stop(){
-        this.dispose();
-    }
-
-    public boolean isPlaying(){
+    public static boolean isPlaying(){
         if(player != null)
             return player.isPlaying();
         else
             return false;
     }
 
-    protected void softPlay() {
+    public static void stop() {
+        if (resyncService != null)
+            resyncService.cancel(true);
+        player.stop();
+        //player.reset();
+        currentOnPlay = null;
+    }
+
+    public static void changeChannel(Channel channel){
+        stop();
+
+        synchronizer = new Synchronizer(channel)
+                .setListener(new Synchronizer.ISyncListener() {
+                    @Override
+                    public void onFinished() {
+                        softPlay();
+                    }
+                });
+
+        start();
+    }
+
+    protected static void softPlay() {
         try {
             SyncItem sync = synchronizer.findCurrent();
             StreamItem stream = streamer.stream(sync.music);
@@ -97,7 +123,7 @@ public class UheerPlayer {
             // Does nothing when the player is already playing the expected song or when the download hasn't finished yet.
             if (currentOnPlay != null && sync.music == currentOnPlay.sync.music || !stream.finished) return;
 
-            play(new PlayItem(stream, sync));
+            playNow(new PlayItem(stream, sync));
 
             streamer.stream(channel.peak(1));
 
@@ -108,17 +134,18 @@ public class UheerPlayer {
         }
     }
 
-    protected UheerPlayer play(PlayItem item) {
+    protected static void playNow(PlayItem item) {
         if (item.sync.music == null) {
             Log.e("UheerPlayer", "Play attempt on a channel which is stalled.");
-            return this;
         }
 
         if (player.isPlaying()) {
             player.stop();
         }
 
-        if (resyncService != null) resyncService.cancel(true);
+        if (resyncService != null)
+            resyncService.cancel(true);
+
         player.reset();
 
         try {
@@ -153,11 +180,9 @@ public class UheerPlayer {
         } catch (Exception e) {
             Log.e("UheerPlayer", e.toString());
         }
-
-        return this;
     }
 
-    private class AsyncPlayerResync extends AsyncTask {
+    private static class AsyncPlayerResync extends AsyncTask {
         private static final int executionPeriodInSeconds = 10;
         private static final long maxDelayAllowedInMilliseconds = 200;
         private static final double deltaErrorInfluence = .5;

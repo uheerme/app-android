@@ -40,12 +40,13 @@ public class ListenActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-        player.dispose();
+        //Commented after new Player
+        //player.dispose();
     }
 
     protected void onChannelLoad() {
-        player = new UheerPlayer(getApplicationContext(), channel)
-                .start();
+        //Commented after new Player
+        //player = new UheerPlayer(getApplicationContext(), channel).start();
 
         TextView quality = (TextView) findViewById(R.id.quality);
         quality.setText("Round Time Trip was " + GlobalVariables.roundTimeTrip + " ms (Sync quality).");

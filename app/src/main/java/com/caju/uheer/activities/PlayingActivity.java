@@ -34,8 +34,6 @@ public class PlayingActivity extends FragmentActivity
     FrameLayout loadingFragment;
     FrameLayout errorFragment;
 
-    private UheerPlayer uheerPlayer;
-
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -70,9 +68,6 @@ public class PlayingActivity extends FragmentActivity
     @Override
     protected void onDestroy(){
         super.onDestroy();
-
-        if(uheerPlayer != null)
-            uheerPlayer.stop();
     }
 
     public void playOrStop(View view)
@@ -80,12 +75,14 @@ public class PlayingActivity extends FragmentActivity
 
         int currentTab = tabsInfoContainer.getCurrentItem();
         Log.d("Current", "Current Fragment:" + String.valueOf(tabsInfoContainer.getCurrentItem()));
-        if(uheerPlayer != null && uheerPlayer.isPlaying()){
-            uheerPlayer.dispose();
+        if(UheerPlayer.isPlaying()){
+            UheerPlayer.stop();
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_play_icon));
+        } else if (UheerPlayer.isInitiated()){
+            UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
+            playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         } else {
-            uheerPlayer = new UheerPlayer(getApplicationContext(),
-                    ActiveChannels.getActiveChannel(currentTab)).start();
+            UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(currentTab));
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
     }
@@ -139,7 +136,9 @@ public class PlayingActivity extends FragmentActivity
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
 
                 //Start Playing
-                playOrStop(null);
+                if (!UheerPlayer.isInitiated()) {
+                    UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0));
+                }
             } else {
                 errorFragment.setVisibility(View.VISIBLE);
                 TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
@@ -166,11 +165,11 @@ public class PlayingActivity extends FragmentActivity
         @Override
         public void onPageSelected(int position)
         {
-            Log.d("Tab Selected","Selected " + String.valueOf(position));
-            if(uheerPlayer != null && uheerPlayer.isPlaying())
-                uheerPlayer.dispose();
-            uheerPlayer = new UheerPlayer(getApplicationContext(),
-                    ActiveChannels.getActiveChannel(position)).start();
+            Log.d("Tab Selected", "Selected " + String.valueOf(position));
+            if(UheerPlayer.isInitiated())
+                UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(position));
+            else
+                UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(position));
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
