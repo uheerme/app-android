@@ -163,6 +163,7 @@ public class PlayingActivity extends FragmentActivity
                 player.stop();
             player = new UheerPlayer(getApplicationContext(),
                     ActiveChannels.getActiveChannel(position)).start();
+            playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
         @Override
