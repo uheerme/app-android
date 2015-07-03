@@ -104,6 +104,7 @@ public class UheerPlayer {
     public static void changeChannel(Channel channel){
         stop();
 
+        UheerPlayer.channel = channel;
         synchronizer = new Synchronizer(channel)
                 .setListener(new Synchronizer.ISyncListener() {
                     @Override
@@ -113,6 +114,13 @@ public class UheerPlayer {
                 });
 
         start();
+    }
+
+    public static int currentChannelId(){
+        if(channel != null)
+            return channel.Id;
+        else
+            return -1;
     }
 
     protected static void softPlay() {

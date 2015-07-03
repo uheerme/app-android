@@ -136,8 +136,12 @@ public class PlayingActivity extends FragmentActivity
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
 
                 //Start Playing
+                int currentTab = tabsInfoContainer.getCurrentItem();
                 if (!UheerPlayer.isInitiated()) {
                     UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0));
+                //In the case the app was closed with the back button
+                } else if (UheerPlayer.currentChannelId() != ActiveChannels.getActiveChannel(currentTab).Id ) {
+                    UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
                 }
             } else {
                 errorFragment.setVisibility(View.VISIBLE);
@@ -147,7 +151,8 @@ public class PlayingActivity extends FragmentActivity
         }
 
         @Override
-        protected void onCancelled() {
+        protected void onCancelled()
+        {
             loadingFragment.setVisibility(View.GONE);
             errorFragment.setVisibility(View.VISIBLE);
             TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
