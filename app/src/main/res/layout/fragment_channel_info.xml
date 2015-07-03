@@ -5,51 +5,48 @@
               android:padding="8dp">
 
     <LinearLayout
-                  android:orientation="vertical"
-                  android:layout_width="match_parent"
-                  android:layout_height="0dp"
-                  android:elevation="2dp"
-                  android:layout_weight="1"
-                  android:background="@color/accent_material_light">
-
-    <TextView
-        android:id="@+id/channel_name_in_playing"
-        android:textSize="@dimen/abc_text_size_large_material"
-        android:gravity="center"
-        android:padding="8dp"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="getGlobals"
-        android:lines="1"
+        android:layout_height="0dp"
+        android:elevation="2dp"
         android:layout_weight="1"
-        android:text="Channel Name"
-        />
+        android:background="@color/accent_material_light">
 
-    <TextView
-        android:id="@+id/channel_owner_in_playing"
-        android:textSize="@dimen/abc_text_size_medium_material"
-        android:gravity="center"
-        android:padding="6dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="getGlobals"
-        android:lines="1"
-        android:layout_weight="1"
-        android:text="Channel's Owner"
-        />
+        <TextView
+            android:id="@+id/channel_name_in_playing"
+            android:textSize="@dimen/abc_text_size_large_material"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:layout_weight="1"
+            android:text="Channel Name"
+            />
 
-    <TextView
-        android:id="@+id/channel_duration_in_playing"
-        android:textSize="@dimen/abc_text_size_small_material"
-        android:gravity="center"
-        android:padding="4dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="getGlobals"
-        android:lines="1"
-        android:layout_weight="1"
-        android:text="Duration"
-        />
+        <TextView
+            android:id="@+id/channel_owner_in_playing"
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:gravity="center"
+            android:padding="6dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:layout_weight="1"
+            android:text="Channel's Owner"
+            />
+
+        <TextView
+            android:id="@+id/channel_duration_in_playing"
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:gravity="center"
+            android:padding="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:layout_weight="1"
+            android:text="Duration"
+            />
 
     </LinearLayout>
 
