@@ -111,6 +111,8 @@ public class PlayingActivity extends FragmentActivity
         @Override
         protected void onPostExecute(Channel[] channels)
         {
+            //It is removed from the view in both situations
+            loadingFragment.setVisibility(View.GONE);
 
             ActiveChannels.setActiveChannels(channels);
             if(channels != null)
@@ -124,7 +126,6 @@ public class PlayingActivity extends FragmentActivity
                 // Give the TabLayout the ViewPager
                 tabsContainer.setupWithViewPager(tabsInfoContainer);
             } else {
-                loadingFragment.setVisibility(View.GONE);
                 errorFragment.setVisibility(View.VISIBLE);
             }
 
