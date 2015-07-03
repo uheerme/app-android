@@ -63,8 +63,10 @@ public class UheerPlayer {
     }
 
     public UheerPlayer dispose() {
-        if (resyncService != null) resyncService.cancel(true);
+        if (resyncService != null)
+            resyncService.cancel(true);
         player.stop();
+        player.reset();
         currentOnPlay = null;
 
         return this;
@@ -77,13 +79,7 @@ public class UheerPlayer {
     }
 
     public void stop(){
-        if(player != null){
-            player.pause();
-            player.stop();
-            player.reset();
-        }
-        if(resyncService != null)
-            resyncService.cancel(true);
+        this.dispose();
     }
 
     public boolean isPlaying(){

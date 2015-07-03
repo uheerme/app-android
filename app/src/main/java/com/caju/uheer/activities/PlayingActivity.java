@@ -34,7 +34,7 @@ public class PlayingActivity extends FragmentActivity
     FrameLayout loadingFragment;
     FrameLayout errorFragment;
 
-    private UheerPlayer player;
+    private UheerPlayer uheerPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,16 +67,24 @@ public class PlayingActivity extends FragmentActivity
         }, 5000);
     }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+
+        if(uheerPlayer != null)
+            uheerPlayer.stop();
+    }
+
     public void playOrStop(View view)
     {
 
         int currentTab = tabsInfoContainer.getCurrentItem();
         Log.d("Current", "Current Fragment:" + String.valueOf(tabsInfoContainer.getCurrentItem()));
-        if(player != null && player.isPlaying()){
-            player.stop();
+        if(uheerPlayer != null && uheerPlayer.isPlaying()){
+            uheerPlayer.dispose();
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_play_icon));
         } else {
-            player = new UheerPlayer(getApplicationContext(),
+            uheerPlayer = new UheerPlayer(getApplicationContext(),
                     ActiveChannels.getActiveChannel(currentTab)).start();
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
@@ -159,9 +167,9 @@ public class PlayingActivity extends FragmentActivity
         public void onPageSelected(int position)
         {
             Log.d("Tab Selected","Selected " + String.valueOf(position));
-            if(player != null && player.isPlaying())
-                player.stop();
-            player = new UheerPlayer(getApplicationContext(),
+            if(uheerPlayer != null && uheerPlayer.isPlaying())
+                uheerPlayer.dispose();
+            uheerPlayer = new UheerPlayer(getApplicationContext(),
                     ActiveChannels.getActiveChannel(position)).start();
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
