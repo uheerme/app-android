@@ -1,4 +1,4 @@
-package com.caju.uheer.activities;
+package com.caju.uheer.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,10 +12,10 @@ import com.caju.uheer.R;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayingLoadingFragment extends Fragment
+public class LoadingImageFragment extends Fragment
 {
 
-    public PlayingLoadingFragment()
+    public LoadingImageFragment()
     {
     }
 

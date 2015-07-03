@@ -5,11 +5,11 @@
               android:padding="8dp">
 
     <ImageView
+        android:id="@+id/loading_or_error_playing"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:src="@drawable/black_loop_icon"
         android:layout_gravity="center"
-        android:id="@+id/stop_button"
         android:layout_weight="1"
         android:padding="8dp"/>
 

@@ -1,4 +1,4 @@
-package com.caju.uheer.activities;
+package com.caju.uheer.fragments;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -20,21 +20,21 @@ import java.util.ArrayList;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class PlayingFragment extends Fragment
+public class ChannelInfoFragment extends Fragment
 {
     public static final String ARG_CHANNEL_POSITION = "ARG_CHANNEL_POSITION";
 
     private Channel mChannel;
 
-    public PlayingFragment()
+    public ChannelInfoFragment()
     {
     }
 
-    public static PlayingFragment newInstance(int position)
+    public static ChannelInfoFragment newInstance(int position)
     {
         Bundle args = new Bundle();
         args.putInt(ARG_CHANNEL_POSITION, position);
-        PlayingFragment fragment = new PlayingFragment();
+        ChannelInfoFragment fragment = new ChannelInfoFragment();
         fragment.setArguments(args);
         return fragment;
     }

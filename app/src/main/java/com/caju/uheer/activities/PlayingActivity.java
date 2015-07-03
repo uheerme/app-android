@@ -1,6 +1,5 @@
 package com.caju.uheer.activities;
 
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
@@ -11,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.caju.uheer.R;
@@ -24,12 +24,14 @@ import com.caju.uheer.interfaces.Routes;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-public class Playing extends FragmentActivity
+public class PlayingActivity extends FragmentActivity
 {
-    ViewPager mViewPager;
-    TabLayout mTabLayout;
-    LinearLayout mLinearLayout;
-    FloatingActionButton mFAB;
+    ViewPager tabsInfoContainer;
+    TabLayout tabsContainer;
+    FloatingActionButton playAndStopFAB;
+
+    LinearLayout linearLayoutInsideLoadingFragment;
+    ImageView imageInsideLoadingFragment;
 
     private UheerPlayer player;
     int currentPlaying;
@@ -43,10 +45,11 @@ public class Playing extends FragmentActivity
         currentPlaying = 1;
         new fetchActiveChannelsAndMusicTask().execute();
 
-        mViewPager = (ViewPager) findViewById(R.id.viewpager);
-        mTabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-        mLinearLayout = (LinearLayout) findViewById(R.id.empty_channel_image_in_playing);
-        mFAB = (FloatingActionButton) findViewById(R.id.playOrStopFAB);
+        tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
+        tabsContainer = (TabLayout) findViewById(R.id.sliding_tabs);
+        playAndStopFAB = (FloatingActionButton) findViewById(R.id.playOrStopFAB);
+        linearLayoutInsideLoadingFragment = (LinearLayout) findViewById(R.id.empty_channel_image_in_playing);
+        imageInsideLoadingFragment = (ImageView) findViewById(R.id.loading_or_error_playing);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setTitle("uheer");
@@ -56,14 +59,14 @@ public class Playing extends FragmentActivity
     public void playOrStopChannel(View view)
     {
 
-        int currentFragment = mViewPager.getCurrentItem();
-        Log.d("Current", "Current Fragment:" + String.valueOf(mViewPager.getCurrentItem()));
+        int currentFragment = tabsInfoContainer.getCurrentItem();
+        Log.d("Current", "Current Fragment:" + String.valueOf(tabsInfoContainer.getCurrentItem()));
         if(player != null)
             player.stop();
 
         if(currentFragment == currentPlaying)
         {
-            mFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_play_icon));
+            playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_play_icon));
             currentPlaying = 1;
             return;
         }
@@ -71,7 +74,7 @@ public class Playing extends FragmentActivity
         currentPlaying = currentFragment;
         player = new UheerPlayer(getApplicationContext(),
                 ActiveChannels.getActiveChannel(currentFragment)).start();
-        mFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
+        playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
     }
 
     class fetchActiveChannelsAndMusicTask extends AsyncTask<Void, Void, Channel[]>
@@ -112,16 +115,40 @@ public class Playing extends FragmentActivity
             ActiveChannels.setActiveChannels(channels);
             if(channels != null)
             {
-                mLinearLayout.setVisibility(View.GONE);
-                mViewPager.setVisibility(View.VISIBLE);
-                mFAB.setVisibility(View.VISIBLE);
+                linearLayoutInsideLoadingFragment.setVisibility(View.GONE);
+                tabsInfoContainer.setVisibility(View.VISIBLE);
+                playAndStopFAB.setVisibility(View.VISIBLE);
 
-                mViewPager.setAdapter(new PlayingFragmentAdapter(getSupportFragmentManager(), Playing.this));
+                tabsInfoContainer.setAdapter(new PlayingFragmentAdapter(getSupportFragmentManager(), PlayingActivity.this));
+                tabsInfoContainer.addOnPageChangeListener(new PlayingActivity.onHorizontalSwypeListener());
 
                 // Give the TabLayout the ViewPager
-                mTabLayout.setupWithViewPager(mViewPager);
+                tabsContainer.setupWithViewPager(tabsInfoContainer);
+            } else {
+                imageInsideLoadingFragment.setImageDrawable(getResources().getDrawable(R.drawable.black_error_icon));
             }
 
+        }
+    }
+
+    class onHorizontalSwypeListener implements ViewPager.OnPageChangeListener{
+
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
+        {
+            Log.d("Page","1" + String.valueOf(position));
+        }
+
+        @Override
+        public void onPageSelected(int position)
+        {
+            Log.d("Page","2" + String.valueOf(position));
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state)
+        {
+            Log.d("Page","3" + String.valueOf(state));
         }
     }
 }

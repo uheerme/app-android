@@ -46,7 +46,7 @@
         android:orientation="vertical">
 
         <fragment
-            android:name="com.caju.uheer.activities.PlayingLoadingFragment"
+            android:name="com.caju.uheer.fragments.LoadingImageFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:layout="@layout/fragment_playing_loading"/>

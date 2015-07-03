@@ -5,8 +5,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.caju.uheer.activities.Playing;
-import com.caju.uheer.activities.PlayingFragment;
+import com.caju.uheer.fragments.ChannelInfoFragment;
 import com.caju.uheer.core.ActiveChannels;
 import com.caju.uheer.core.Channel;
 
@@ -30,13 +29,12 @@ public class PlayingFragmentAdapter extends FragmentPagerAdapter
     @Override
     public Fragment getItem(int position)
     {
-        return PlayingFragment.newInstance(position);
+        return ChannelInfoFragment.newInstance(position);
     }
 
     @Override
     public CharSequence getPageTitle(int position)
     {
-        // Generate title based on item position
         Channel c = ActiveChannels.getActiveChannel(position);
         return c.Name;
     }
