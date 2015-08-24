@@ -56,7 +56,7 @@ public class ChannelInfoFragment extends Fragment
         TextView channelName = (TextView) view.findViewById(R.id.channel_name_in_playing);
         channelName.setText(mChannel.Name);
         TextView owner = (TextView) view.findViewById(R.id.channel_owner_in_playing);
-        owner.setText(mChannel.Owner);
+        owner.setText(mChannel.Author.Email);
         TextView duration = (TextView) view.findViewById(R.id.channel_duration_in_playing);
         duration.setText("31 min and 34 seg");
 

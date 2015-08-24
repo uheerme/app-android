@@ -12,7 +12,7 @@ public class Channel {
     public int Id;
     public String Name;
 
-    public String Owner;
+    public User Author;
     public String HostIpAddress;
     public String HostMacAddress;
 
