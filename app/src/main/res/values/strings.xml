@@ -19,5 +19,6 @@
     <string name="title_activity_main">uheer Old Layout</string>
     <string name="no_connection">You have no connection.</string>
     <string name="slow_connection">Connection issues were detected</string>
+    <string name="taking_too_long">Just one more second</string>
 
 </resources>

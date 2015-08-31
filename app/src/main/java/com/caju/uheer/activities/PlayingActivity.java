@@ -34,30 +34,57 @@ public class PlayingActivity extends FragmentActivity
     FrameLayout loadingFragment;
     FrameLayout errorFragment;
 
+    /*
+        This task will fetch the active channels around the user and
+        their music. It is final to be acessed within another class.
+    */
+    final AsyncTask fetchingInfo = new fetchActiveChannelsAndMusicTask().execute();
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
-        //It is final because it is accessed within another subclass.
-        final AsyncTask fetchingInfo = new fetchActiveChannelsAndMusicTask().execute();
 
-        //Associate Views with class objects for subsequent manipulation
+
+        /*
+            Association of Views with their class objects for subsequent manipulation
+         */
         tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
         tabsContainer = (TabLayout) findViewById(R.id.sliding_tabs);
         playAndStopFAB = (FloatingActionButton) findViewById(R.id.playOrStopFAB);
         loadingFragment = (FrameLayout) findViewById(R.id.loading_image_in_Playing_Activity);
         errorFragment = (FrameLayout) findViewById(R.id.error_image_in_Playing_Activity);
 
-        //Inflate toolbar with app name
+        /*
+            Load the toolbar with the app's name
+         */
         Toolbar toolbar = (Toolbar) findViewById(R.id.main_toolbar);
         toolbar.setTitle(R.string.app_name);
         toolbar.setTitleTextColor(Color.WHITE);
 
-        //timeout for AsyncTask of 5 seconds
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable()
+        /*
+            Timeout of 5 seconds for AsyncTask
+            to warn user of potential delay
+         */
+        Handler waitMessage = new Handler();
+        waitMessage.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if(fetchingInfo.getStatus() == AsyncTask.Status.RUNNING)
+                    onTakingTooLong();
+            }
+        }, 5000);
+
+        /*
+            Timeout of 10 seconds for AsyncTask
+            to cancel running task
+         */
+        Handler cancelTask = new Handler();
+        cancelTask.postDelayed(new Runnable()
         {
             @Override
             public void run()
@@ -65,7 +92,18 @@ public class PlayingActivity extends FragmentActivity
                 if(fetchingInfo.getStatus() == AsyncTask.Status.RUNNING)
                     fetchingInfo.cancel(true);
             }
-        }, 5000);
+        }, 10000);
+    }
+
+    private void onTakingTooLong()
+    {
+        if(fetchingInfo.getStatus() == AsyncTask.Status.RUNNING)
+        {
+            loadingFragment.setVisibility(View.GONE);
+            errorFragment.setVisibility(View.VISIBLE);
+            TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
+            error_message.setText(R.string.taking_too_long);
+        }
     }
 
     /*
@@ -129,6 +167,7 @@ public class PlayingActivity extends FragmentActivity
         {
             //It is removed from the view in both situations
             loadingFragment.setVisibility(View.GONE);
+            errorFragment.setVisibility(View.GONE);
 
             ActiveChannels.setActiveChannels(channels);
             if(channels != null)
@@ -167,6 +206,7 @@ public class PlayingActivity extends FragmentActivity
             TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
             error_message.setText(R.string.slow_connection);
         }
+
     }
 
     class onSwypeWithinPlayingListener implements ViewPager.OnPageChangeListener{
