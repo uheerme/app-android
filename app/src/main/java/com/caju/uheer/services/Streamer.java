@@ -91,7 +91,7 @@ public class Streamer {
             try {
                 // Get file's length. If we already have the audio file stored and its length is the same,
                 // we don't have to stream, as this song was streamed already, in a different uheer instance.
-                URL url = new URL(Routes.MUSICS + music.Id + "/stream");
+                URL url = new URL(Routes.API + Routes.MUSICS + music.Id + Routes.STREAM);
                 URLConnection c = url.openConnection();
                 c.connect();
                 int length = c.getContentLength();

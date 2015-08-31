@@ -46,8 +46,6 @@ public class PlayingActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
-
-
         /*
             Association of Views with their class objects for subsequent manipulation
          */
@@ -94,6 +92,11 @@ public class PlayingActivity extends FragmentActivity
             }
         }, 10000);
     }
+
+    /*
+        This routine sets up a warning message (via an error fragment)
+        to the user in case of fetching is taking too long
+     */
 
     private void onTakingTooLong()
     {
@@ -143,14 +146,14 @@ public class PlayingActivity extends FragmentActivity
             {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                Log.d("Channels Route", Routes.CHANNELS + "active");
-                activeChannels = restTemplate.getForObject(Routes.CHANNELS + "active", Channel[].class);
+                activeChannels = restTemplate.getForObject(Routes.API + Routes.CHANNELS + Routes.ACTIVE, Channel[].class);
+                Log.d("Channels Route", Routes.API + Routes.CHANNELS + Routes.ACTIVE);
 
                 if(activeChannels != null)
                 {
                     for(Channel c : activeChannels)
                     {
-                        channelSongs = restTemplate.getForObject(Routes.CHANNELS + c.Id + "/musics", Music[].class);
+                        channelSongs = restTemplate.getForObject(Routes.API + Routes.CHANNELS + c.Id + Routes.MUSICS, Music[].class);
                         c.Musics = channelSongs;
                     }
                 }
@@ -165,10 +168,15 @@ public class PlayingActivity extends FragmentActivity
         @Override
         protected void onPostExecute(Channel[] channels)
         {
-            //It is removed from the view in both situations
+            /*
+                Remove from screen auxiliary views
+             */
             loadingFragment.setVisibility(View.GONE);
             errorFragment.setVisibility(View.GONE);
 
+            /*
+                Update active channels locally
+             */
             ActiveChannels.setActiveChannels(channels);
             if(channels != null)
             {
