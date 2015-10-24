@@ -9,9 +9,9 @@
     android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@drawable/black_error_icon"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:src="@drawable/circle_list_item"
         android:layout_gravity="center"
         android:padding="2dp"/>
 
@@ -19,6 +19,7 @@
         android:id="@+id/song_name_in_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="8dp"
         android:textSize="@dimen/abc_text_size_medium_material"
         android:textColor="@android:color/black"
         />

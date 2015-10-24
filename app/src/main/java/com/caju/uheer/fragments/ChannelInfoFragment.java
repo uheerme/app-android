@@ -2,11 +2,9 @@ package com.caju.uheer.fragments;
 
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -14,10 +12,7 @@ import android.widget.TextView;
 import com.caju.uheer.R;
 import com.caju.uheer.core.ActiveChannels;
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.core.Music;
 import com.caju.uheer.services.adapters.MusicListAdapter;
-
-import java.util.ArrayList;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -68,7 +63,7 @@ public class ChannelInfoFragment extends Fragment
 
         View v = new LinearLayout(getActivity());
 
-        MusicListAdapter listAdapter = new MusicListAdapter(getActivity(), R.layout.list_channels,mChannel.Musics);
+        MusicListAdapter listAdapter = new MusicListAdapter(getActivity(), R.layout.adapter_music_list,mChannel.Musics);
         songsListView.setAdapter(listAdapter);
 
         return view;

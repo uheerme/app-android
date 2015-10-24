@@ -82,7 +82,7 @@ public class ChannelsActivity extends AppCompatActivity {
                 channelsNames.add(channel);
             }
             final ArrayAdapter<Channel> listAdapter = new ArrayAdapter<Channel>(getApplicationContext(),
-             R.layout.list_channels, channelsNames);
+             R.layout.adapter_music_list, channelsNames);
 
             channelListView.setAdapter(listAdapter);
             channelListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
