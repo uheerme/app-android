@@ -120,6 +120,10 @@ public class MainActivity extends Activity {
         startActivity(new Intent(this, ChannelsActivity.class));
     }
 
+    public void goToFriendsHereActivity(View view) {
+        startActivity(new Intent(this, FriendsHereActivity.class));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -141,90 +145,4 @@ public class MainActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
-//
-//    /* This method is called after GetChannel is finished */
-//    public void onLoadFinished() {
-//        System.out.println("Executing OnLoadFinished");
-//        /*if(lastButtonClicked == 1){
-//            if(getChannel.getResultResponse() != null)
-//                textView.setText(getChannel.getResultResponse());
-//            else
-//                textView.setText("This shouldn't happen");
-//        }*/
-//        if (lastButtonClicked == 1) {
-//            if (getChannel.getResultResponse() != null)
-//                textView.setText(getChannel.getResultResponse());
-//            else
-//                textView.setText("This shouldn't happen");
-//        } else if (lastButtonClicked == 2) {
-//            if (getChannelMusic.getResultResponse() != null)
-//                textView.setText(getChannelMusic.getResultResponse());
-//            else
-//                textView.setText("This shouldn't happen");
-//        } else if (lastButtonClicked == 3) {
-//            if (postMusic.getResultResponse() != null)
-//                textView.setText(postMusic.getResultResponse());
-//            else
-//                textView.setText("This shouldn't happen");
-//        } else if (lastButtonClicked == 4) {
-//            if (getMusic.getResultResponse() != null)
-//                textView.setText(getMusic.getResultResponse());
-//            else
-//                textView.setText("This shouldn't happen");
-//
-//            File file = new File(getFileStreamPath(getMusic.getFilename()).getPath());
-//            Uri u = Uri.fromFile(file);
-//            if (mediaPlayer != null)
-//                mediaPlayer.release();
-//            mediaPlayer = new MediaPlayer();
-//            try {
-//                mediaPlayer.setDataSource(this, u);
-//                mediaPlayer.prepare();
-//                //mediaPlayer.seekTo(30*1000);
-//                mediaPlayer.start();
-//
-//            } catch (IOException e) {
-//                System.err.println("SONG COULD NOT BE PREPARED AND PLAYED");
-//                e.printStackTrace();
-//            }
-//
-//        }
-//    }
-//
-//    public void onLoadFailed() {
-//        System.out.println("Executing OnLoadFailed");
-//        textView.setText("Something went wrong in op " + lastButtonClicked);
-//    }
-//
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent resultData) {
-//
-//        if (requestCode == 10 && resultCode == Activity.RESULT_OK) {
-//            Uri uri = null;
-//            ArrayList<String> files = new ArrayList<>();
-//
-//            if (resultData != null) {
-//                uri = resultData.getData();
-//                files.add(uri.getPath());
-//            }
-//
-//            int id;
-//            String s_id = number.getText().toString();
-//            try {
-//                id = Integer.parseInt(s_id);
-//            } catch (NumberFormatException e) {
-//                id = 0;
-//            }
-//
-//            try {
-//                postMusic = new PostMusic(getApplicationContext(), id, files);
-//            } catch (NoConnectionException e) {
-//                textView.setText("You have no connection.");
-//            } catch (NoIDSelectedException e) {
-//                textView.setText("You have no ID.");
-//            }
-//
-//        }
-//
-//    }
 }
