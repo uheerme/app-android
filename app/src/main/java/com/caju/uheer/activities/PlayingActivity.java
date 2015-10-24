@@ -1,5 +1,7 @@
 package com.caju.uheer.activities;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Handler;
@@ -10,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.TextView;
@@ -24,6 +27,10 @@ import com.caju.uheer.interfaces.Routes;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.regex.Pattern;
 
 public class PlayingActivity extends FragmentActivity
 {
@@ -45,6 +52,20 @@ public class PlayingActivity extends FragmentActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
+
+        ArrayList<String> contas = new ArrayList<>();
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS;
+        Account[] accounts = ((AccountManager) getSystemService(ACCOUNT_SERVICE)).getAccounts();
+        for (Account a : accounts) {
+            if (emailPattern.matcher(a.name).matches()) {
+                if(contas.size() == 0)
+                    contas.add(a.name);
+                else if(Collections.frequency(contas,a.name)+1 > Collections.frequency(contas,contas.get(0)))
+                    contas.add(0,a.name);
+                else
+                    contas.add(a.name);
+            }
+        }
 
         /*
             Association of Views with their class objects for subsequent manipulation
