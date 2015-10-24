@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -14,6 +15,7 @@ import com.caju.uheer.R;
 import com.caju.uheer.core.ActiveChannels;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.core.Music;
+import com.caju.uheer.services.adapters.MusicListAdapter;
 
 import java.util.ArrayList;
 
@@ -64,18 +66,9 @@ public class ChannelInfoFragment extends Fragment
 
         ListView songsListView = (ListView) view.findViewById(R.id.music_list_view_in_playing);
 
-        ArrayList<Music> songNames = new ArrayList<Music>();
-        ArrayAdapter<Music> listAdapter;
-        if(mChannel.Musics != null)
-        {
-            for(Music m : mChannel.Musics)
-            {
-                songNames.add(m);
-                Log.d("SongName", m.toString());
-            }
-        }
-        listAdapter = new ArrayAdapter<Music>(getActivity().getApplicationContext(), R.layout.list_channels, songNames);
+        View v = new LinearLayout(getActivity());
 
+        MusicListAdapter listAdapter = new MusicListAdapter(getActivity(), R.layout.list_channels,mChannel.Musics);
         songsListView.setAdapter(listAdapter);
 
         return view;
