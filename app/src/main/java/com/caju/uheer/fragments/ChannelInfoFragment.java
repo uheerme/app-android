@@ -54,9 +54,11 @@ public class ChannelInfoFragment extends Fragment
 
         View view = inflater.inflate(R.layout.fragment_channel_info, container, false);
         TextView channelName = (TextView) view.findViewById(R.id.channel_name_in_playing);
-        channelName.setText(mChannel.Name);
+        channelName.setText(mChannel.Name.toUpperCase());
         TextView owner = (TextView) view.findViewById(R.id.channel_owner_in_playing);
         owner.setText(mChannel.Author.Email);
+        TextView ip = (TextView) view.findViewById(R.id.channel_ip_in_playing);
+        ip.setText(mChannel.HostIpAddress);
         TextView duration = (TextView) view.findViewById(R.id.channel_duration_in_playing);
         duration.setText("31 min and 34 seg");
 

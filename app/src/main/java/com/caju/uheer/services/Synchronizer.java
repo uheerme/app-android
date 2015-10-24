@@ -105,7 +105,7 @@ public class Synchronizer {
                 for (int i = 0; i < CHRISTIAN_EXECUTION_COUNT; i++) {
                     long localTime = System.currentTimeMillis();
 
-                    BackendStatus response = serializer.getForObject(Routes.STATUS + "now/", BackendStatus.class);
+                    BackendStatus response = serializer.getForObject(Routes.API + Routes.STATUS + Routes.NOW, BackendStatus.class);
 
                     Date formattedDate = formatter.parse(response.Now.replaceAll("(\\.[0-9]{3})[0-9]*(Z$)", "$1+0000"));
 

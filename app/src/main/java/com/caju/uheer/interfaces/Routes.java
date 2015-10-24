@@ -9,5 +9,6 @@ public interface Routes {
     String MUSICS   = "/musics/";
     String STATUS   = "/status/";
     String STREAM   = "/stream/";
+    String NOW   = "/now/";
 
 }

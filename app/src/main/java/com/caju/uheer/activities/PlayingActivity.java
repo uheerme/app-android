@@ -240,6 +240,7 @@ public class PlayingActivity extends FragmentActivity
         @Override
         public void onPageScrollStateChanged(int state)
         {
+
         }
     }
 }

@@ -7,20 +7,18 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="100dp"
         android:elevation="2dp"
-        android:layout_weight="1"
         android:background="@color/accent_material_light">
 
         <TextView
             android:id="@+id/channel_name_in_playing"
             android:textSize="@dimen/abc_text_size_large_material"
             android:gravity="center"
-            android:padding="8dp"
+            android:padding="4dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:layout_weight="1"
             android:text="Channel Name"
             />
 
@@ -28,23 +26,32 @@
             android:id="@+id/channel_owner_in_playing"
             android:textSize="@dimen/abc_text_size_medium_material"
             android:gravity="center"
-            android:padding="6dp"
+            android:padding="2dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:layout_weight="1"
             android:text="Channel's Owner"
+            />
+
+        <TextView
+            android:id="@+id/channel_ip_in_playing"
+            android:textSize="@dimen/abc_text_size_small_material"
+            android:gravity="center"
+            android:padding="1dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:text="IP Address"
             />
 
         <TextView
             android:id="@+id/channel_duration_in_playing"
             android:textSize="@dimen/abc_text_size_small_material"
             android:gravity="center"
-            android:padding="4dp"
+            android:padding="1dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lines="1"
-            android:layout_weight="1"
             android:text="Duration"
             />
 
@@ -53,8 +60,7 @@
     <ListView
         android:id="@+id/music_list_view_in_playing"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"
+        android:layout_height="match_parent"
         android:padding="8dp" >
     </ListView>
 
