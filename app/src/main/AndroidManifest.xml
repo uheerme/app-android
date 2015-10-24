@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.caju.uheer" >
 
-    <uses-feature android:name="android.hardware.audio.low_latency"/>
+    <uses-feature android:name="android.hardware.audio.low_latency" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -17,19 +17,21 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activities.PlayingActivity"
-            android:label="@string/title_activity_playing"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".activities.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".activities.PlayingActivity"
+            android:label="@string/title_activity_playing"
+            android:screenOrientation="portrait" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -46,6 +48,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.caju.uheer.activities.ChannelsActivity" />
+        </activity>
+        <activity
+            android:name=".activities.FriendsHereActivity"
+            android:label="@string/title_activity_friends_here" >
+        </activity>
+        <activity
+            android:name=".activities.FriendsInOtherPlacesActivity"
+            android:label="@string/title_activity_friends_in_other_places" >
         </activity>
     </application>
 

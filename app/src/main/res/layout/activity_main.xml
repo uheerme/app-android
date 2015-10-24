@@ -27,5 +27,23 @@
         android:onClick="gameNightTest"
         android:text="@string/game_night" />
 
+    <Button
+        android:id="@+id/friends_here"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:onClick="goToFriendsHereActivity"
+        android:text="@string/friends_here" />
+
+    <Button
+        android:id="@+id/friends_in_other_places"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginLeft="50dp"
+        android:layout_marginRight="50dp"
+        android:onClick="goToFriendsInOtherPlaces"
+        android:text="@string/friends_in_other_places" />
+
 
 </LinearLayout>
