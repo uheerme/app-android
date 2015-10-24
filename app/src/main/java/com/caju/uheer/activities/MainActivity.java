@@ -124,6 +124,10 @@ public class MainActivity extends Activity {
         startActivity(new Intent(this, FriendsHereActivity.class));
     }
 
+    public void goToFriendsInOtherPlaces(View view) {
+        startActivity(new Intent(this, FriendsInOtherPlacesActivity.class));
+    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

@@ -4,6 +4,7 @@
     <string name="action_about">About Us</string>
     <string name="channels">Channels</string>
     <string name="friends_here">Friends Here</string>
+    <string name="friends_in_other_places">Friends in other Places</string>
     <string name="listen">Listen</string>
     <string name="listening">Listening to...</string>
     <string name="channel1">Channel 1</string>
@@ -24,5 +25,6 @@
     <string name="title_activity_friends_here">FriendsHereActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_friends_in_other_places">FriendsInOtherPlacesActivity</string>
 
 </resources>

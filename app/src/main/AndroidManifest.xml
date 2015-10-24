@@ -52,6 +52,10 @@
             android:name=".activities.FriendsHereActivity"
             android:label="@string/title_activity_friends_here" >
         </activity>
+        <activity
+            android:name=".activities.FriendsInOtherPlacesActivity"
+            android:label="@string/title_activity_friends_in_other_places" >
+        </activity>
     </application>
 
 </manifest>
