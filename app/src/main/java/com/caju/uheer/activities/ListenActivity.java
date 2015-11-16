@@ -13,7 +13,7 @@ import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.interfaces.Routes;
-import com.caju.uheer.services.UheerPlayer;
+import com.caju.uheer.services.player.UheerPlayer;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;

@@ -8,7 +8,7 @@ import android.view.MenuItem;
 
 import com.caju.uheer.R;
 import com.caju.uheer.core.Channel;
-import com.caju.uheer.core.BackendStatus;
+import com.caju.uheer.services.BackendStatus;
 import com.caju.uheer.interfaces.Routes;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;

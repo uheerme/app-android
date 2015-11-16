@@ -18,10 +18,10 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
-import com.caju.uheer.core.ActiveChannels;
+import com.caju.uheer.services.ActiveChannels;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.core.Music;
-import com.caju.uheer.services.UheerPlayer;
+import com.caju.uheer.services.player.UheerPlayer;
 import com.caju.uheer.services.adapters.PlayingFragmentAdapter;
 import com.caju.uheer.interfaces.Routes;
 

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.caju.uheer.fragments.ChannelInfoFragment;
-import com.caju.uheer.core.ActiveChannels;
+import com.caju.uheer.services.ActiveChannels;
 import com.caju.uheer.core.Channel;
 
 public class PlayingFragmentAdapter extends FragmentPagerAdapter

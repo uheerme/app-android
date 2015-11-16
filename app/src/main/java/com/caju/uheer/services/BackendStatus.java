@@ -1,4 +1,4 @@
-package com.caju.uheer.core;
+package com.caju.uheer.services;
 
 public class BackendStatus {
     public String Now;

@@ -1,12 +1,12 @@
-package com.caju.uheer.services;
+package com.caju.uheer.services.player;
 
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.caju.uheer.core.BackendStatus;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.debug.GlobalVariables;
 import com.caju.uheer.interfaces.Routes;
+import com.caju.uheer.services.BackendStatus;
 import com.caju.uheer.services.infrastructure.SyncItem;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;

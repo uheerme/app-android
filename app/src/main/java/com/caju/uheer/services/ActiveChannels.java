@@ -1,4 +1,6 @@
-package com.caju.uheer.core;
+package com.caju.uheer.services;
+
+import com.caju.uheer.core.Channel;
 
 /**
  * This class maintains the current information of the Active Channels

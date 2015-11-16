@@ -10,7 +10,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
-import com.caju.uheer.core.ActiveChannels;
+import com.caju.uheer.services.ActiveChannels;
 import com.caju.uheer.core.Channel;
 import com.caju.uheer.services.adapters.MusicListAdapter;
 

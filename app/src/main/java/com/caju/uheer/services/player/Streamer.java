@@ -1,4 +1,4 @@
-package com.caju.uheer.services;
+package com.caju.uheer.services.player;
 
 import android.content.Context;
 import android.os.AsyncTask;
