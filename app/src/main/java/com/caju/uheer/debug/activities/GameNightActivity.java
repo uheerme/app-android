@@ -24,8 +24,8 @@ public class GameNightActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game_night);
 
-        new AllActiveChannelsTask().execute();
-        new StatusNowTask().execute();
+        //new AllActiveChannelsTask().execute();
+        //new StatusNowTask().execute();
     }
 
     @Override

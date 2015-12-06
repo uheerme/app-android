@@ -5,33 +5,38 @@ import android.accounts.AccountManager;
 import android.graphics.Color;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.GestureDetector;
+import android.view.Gravity;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
-import com.caju.uheer.app.services.ActiveChannels;
 import com.caju.uheer.app.core.Channel;
 import com.caju.uheer.app.core.Music;
-import com.caju.uheer.app.services.adapters.EmailListAdapter;
-import com.caju.uheer.app.services.adapters.MusicListAdapter;
-import com.caju.uheer.app.services.player.UheerPlayer;
-import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
 import com.caju.uheer.app.interfaces.Routes;
+import com.caju.uheer.app.services.ActiveChannels;
+import com.caju.uheer.app.services.adapters.EmailListAdapter;
+import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
+import com.caju.uheer.app.services.player.UheerPlayer;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -52,6 +57,8 @@ public class PlayingActivity extends FragmentActivity
     String connectedEmail;
     ArrayList<String> friendsEmails;
 
+    DrawerLayout mDrawerLayout;
+
     /*
         This task will fetch the active channels around the user and
         their music. It is final to be acessed within another class.
@@ -64,26 +71,6 @@ public class PlayingActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
-        ArrayList<String> contas = new ArrayList<>();
-        Pattern emailPattern = Patterns.EMAIL_ADDRESS;
-        Account[] accounts = ((AccountManager) getSystemService(ACCOUNT_SERVICE)).getAccounts();
-        for (Account a : accounts) {
-            if (emailPattern.matcher(a.name).matches()) {
-                if(contas.size() == 0)
-                    contas.add(a.name);
-                else if(Collections.frequency(contas,a.name)+1 > Collections.frequency(contas,contas.get(0)))
-                    contas.add(0,a.name);
-                else
-                    contas.add(a.name);
-            }
-        }
-        if(contas.size() > 0)
-            connectedEmail = contas.get(0).toString();
-        else
-            connectedEmail = "undefined@email.com";
-        friendsEmails = contas;
-        Log.d("Connected Email", connectedEmail);
-
         /*
             Association of Views with their class objects for subsequent manipulation
          */
@@ -93,6 +80,33 @@ public class PlayingActivity extends FragmentActivity
         socialFAB = (FloatingActionButton) findViewById(R.id.socialFAB);
         loadingFragment = (FrameLayout) findViewById(R.id.loading_image_in_Playing_Activity);
         errorFragment = (FrameLayout) findViewById(R.id.error_image_in_Playing_Activity);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        mDrawerLayout.setDrawerListener(new DrawerLayout.DrawerListener() {
+            @Override public void onDrawerSlide(View drawerView, float slideOffset) {}
+
+            @Override public void onDrawerOpened(View drawerView) {
+
+            }
+
+            @Override
+            public void onDrawerClosed(View drawerView)
+            {
+                DisplayMetrics displaymetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                int height = displaymetrics.heightPixels;
+                int width = displaymetrics.widthPixels;
+
+                playAndStopFAB.animate().alpha(1);
+                //playAndStopFAB.setVisibility(View.GONE);
+                socialFAB.animate().alpha(1);
+                //socialFAB.setVisibility(View.GONE);
+                mDrawerLayout.setVisibility(View.GONE);
+            }
+
+            @Override public void onDrawerStateChanged(int newState) {}
+        });
+        mDrawerLayout.setVisibility(View.GONE);
 
         /*
             Load the toolbar with the app's name
@@ -131,7 +145,27 @@ public class PlayingActivity extends FragmentActivity
             }
         }, 10000);
 
+        ArrayList<String> contas = new ArrayList<>();
+        Pattern emailPattern = Patterns.EMAIL_ADDRESS;
+        Account[] accounts = ((AccountManager) getSystemService(ACCOUNT_SERVICE)).getAccounts();
+        for (Account a : accounts) {
+            if (emailPattern.matcher(a.name).matches()) {
+                if(contas.size() == 0)
+                    contas.add(a.name);
+                else if(Collections.frequency(contas,a.name)+1 > Collections.frequency(contas,contas.get(0)))
+                    contas.add(0,a.name);
+                else
+                    contas.add(a.name);
+            }
+        }
+        if(contas.size() > 0)
+            connectedEmail = contas.get(0).toString();
+        else
+            connectedEmail = "undefined@email.com";
+        friendsEmails = contas;
+        Log.d("Connected Email", connectedEmail);
 
+        
     }
 
     /*
@@ -148,6 +182,22 @@ public class PlayingActivity extends FragmentActivity
             TextView error_message = (TextView) findViewById(R.id.error_fragment_text);
             error_message.setText(R.string.taking_too_long);
         }
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        if(mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.RIGHT))
+            mDrawerLayout.closeDrawer(Gravity.RIGHT);
+    }
+
+    @Override
+    public void onBackPressed() {
+        System.out.println("BACK");
+        if(mDrawerLayout != null && mDrawerLayout.isDrawerOpen(Gravity.RIGHT))
+            mDrawerLayout.closeDrawer(Gravity.RIGHT);
+        else
+            super.onBackPressed();
     }
 
     /*
@@ -176,10 +226,10 @@ public class PlayingActivity extends FragmentActivity
     {
 
         int currentTab = tabsInfoContainer.getCurrentItem();
-        LinearLayout social = (LinearLayout) ((View)view.getParent()).findViewWithTag(currentTab);
+        LinearLayout social = (LinearLayout) ((View) view.getParent()).findViewWithTag(currentTab);
         if(social.getVisibility() == View.GONE)
         {
-            social.setVisibility(View.VISIBLE);
+            //social.setVisibility(View.VISIBLE);
 
             friendsEmails.addAll(friendsEmails);
 
@@ -187,13 +237,29 @@ public class PlayingActivity extends FragmentActivity
                     this, R.layout.adapter_email_list, friendsEmails);
             ListView emails = (ListView) social.findViewById(R.id.email_list_in_channel_info);
             emails.setAdapter(listAdapter);
+            DisplayMetrics displaymetrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+            int height = displaymetrics.heightPixels;
+            int width = displaymetrics.widthPixels;
+
+            playAndStopFAB.animate().alpha(0);
+            //playAndStopFAB.setVisibility(View.GONE);
+            socialFAB.animate().alpha(0);
+            //socialFAB.setVisibility(View.GONE);
+
+            mDrawerLayout.setVisibility(View.VISIBLE);
+            mDrawerLayout.openDrawer(Gravity.RIGHT);
+            mDrawerLayout.animate().alpha(1).setDuration(500);
+        } else{
+            //social.setVisibility(View.GONE);
+            mDrawerLayout.closeDrawer(Gravity.LEFT);
         }
-        else
-            social.setVisibility(View.GONE);
+
+
+
 
     }
-
-    /*
+        /*
         This AsyncTask fetches the currently active channels and their song list.
      */
 

@@ -36,7 +36,7 @@ public class ChannelsActivity extends AppCompatActivity {
 
         channelListView = (ListView)findViewById(R.id.channelListView);
 
-        new AllChannelsTask().execute();
+        //new AllChannelsTask().execute();
 
         getWifiInformation();
     }
