@@ -2,9 +2,8 @@ package com.caju.uheer.app.activities;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
@@ -13,10 +12,9 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
@@ -31,8 +29,6 @@ import com.caju.uheer.app.core.Music;
 import com.caju.uheer.app.services.player.UheerPlayer;
 import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
 import com.caju.uheer.app.interfaces.Routes;
-import com.caju.uheer.debug.activities.GameNightActivity;
-import com.caju.uheer.debug.activities.MainActivity;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
@@ -45,14 +41,10 @@ public class PlayingActivity extends FragmentActivity
 {
     ViewPager tabsInfoContainer;
     TabLayout tabsContainer;
-    FloatingActionButton playAndStopFAB;
+    FloatingActionButton playAndStopFAB, socialFAB;
 
     FrameLayout loadingFragment;
     FrameLayout errorFragment;
-
-    LinearLayout layoutOfPopup;
-    PopupWindow popupMessage;
-    Button popupButton, insidePopupButton; TextView popupText;
 
     /*
         This task will fetch the active channels around the user and
@@ -86,6 +78,7 @@ public class PlayingActivity extends FragmentActivity
         tabsInfoContainer = (ViewPager) findViewById(R.id.viewpager);
         tabsContainer = (TabLayout) findViewById(R.id.sliding_tabs);
         playAndStopFAB = (FloatingActionButton) findViewById(R.id.playOrStopFAB);
+        socialFAB = (FloatingActionButton) findViewById(R.id.socialFAB);
         loadingFragment = (FrameLayout) findViewById(R.id.loading_image_in_Playing_Activity);
         errorFragment = (FrameLayout) findViewById(R.id.error_image_in_Playing_Activity);
 
@@ -165,8 +158,17 @@ public class PlayingActivity extends FragmentActivity
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+    }
+
+    public void enableSocial(View view)
+    {
+
+        int currentTab = tabsInfoContainer.getCurrentItem();
+        FrameLayout social = (FrameLayout) ((View)view.getParent()).findViewWithTag(currentTab);
+        if(social.getVisibility() == View.GONE)
+            social.setVisibility(View.VISIBLE);
+        else
+            social.setVisibility(View.GONE);
 
     }
 
@@ -179,20 +181,31 @@ public class PlayingActivity extends FragmentActivity
         @Override
         protected Channel[] doInBackground(Void... params)
         {
-            Channel[] activeChannels = null;
+            Channel[] allActiveChannels = null;
             Music[] channelSongs = null;
+            ArrayList<Channel> possibleChannels = new ArrayList<>();
 
             try
             {
                 RestTemplate restTemplate = new RestTemplate();
                 restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                activeChannels = restTemplate.getForObject(Routes.API + Routes.CHANNELS + Routes.ACTIVE, Channel[].class);
+                allActiveChannels = restTemplate.getForObject(Routes.API + Routes.CHANNELS + Routes.ACTIVE, Channel[].class);
                 Log.d("Channels Route", Routes.API + Routes.CHANNELS + Routes.ACTIVE);
 
-                if(activeChannels != null)
+                WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
+                String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
+
+                for(int i = 0; i < allActiveChannels.length ; i++){
+                    if(allActiveChannels[i].HostIpAddress.compareTo(ip) != 0)
+                        allActiveChannels[i] = null;
+                }
+
+                if(allActiveChannels != null)
                 {
-                    for(Channel c : activeChannels)
+                    for(Channel c : allActiveChannels)
                     {
+                        if(c == null)
+                            continue;
                         System.out.println(c.DateDeactivated);
                         channelSongs = restTemplate.getForObject(Routes.API + Routes.CHANNELS + c.Id + Routes.MUSICS, Music[].class);
                         c.Musics = channelSongs;
@@ -203,7 +216,7 @@ public class PlayingActivity extends FragmentActivity
                 Log.e("ChannelsActivity", e.getMessage(), e);
             }
 
-            return activeChannels;
+            return allActiveChannels;
         }
 
         @Override
@@ -215,14 +228,33 @@ public class PlayingActivity extends FragmentActivity
             loadingFragment.setVisibility(View.GONE);
             errorFragment.setVisibility(View.GONE);
 
+            // Filter not available channels
+            Channel[] possibleChannels = null;
+            int j = 0;
+            for(int i = 0; i < channels.length; i++){
+                if(channels[i] != null)
+                    j++;
+            }
+            if(j > 0)
+            {
+                possibleChannels = new Channel[j];
+
+                for(int i = 0; i < channels.length; i++)
+                {
+                    if(channels[i] != null)
+                        possibleChannels[j++] = channels[i];
+                }
+            }
+
             /*
                 Update active channels locally
              */
-            ActiveChannels.setActiveChannels(channels);
-            if(channels != null)
+            ActiveChannels.setActiveChannels(possibleChannels);
+            if(possibleChannels != null)
             {
                 tabsInfoContainer.setVisibility(View.VISIBLE);
                 playAndStopFAB.setVisibility(View.VISIBLE);
+                socialFAB.setVisibility(View.VISIBLE);
 
                 //set Adapter that creates the Channel Info Fragments
                 tabsInfoContainer.setAdapter(new PlayingFragmentAdapter(getSupportFragmentManager(), PlayingActivity.this));

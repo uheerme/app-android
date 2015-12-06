@@ -63,20 +63,35 @@
 
         </FrameLayout>
 
+
+
     </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/playOrStopFAB"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
         android:clickable="true"
         android:visibility="gone"
         android:src="@drawable/white_stop_icon"
         android:onClick="playOrStop"
         app:elevation="6dp"
         app:borderWidth="0dp"
-        app:layout_anchor="@id/linear_layout_above_FAB"
-        app:layout_anchorGravity="bottom|right|end"/>
+        android:layout_gravity="right|bottom"
+        android:layout_margin="16dp"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/socialFAB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:visibility="gone"
+        android:src="@drawable/white_social"
+        android:onClick="enableSocial"
+        app:elevation="6dp"
+        app:borderWidth="0dp"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="82dp"
+        android:layout_marginRight="16dp"/>
 
 </android.support.design.widget.CoordinatorLayout>

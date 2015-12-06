@@ -58,6 +58,15 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        android:id="@+id/social_in_ChannelInfo"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:background="@color/background_material_light"
+        android:visibility="gone">
+
+    </FrameLayout>
+
     <ListView
         android:id="@+id/music_list_view_in_playing"
         android:layout_width="match_parent"

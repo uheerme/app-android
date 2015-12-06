@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -65,6 +66,10 @@ public class ChannelInfoFragment extends Fragment
 
         MusicListAdapter listAdapter = new MusicListAdapter(getActivity(), R.layout.adapter_music_list,mChannel.Musics);
         songsListView.setAdapter(listAdapter);
+
+        FrameLayout social = (FrameLayout) view.findViewById(R.id.social_in_ChannelInfo);
+        int position = getArguments().getInt(ARG_CHANNEL_POSITION);
+        social.setTag(position);
 
         return view;
 
