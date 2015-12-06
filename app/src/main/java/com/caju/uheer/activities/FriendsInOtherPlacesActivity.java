@@ -11,6 +11,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
+import com.caju.uheer.services.infrastructure.ContactablesLoaderCallbacks;
 
 public class FriendsInOtherPlacesActivity extends ActionBarActivity {
 
@@ -53,6 +54,16 @@ public class FriendsInOtherPlacesActivity extends ActionBarActivity {
 
         // Minimum of 2 minutes between checks (120000 milisecs).
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 120000, 0, locationListener);
+
+        // Searching for contacts
+        String query = "lumagri@gmail.com";
+
+        Bundle bundle = new Bundle();
+        bundle.putString("query", query);
+
+        ContactablesLoaderCallbacks loaderCallbacks = new ContactablesLoaderCallbacks(this);
+
+        getLoaderManager().restartLoader(0, bundle, loaderCallbacks);
     }
 
     @Override
