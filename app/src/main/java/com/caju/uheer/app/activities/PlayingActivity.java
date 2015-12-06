@@ -19,6 +19,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
@@ -26,6 +27,8 @@ import com.caju.uheer.R;
 import com.caju.uheer.app.services.ActiveChannels;
 import com.caju.uheer.app.core.Channel;
 import com.caju.uheer.app.core.Music;
+import com.caju.uheer.app.services.adapters.EmailListAdapter;
+import com.caju.uheer.app.services.adapters.MusicListAdapter;
 import com.caju.uheer.app.services.player.UheerPlayer;
 import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
 import com.caju.uheer.app.interfaces.Routes;
@@ -45,6 +48,9 @@ public class PlayingActivity extends FragmentActivity
 
     FrameLayout loadingFragment;
     FrameLayout errorFragment;
+
+    String connectedEmail;
+    ArrayList<String> friendsEmails;
 
     /*
         This task will fetch the active channels around the user and
@@ -71,6 +77,12 @@ public class PlayingActivity extends FragmentActivity
                     contas.add(a.name);
             }
         }
+        if(contas.size() > 0)
+            connectedEmail = contas.get(0).toString();
+        else
+            connectedEmail = "undefined@email.com";
+        friendsEmails = contas;
+        Log.d("Connected Email", connectedEmail);
 
         /*
             Association of Views with their class objects for subsequent manipulation
@@ -164,9 +176,18 @@ public class PlayingActivity extends FragmentActivity
     {
 
         int currentTab = tabsInfoContainer.getCurrentItem();
-        FrameLayout social = (FrameLayout) ((View)view.getParent()).findViewWithTag(currentTab);
+        LinearLayout social = (LinearLayout) ((View)view.getParent()).findViewWithTag(currentTab);
         if(social.getVisibility() == View.GONE)
+        {
             social.setVisibility(View.VISIBLE);
+
+            friendsEmails.addAll(friendsEmails);
+
+            EmailListAdapter listAdapter = new EmailListAdapter(
+                    this, R.layout.adapter_email_list, friendsEmails);
+            ListView emails = (ListView) social.findViewById(R.id.email_list_in_channel_info);
+            emails.setAdapter(listAdapter);
+        }
         else
             social.setVisibility(View.GONE);
 
@@ -209,7 +230,6 @@ public class PlayingActivity extends FragmentActivity
                     {
                         if(c == null)
                             continue;
-                        System.out.println(c.DateDeactivated);
                         channelSongs = restTemplate.getForObject(Routes.API + Routes.CHANNELS + c.Id + Routes.MUSICS, Music[].class);
                         c.Musics = channelSongs;
                     }

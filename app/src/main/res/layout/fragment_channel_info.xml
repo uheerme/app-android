@@ -58,14 +58,32 @@
 
     </LinearLayout>
 
-    <FrameLayout
-        android:id="@+id/social_in_ChannelInfo"
+    <LinearLayout
+        android:id="@+id/social_in_channel_info"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="150dp"
+        android:padding="5dp"
         android:background="@color/background_material_light"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:orientation="vertical">
 
-    </FrameLayout>
+        <TextView
+            android:textSize="@dimen/abc_text_size_medium_material"
+            android:gravity="center"
+            android:padding="2dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:lines="1"
+            android:text="@string/your_friends_email_list" />
+
+        <ListView
+            android:id="@+id/email_list_in_channel_info"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="2dp" >
+        </ListView>
+
+    </LinearLayout>
 
     <ListView
         android:id="@+id/music_list_view_in_playing"

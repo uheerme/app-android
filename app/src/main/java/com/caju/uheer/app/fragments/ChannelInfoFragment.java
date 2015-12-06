@@ -67,7 +67,7 @@ public class ChannelInfoFragment extends Fragment
         MusicListAdapter listAdapter = new MusicListAdapter(getActivity(), R.layout.adapter_music_list,mChannel.Musics);
         songsListView.setAdapter(listAdapter);
 
-        FrameLayout social = (FrameLayout) view.findViewById(R.id.social_in_ChannelInfo);
+        LinearLayout social = (LinearLayout) view.findViewById(R.id.social_in_channel_info);
         int position = getArguments().getInt(ARG_CHANNEL_POSITION);
         social.setTag(position);
 

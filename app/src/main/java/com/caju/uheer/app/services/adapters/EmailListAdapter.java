@@ -11,13 +11,15 @@ import android.widget.TextView;
 import com.caju.uheer.R;
 import com.caju.uheer.app.core.Music;
 
-public class MusicListAdapter extends ArrayAdapter<Music>
+import java.util.ArrayList;
+
+public class EmailListAdapter extends ArrayAdapter<String>
 {
     Context mContext;
     int layoutResourceId;
-    Music data[] = null;
+    ArrayList<String> data = null;
 
-    public MusicListAdapter(Context context, int resource, Music[] list)
+    public EmailListAdapter(Context context, int resource, ArrayList<String> list)
     {
         super(context, resource, list);
 
@@ -37,11 +39,11 @@ public class MusicListAdapter extends ArrayAdapter<Music>
             convertView = inflater.inflate(layoutResourceId, parent, false);
         }
 
-        Music objectItem = data[position];
+        String objectItem = data.get(position);
 
-        TextView textViewItem = (TextView) convertView.findViewById(R.id.song_name_in_list_view);
-        textViewItem.setText(objectItem.Name.replaceAll("\\.mp3",""));
-        textViewItem.setTag(objectItem.Id);
+        TextView textViewItem = (TextView) convertView.findViewById(R.id.email_in_list_view);
+        textViewItem.setText(objectItem);
+        textViewItem.setTag(objectItem);
 
         return convertView;
     }
