@@ -23,8 +23,16 @@ public class FriendsInOtherPlacesActivity extends ActionBarActivity {
         LocationListener locationListener = new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
+                Location locationTest = new Location("test");
+                // Test location in Jockey Club, Sao Carlos.
+//                locationTest.setLongitude(-47.895520);
+//                locationTest.setLatitude(-21.982965);
+                // Test location in Sao Paulo
+                locationTest.setLongitude(-46.639126);
+                locationTest.setLatitude(-23.566787);
                 TextView tv = (TextView)findViewById(R.id.gps_data);
-                tv.setText("Location: "+location.toString());
+                float distance = location.distanceTo(locationTest)/1000;
+                tv.setText("Location: "+location.toString() + "\nDistance: "+String.format("%.1f",distance) +"Km");
             }
 
             @Override
