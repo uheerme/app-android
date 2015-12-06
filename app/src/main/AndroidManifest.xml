@@ -18,7 +18,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".debug.activities.MainActivity"
             android:label="@string/title_activity_main" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.PlayingActivity"
+            android:name=".app.activities.PlayingActivity"
             android:label="@string/title_activity_playing"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -37,25 +37,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.GameNightActivity"
+            android:name=".debug.activities.GameNightActivity"
             android:theme="@style/AppTheme" >
         </activity>
-        <activity android:name=".activities.ChannelsActivity" >
+        <activity android:name=".debug.activities.ChannelsActivity" >
         </activity>
         <activity
-            android:name=".activities.ListenActivity"
+            android:name=".debug.activities.ListenActivity"
             android:label="@string/title_activity_listen"
-            android:parentActivityName=".activities.ChannelsActivity" >
+            android:parentActivityName=".debug.activities.ChannelsActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.caju.uheer.activities.ChannelsActivity" />
+                android:value=".debug.activities.ChannelsActivity" />
         </activity>
         <activity
-            android:name=".activities.FriendsHereActivity"
+            android:name=".beta.activities.FriendsHereActivity"
             android:label="@string/title_activity_friends_here" >
         </activity>
         <activity
-            android:name=".activities.FriendsInOtherPlacesActivity"
+            android:name=".beta.activities.FriendsInOtherPlacesActivity"
             android:label="@string/title_activity_friends_in_other_places" >
         </activity>
     </application>

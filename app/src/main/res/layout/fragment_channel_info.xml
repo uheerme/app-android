@@ -45,6 +45,7 @@
             />
 
         <TextView
+            android:visibility="gone"
             android:id="@+id/channel_duration_in_playing"
             android:textSize="@dimen/abc_text_size_small_material"
             android:gravity="center"

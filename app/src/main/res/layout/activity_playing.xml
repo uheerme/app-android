@@ -42,7 +42,7 @@
             android:layout_height="match_parent">
 
             <fragment
-                android:name="com.caju.uheer.fragments.LoadingFragment"
+                android:name="com.caju.uheer.app.fragments.LoadingFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_loading"/>
@@ -56,7 +56,7 @@
             android:visibility="gone">
 
             <fragment
-                android:name="com.caju.uheer.fragments.ErrorFragment"
+                android:name="com.caju.uheer.app.fragments.ErrorFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:layout="@layout/fragment_loading"/>
