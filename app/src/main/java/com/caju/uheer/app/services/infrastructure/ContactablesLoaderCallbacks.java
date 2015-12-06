@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.caju.uheer.services.infrastructure;
+package com.caju.uheer.app.services.infrastructure;
 
 import android.app.Activity;
 import android.app.LoaderManager;

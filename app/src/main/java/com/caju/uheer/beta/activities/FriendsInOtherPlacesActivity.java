@@ -11,7 +11,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
-import com.caju.uheer.services.infrastructure.ContactablesLoaderCallbacks;
+import com.caju.uheer.app.services.infrastructure.ContactablesLoaderCallbacks;
 
 public class FriendsInOtherPlacesActivity extends ActionBarActivity {
 
