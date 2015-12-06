@@ -195,13 +195,16 @@ public class PlayingActivity extends FragmentActivity
                 WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
                 String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
 
-                for(int i = 0; i < allActiveChannels.length ; i++){
-                    if(allActiveChannels[i].HostIpAddress.compareTo(ip) != 0)
-                        allActiveChannels[i] = null;
-                }
+
 
                 if(allActiveChannels != null)
                 {
+                    /*// Filter not available channels
+                    for(int i = 0; i < allActiveChannels.length ; i++){
+                        if(allActiveChannels[i].HostIpAddress.compareTo(ip) != 0)
+                            allActiveChannels[i] = null;
+                    }*/
+
                     for(Channel c : allActiveChannels)
                     {
                         if(c == null)
@@ -238,7 +241,7 @@ public class PlayingActivity extends FragmentActivity
             if(j > 0)
             {
                 possibleChannels = new Channel[j];
-
+                j=0;
                 for(int i = 0; i < channels.length; i++)
                 {
                     if(channels[i] != null)
