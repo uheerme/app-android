@@ -256,11 +256,14 @@ public class PlayingActivity extends FragmentActivity
 
                 if(allActiveChannels != null)
                 {
+                    // Network filter is disabled
+                    /*
                     // Filter not available channels
                     for(int i = 0; i < allActiveChannels.length ; i++){
                         if(allActiveChannels[i].HostIpAddress.compareTo(ip) != 0)
                             allActiveChannels[i] = null;
                     }
+                    */
 
                     for(Channel c : allActiveChannels)
                     {
@@ -290,13 +293,7 @@ public class PlayingActivity extends FragmentActivity
             // Filter not available channels
             Channel[] possibleChannels = null;
 
-
-            /*
-                Update active channels locally
-             */
-            ActiveChannels.setActiveChannels(possibleChannels);
-            if(possibleChannels != null)
-            {
+            if(channels != null && channels.length > 0){
                 int j = 0;
                 for(int i = 0; i < channels.length; i++){
                     if(channels[i] != null)
@@ -312,6 +309,14 @@ public class PlayingActivity extends FragmentActivity
                             possibleChannels[j++] = channels[i];
                     }
                 }
+            }
+            ActiveChannels.setActiveChannels(possibleChannels);
+
+            /*
+                Update active channels locally
+             */
+            if(possibleChannels != null)
+            {
 
                 tabsInfoContainer.setVisibility(View.VISIBLE);
                 playAndStopFAB.setVisibility(View.VISIBLE);
@@ -412,9 +417,9 @@ public class PlayingActivity extends FragmentActivity
                     if(urlConnection != null)
                         urlConnection.disconnect();
                 }
-                response = response.substring(response.indexOf("[")+1,response.indexOf("]"));
+
                 if(response != null && response.length() > 0){
-                    System.out.println(response);
+                    response = response.substring(response.indexOf("[")+1,response.indexOf("]"));
                     String[] split = response.split(",");
                     ArrayList<String> array = new ArrayList<String>(Arrays.asList(split));
                     for(String s : split){
@@ -477,28 +482,34 @@ public class PlayingActivity extends FragmentActivity
 
     private void doAfter(){
 
-        ArrayList<String> friendsEmails = new ArrayList<>();
-        for(int i = 0; i < ActiveChannels.getNumberOfActiveChannels(); i++){
-            String channel = ActiveChannels.getActiveChannel(i).Name;
-            for(String s : ActiveChannels.getActiveListeners(i)){
-                if(s.compareTo(connectedEmail) == 0)
-                    continue;
+        try
+        {
+            ArrayList<String> friendsEmails = new ArrayList<>();
+            for(int i = 0; i < ActiveChannels.getNumberOfActiveChannels(); i++){
+                String channel = ActiveChannels.getActiveChannel(i).Name;
+                for(String s : ActiveChannels.getActiveListeners(i)){
+                    if(s.compareTo(connectedEmail) == 0)
+                        continue;
 
-                if(android.os.Build.VERSION.SDK_INT >= 19)
-                    friendsEmails.add(channel + System.lineSeparator() + s);
-                else
-                    friendsEmails.add(s);
+                    if(android.os.Build.VERSION.SDK_INT >= 19)
+                        friendsEmails.add(channel + System.lineSeparator() + s);
+                    else
+                        friendsEmails.add(s);
+                }
             }
+
+            Collections.sort(friendsEmails);
+            EmailListAdapter listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
+            ListView emails = (ListView) findViewById(R.id.email_friends_from_drawer);
+            emails.setAdapter(listAdapter);
+
+            listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
+            ListView gps = (ListView) findViewById(R.id.gps_friends_from_drawer);
+            gps.setAdapter(listAdapter);
+
+        } catch (Exception e){
+            return;
         }
-        Collections.sort(friendsEmails);
-        EmailListAdapter listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
-        ListView emails = (ListView) findViewById(R.id.email_friends_from_drawer);
-        emails.setAdapter(listAdapter);
-
-        listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
-        ListView gps = (ListView) findViewById(R.id.gps_friends_from_drawer);
-        gps.setAdapter(listAdapter);
-
         // Querying contacts with the same email received from the server.
 //        Bundle bundle = new Bundle();
 //        bundle.putString("jsonString", nearbyUsersString);
