@@ -176,7 +176,9 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
                         // infoAndName tem a informacao de distancia ou canal e o nome. Precisa editar
                         //essa parte de baixo pra usar o infoAndName.
-                        ArrayList<String> friendsEmails;
+                        ArrayList<String> friendsEmails = new ArrayList<>();
+
+                        friendsEmails.addAll(infoAndName);
 
                         friendsEmails = new ArrayList<>();
                         for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){

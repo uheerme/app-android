@@ -30,7 +30,6 @@ import com.caju.uheer.app.services.ActiveChannels;
 import com.caju.uheer.app.services.EmailLookup;
 import com.caju.uheer.app.services.adapters.EmailListAdapter;
 import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
-import com.caju.uheer.app.services.infrastructure.ContactablesLoaderCallbacks;
 import com.caju.uheer.app.services.player.UheerPlayer;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -499,10 +498,10 @@ public class PlayingActivity extends FragmentActivity
         gps.setAdapter(listAdapter);
 
         // Querying contacts with the same email received from the server.
-        Bundle bundle = new Bundle();
-        bundle.putString("jsonString", nearbyUsersString);
-        bundle.putString("connectedEmail", connectedEmail);
-        ContactablesLoaderCallbacks loaderCallbacks = new ContactablesLoaderCallbacks(this);
-        getLoaderManager().restartLoader(0, bundle, loaderCallbacks);
+//        Bundle bundle = new Bundle();
+//        bundle.putString("jsonString", nearbyUsersString);
+//        bundle.putString("connectedEmail", connectedEmail);
+//        ContactablesLoaderCallbacks loaderCallbacks = new ContactablesLoaderCallbacks(this);
+//        getLoaderManager().restartLoader(0, bundle, loaderCallbacks);
     }
 }
