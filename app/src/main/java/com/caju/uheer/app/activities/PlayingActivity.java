@@ -10,19 +10,13 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -36,6 +30,7 @@ import com.caju.uheer.app.interfaces.Routes;
 import com.caju.uheer.app.services.ActiveChannels;
 import com.caju.uheer.app.services.adapters.EmailListAdapter;
 import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
+import com.caju.uheer.app.services.EmailLookup;
 import com.caju.uheer.app.services.player.UheerPlayer;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -71,6 +66,10 @@ public class PlayingActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
+        //System.out.println("EMAIL " + ContactLookup.contactExists(this,"smokeonline3ju@gmail.com"));
+        //System.out.println("EMAIL " + ContactLookup.getNameEmailDetails(this).toString());
+        EmailLookup.init(this);
+
         /*
             Association of Views with their class objects for subsequent manipulation
          */
@@ -92,15 +91,9 @@ public class PlayingActivity extends FragmentActivity
             @Override
             public void onDrawerClosed(View drawerView)
             {
-                DisplayMetrics displaymetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                int height = displaymetrics.heightPixels;
-                int width = displaymetrics.widthPixels;
 
-                playAndStopFAB.animate().alpha(1);
-                //playAndStopFAB.setVisibility(View.GONE);
-                socialFAB.animate().alpha(1);
-                //socialFAB.setVisibility(View.GONE);
+                playAndStopFAB.setVisibility(View.VISIBLE);
+                socialFAB.setVisibility(View.VISIBLE);
                 mDrawerLayout.setVisibility(View.GONE);
             }
 
@@ -220,6 +213,10 @@ public class PlayingActivity extends FragmentActivity
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
+        System.out.println(EmailLookup.searchEmail("smokeonline@gmail.com"));
+        System.out.println(EmailLookup.searchEmail("smokeonline666@gmail.com"));
+        System.out.println(EmailLookup.searchEmail("smokeonlinegmail.com"));
+
     }
 
     public void enableSocial(View view)
@@ -237,19 +234,12 @@ public class PlayingActivity extends FragmentActivity
                     this, R.layout.adapter_email_list, friendsEmails);
             ListView emails = (ListView) social.findViewById(R.id.email_list_in_channel_info);
             emails.setAdapter(listAdapter);
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            int height = displaymetrics.heightPixels;
-            int width = displaymetrics.widthPixels;
 
-            playAndStopFAB.animate().alpha(0);
-            //playAndStopFAB.setVisibility(View.GONE);
-            socialFAB.animate().alpha(0);
-            //socialFAB.setVisibility(View.GONE);
+            playAndStopFAB.setVisibility(View.GONE);
+            socialFAB.setVisibility(View.GONE);
 
             mDrawerLayout.setVisibility(View.VISIBLE);
             mDrawerLayout.openDrawer(Gravity.RIGHT);
-            mDrawerLayout.animate().alpha(1).setDuration(500);
         } else{
             //social.setVisibility(View.GONE);
             mDrawerLayout.closeDrawer(Gravity.LEFT);

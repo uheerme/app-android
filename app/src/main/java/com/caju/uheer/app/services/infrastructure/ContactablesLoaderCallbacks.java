@@ -39,7 +39,7 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
     public static final String QUERY_KEY = "query";
 
-    public static final String TAG = "ContactablesLoaderCallbacks";
+    public static final String TAG = "ContactLoaderCallbacks";
 
     public ContactablesLoaderCallbacks(Context context) {
         mContext = context;
