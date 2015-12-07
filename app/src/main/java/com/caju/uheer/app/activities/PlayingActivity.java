@@ -10,19 +10,13 @@ import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Patterns;
-import android.view.GestureDetector;
 import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -36,12 +30,20 @@ import com.caju.uheer.app.interfaces.Routes;
 import com.caju.uheer.app.services.ActiveChannels;
 import com.caju.uheer.app.services.adapters.EmailListAdapter;
 import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
+import com.caju.uheer.app.services.EmailLookup;
 import com.caju.uheer.app.services.player.UheerPlayer;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.regex.Pattern;
 
@@ -71,6 +73,10 @@ public class PlayingActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playing);
 
+        //System.out.println("EMAIL " + ContactLookup.contactExists(this,"smokeonline3ju@gmail.com"));
+        //System.out.println("EMAIL " + ContactLookup.getNameEmailDetails(this).toString());
+        EmailLookup.init(this);
+
         /*
             Association of Views with their class objects for subsequent manipulation
          */
@@ -92,15 +98,9 @@ public class PlayingActivity extends FragmentActivity
             @Override
             public void onDrawerClosed(View drawerView)
             {
-                DisplayMetrics displaymetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                int height = displaymetrics.heightPixels;
-                int width = displaymetrics.widthPixels;
 
-                playAndStopFAB.animate().alpha(1);
-                //playAndStopFAB.setVisibility(View.GONE);
-                socialFAB.animate().alpha(1);
-                //socialFAB.setVisibility(View.GONE);
+                playAndStopFAB.setVisibility(View.VISIBLE);
+                socialFAB.setVisibility(View.VISIBLE);
                 mDrawerLayout.setVisibility(View.GONE);
             }
 
@@ -162,7 +162,6 @@ public class PlayingActivity extends FragmentActivity
             connectedEmail = contas.get(0).toString();
         else
             connectedEmail = "undefined@email.com";
-        friendsEmails = contas;
         Log.d("Connected Email", connectedEmail);
 
         
@@ -216,48 +215,21 @@ public class PlayingActivity extends FragmentActivity
             UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         } else {
-            UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(currentTab));
+            UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(currentTab),connectedEmail);
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
+
+        System.out.println(EmailLookup.searchEmail("smokeonline@gmail.com"));
+        System.out.println(EmailLookup.searchEmail("smokeonline666@gmail.com"));
+        System.out.println(EmailLookup.searchEmail("smokeonlinegmail.com"));
 
     }
 
     public void enableSocial(View view)
     {
-
-        int currentTab = tabsInfoContainer.getCurrentItem();
-        LinearLayout social = (LinearLayout) ((View) view.getParent()).findViewWithTag(currentTab);
-        if(social.getVisibility() == View.GONE)
-        {
-            //social.setVisibility(View.VISIBLE);
-
-            friendsEmails.addAll(friendsEmails);
-
-            EmailListAdapter listAdapter = new EmailListAdapter(
-                    this, R.layout.adapter_email_list, friendsEmails);
-            ListView emails = (ListView) social.findViewById(R.id.email_list_in_channel_info);
-            emails.setAdapter(listAdapter);
-            DisplayMetrics displaymetrics = new DisplayMetrics();
-            getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-            int height = displaymetrics.heightPixels;
-            int width = displaymetrics.widthPixels;
-
-            playAndStopFAB.animate().alpha(0);
-            //playAndStopFAB.setVisibility(View.GONE);
-            socialFAB.animate().alpha(0);
-            //socialFAB.setVisibility(View.GONE);
-
-            mDrawerLayout.setVisibility(View.VISIBLE);
-            mDrawerLayout.openDrawer(Gravity.RIGHT);
-            mDrawerLayout.animate().alpha(1).setDuration(500);
-        } else{
-            //social.setVisibility(View.GONE);
-            mDrawerLayout.closeDrawer(Gravity.LEFT);
-        }
-
-
-
-
+        playAndStopFAB.setVisibility(View.GONE);
+        socialFAB.setVisibility(View.GONE);
+        new fetchListenersTask().execute();
     }
         /*
         This AsyncTask fetches the currently active channels and their song list.
@@ -281,8 +253,6 @@ public class PlayingActivity extends FragmentActivity
 
                 WifiManager wm = (WifiManager) getSystemService(WIFI_SERVICE);
                 String ip = Formatter.formatIpAddress(wm.getConnectionInfo().getIpAddress());
-
-
 
                 if(allActiveChannels != null)
                 {
@@ -355,7 +325,7 @@ public class PlayingActivity extends FragmentActivity
                 //Start Playing
                 int currentTab = tabsInfoContainer.getCurrentItem();
                 if (!UheerPlayer.isInitiated()) {
-                    UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0));
+                    UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0),connectedEmail);
                 //This is necessary in the case the app was closed with the back button
                 } else if (UheerPlayer.currentChannelId() != ActiveChannels.getActiveChannel(currentTab).Id ) {
                     UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
@@ -395,7 +365,7 @@ public class PlayingActivity extends FragmentActivity
             if(UheerPlayer.isInitiated())
                 UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(position));
             else
-                UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(position));
+                UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(position),connectedEmail);
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
@@ -404,5 +374,70 @@ public class PlayingActivity extends FragmentActivity
         {
 
         }
+    }
+
+    class fetchListenersTask extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            ArrayList<String>[] listeners = new ArrayList[ActiveChannels.getNumberOfActiveChannels()];
+            for(int i = 0; i < ActiveChannels.getNumberOfActiveChannels(); i++){
+                URL url = null;
+                HttpURLConnection urlConnection = null;
+                String response = null;
+                try{
+                    response = null;
+                    String s = "http://debugmaster.koding.io:9000/" + ActiveChannels.getActiveChannel(i).Id;
+                    System.out.println(s);
+                    url = new URL(s);
+                    urlConnection = (HttpURLConnection) url.openConnection();
+
+                    InputStream in = urlConnection.getInputStream();
+                    InputStreamReader isw = new InputStreamReader(in);
+                    char[] buffer = new char[4096];
+                    while(isw.read(buffer) > 0){
+                        response = response + new String(buffer);
+                    };
+                } catch (MalformedURLException e)
+                {
+                    e.printStackTrace();
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                } finally
+                {
+                    if(urlConnection != null)
+                        urlConnection.disconnect();
+                }
+                response = response.substring(response.indexOf("[")+1,response.indexOf("]"));
+                System.out.println(response);
+                String[] split = response.split(",");
+                ArrayList<String> array = new ArrayList<String>(Arrays.asList(split));
+                listeners[i] = array;
+            }
+            ActiveChannels.setActiveListeners(listeners);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void v){
+            doAfter();
+        }
+    }
+
+    private void doAfter(){
+        mDrawerLayout.setVisibility(View.VISIBLE);
+        mDrawerLayout.openDrawer(Gravity.RIGHT);
+
+        friendsEmails = new ArrayList<>();
+        for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){
+            friendsEmails.addAll(array);
+            while(friendsEmails.contains(connectedEmail))
+                friendsEmails.remove(connectedEmail);
+        }
+        EmailListAdapter listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
+        ListView emails = (ListView) findViewById(R.id.list_from_drawer);
+        emails.setAdapter(listAdapter);
     }
 }

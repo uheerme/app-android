@@ -27,5 +27,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_friends_in_other_places">FriendsInOtherPlacesActivity</string>
     <string name="your_friends_email_list">Your contacts in here</string>
+    <string name="your_friends_gps_list">Other friends around</string>
 
 </resources>

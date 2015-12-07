@@ -46,7 +46,7 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
     public static final String QUERY_KEY = "query";
 
-    public static final String TAG = "ContactablesLoaderCallbacks";
+    public static final String TAG = "ContactLoaderCallbacks";
 
     JSONArray usersFound = new JSONArray();
 //    HashMap<String, double[]> usersFound = new HashMap<String, double[]>();
