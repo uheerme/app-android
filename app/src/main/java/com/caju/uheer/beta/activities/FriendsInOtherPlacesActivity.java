@@ -1,65 +1,58 @@
 package com.caju.uheer.beta.activities;
 
-import android.content.Context;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 
 import com.caju.uheer.R;
 import com.caju.uheer.app.services.infrastructure.ContactablesLoaderCallbacks;
 
 public class FriendsInOtherPlacesActivity extends ActionBarActivity {
 
+    // Fake data, a simulation of what would we receive from the server.
+    public static final String nearbyUsersString = "{\"nearbyUsers\": [" +
+            "{" +
+                "\"email\": \"flaviafernanda_moraes@hotmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -22.002899, \"longitude\": -47.893118} " +
+            "}," +
+            "{" +
+                "\"email\": \"cesarteixeira@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -21.985047, \"longitude\": -47.882528} " +
+            "}," +
+            "{" +
+                "\"email\": \"lucasolivdavid@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -22.000540, \"longitude\": -47.899306} " +
+            "}," +
+            "{" +
+                "\"email\": \"cristiadu@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -22.904066, \"longitude\": -47.099372} " +
+            "}," +
+            "{" +
+                "\"email\": \"francielledemattos@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -21.979670, \"longitude\": -47.880059} " +
+            "}," +
+            "{" +
+                "\"email\": \"felipe_reis@dc.ufscar.br\", " +
+                "\"geoPoint\": {\"latitude\": -15.923298, \"longitude\": -47.806466} " +
+            "}," +
+            "{" +
+                "\"email\": \"lucasolivdavid@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -22.000540, \"longitude\": -47.899306} " +
+            "}," +
+            "{" +
+                "\"email\": \"thamenato@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -39.129986, \"longitude\": -77.093338} " +
+            "}" +
+            "]}";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends_in_other_places);
 
-        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Location locationTest = new Location("test");
-                // Test location in Jockey Club, Sao Carlos.
-//                locationTest.setLongitude(-47.895520);
-//                locationTest.setLatitude(-21.982965);
-                // Test location in Sao Paulo
-                locationTest.setLongitude(-46.639126);
-                locationTest.setLatitude(-23.566787);
-                TextView tv = (TextView)findViewById(R.id.gps_data);
-                float distance = location.distanceTo(locationTest)/1000;
-                tv.setText("Location: "+location.toString() + "\nDistance: "+String.format("%.1f",distance) +"Km");
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-
-        // Minimum of 2 minutes between checks (120000 milisecs).
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 120000, 0, locationListener);
-
-        // Searching for contacts
-        String query = "lumagri@gmail.com";
-
         Bundle bundle = new Bundle();
-        bundle.putString("query", query);
+        bundle.putString("jsonString", nearbyUsersString);
 
         ContactablesLoaderCallbacks loaderCallbacks = new ContactablesLoaderCallbacks(this);
 
