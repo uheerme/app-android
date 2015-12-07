@@ -19,7 +19,6 @@ import android.util.Patterns;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -57,7 +56,6 @@ public class PlayingActivity extends FragmentActivity
     FrameLayout errorFragment;
 
     String connectedEmail;
-    ArrayList<String> friendsEmails;
 
     DrawerLayout mDrawerLayout;
 
@@ -230,6 +228,8 @@ public class PlayingActivity extends FragmentActivity
         playAndStopFAB.setVisibility(View.GONE);
         socialFAB.setVisibility(View.GONE);
         new fetchListenersTask().execute();
+        mDrawerLayout.setVisibility(View.VISIBLE);
+        mDrawerLayout.openDrawer(Gravity.RIGHT);
     }
         /*
         This AsyncTask fetches the currently active channels and their song list.
@@ -427,17 +427,19 @@ public class PlayingActivity extends FragmentActivity
     }
 
     private void doAfter(){
-        mDrawerLayout.setVisibility(View.VISIBLE);
-        mDrawerLayout.openDrawer(Gravity.RIGHT);
 
-        friendsEmails = new ArrayList<>();
+        ArrayList<String> friendsEmails = new ArrayList<>();
         for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){
             friendsEmails.addAll(array);
             while(friendsEmails.contains(connectedEmail))
                 friendsEmails.remove(connectedEmail);
         }
         EmailListAdapter listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
-        ListView emails = (ListView) findViewById(R.id.list_from_drawer);
+        ListView emails = (ListView) findViewById(R.id.email_friends_from_drawer);
         emails.setAdapter(listAdapter);
+
+        listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
+        ListView gps = (ListView) findViewById(R.id.gps_friends_from_drawer);
+        gps.setAdapter(listAdapter);
     }
 }

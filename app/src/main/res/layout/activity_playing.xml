@@ -125,9 +125,9 @@
                 android:lines="1"
                 android:text="@string/your_friends_email_list" />
 
-            <ListView android:id="@+id/list_from_drawer"
+            <ListView android:id="@+id/email_friends_from_drawer"
                       android:layout_width="match_parent"
-                      android:layout_height="match_parent"
+                      android:layout_height="wrap_content"
                       android:divider="@android:color/transparent"
                       android:dividerHeight="0dp" />
 
@@ -140,6 +140,12 @@
                 android:layout_height="wrap_content"
                 android:lines="1"
                 android:text="@string/your_friends_gps_list" />
+
+            <ListView android:id="@+id/gps_friends_from_drawer"
+                      android:layout_width="wrap_content"
+                      android:layout_height="200dp"
+                      android:divider="@android:color/transparent"
+                      android:dividerHeight="0dp" />
 
         </LinearLayout>
     </android.support.v4.widget.DrawerLayout>
