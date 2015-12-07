@@ -8,7 +8,7 @@ import java.util.ArrayList;
  * This class maintains the current information of the Active Channels
  * instead of requesting to server every time it is needed.
  */
-public class ActiveChannels
+public class ServerInformation
 {
     static Channel[] activeChannels;
     static ArrayList<String>[] activeListeners;

@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.caju.uheer.app.fragments.ChannelInfoFragment;
-import com.caju.uheer.app.services.ActiveChannels;
+import com.caju.uheer.app.services.ServerInformation;
 import com.caju.uheer.app.core.Channel;
 
 public class PlayingFragmentAdapter extends FragmentPagerAdapter
@@ -23,7 +23,7 @@ public class PlayingFragmentAdapter extends FragmentPagerAdapter
     @Override
     public int getCount()
     {
-        return Math.min(CHANNELS_TO_SHOW, ActiveChannels.getNumberOfActiveChannels());
+        return Math.min(CHANNELS_TO_SHOW, ServerInformation.getNumberOfActiveChannels());
     }
 
     @Override
@@ -35,7 +35,7 @@ public class PlayingFragmentAdapter extends FragmentPagerAdapter
     @Override
     public CharSequence getPageTitle(int position)
     {
-        Channel c = ActiveChannels.getActiveChannel(position);
+        Channel c = ServerInformation.getActiveChannel(position);
         return c.Name;
     }
 }

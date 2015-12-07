@@ -32,7 +32,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.caju.uheer.R;
-import com.caju.uheer.app.services.ActiveChannels;
+import com.caju.uheer.app.services.ServerInformation;
 import com.caju.uheer.app.services.adapters.EmailListAdapter;
 
 import org.json.JSONArray;
@@ -181,7 +181,7 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
                         friendsEmails.addAll(infoAndName);
 
                         friendsEmails = new ArrayList<>();
-                        for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){
+                        for(ArrayList<String> array : ServerInformation.getAllActiveListeners()){
                             friendsEmails.addAll(array);
                             while(friendsEmails.contains(connectedEmail))
                                 friendsEmails.remove(connectedEmail);

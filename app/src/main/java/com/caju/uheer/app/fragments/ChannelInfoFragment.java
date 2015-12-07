@@ -5,13 +5,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
-import com.caju.uheer.app.services.ActiveChannels;
+import com.caju.uheer.app.services.ServerInformation;
 import com.caju.uheer.app.core.Channel;
 import com.caju.uheer.app.services.adapters.MusicListAdapter;
 
@@ -42,7 +41,7 @@ public class ChannelInfoFragment extends Fragment
     {
         super.onCreate(savedInstanceState);
         int position = getArguments().getInt(ARG_CHANNEL_POSITION);
-        mChannel = ActiveChannels.getActiveChannel(position);
+        mChannel = ServerInformation.getActiveChannel(position);
     }
 
     @Override

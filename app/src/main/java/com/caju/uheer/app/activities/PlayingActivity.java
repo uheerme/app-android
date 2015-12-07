@@ -26,7 +26,7 @@ import com.caju.uheer.R;
 import com.caju.uheer.app.core.Channel;
 import com.caju.uheer.app.core.Music;
 import com.caju.uheer.app.interfaces.Routes;
-import com.caju.uheer.app.services.ActiveChannels;
+import com.caju.uheer.app.services.ServerInformation;
 import com.caju.uheer.app.services.EmailLookup;
 import com.caju.uheer.app.services.adapters.EmailListAdapter;
 import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
@@ -210,10 +210,10 @@ public class PlayingActivity extends FragmentActivity
             UheerPlayer.stop();
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_play_icon));
         } else if (UheerPlayer.isInitiated()){
-            UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
+            UheerPlayer.changeChannel(ServerInformation.getActiveChannel(currentTab));
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         } else {
-            UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(currentTab),connectedEmail);
+            UheerPlayer.initPlayer(getApplicationContext(), ServerInformation.getActiveChannel(currentTab),connectedEmail);
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
@@ -310,7 +310,7 @@ public class PlayingActivity extends FragmentActivity
                     }
                 }
             }
-            ActiveChannels.setActiveChannels(possibleChannels);
+            ServerInformation.setActiveChannels(possibleChannels);
 
             /*
                 Update active channels locally
@@ -332,10 +332,10 @@ public class PlayingActivity extends FragmentActivity
                 //Start Playing
                 int currentTab = tabsInfoContainer.getCurrentItem();
                 if (!UheerPlayer.isInitiated()) {
-                    UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0),connectedEmail);
+                    UheerPlayer.initPlayer(getApplicationContext(), ServerInformation.getActiveChannel(0),connectedEmail);
                 //This is necessary in the case the app was closed with the back button
-                } else if (UheerPlayer.currentChannelId() != ActiveChannels.getActiveChannel(currentTab).Id ) {
-                    UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
+                } else if (UheerPlayer.currentChannelId() != ServerInformation.getActiveChannel(currentTab).Id ) {
+                    UheerPlayer.changeChannel(ServerInformation.getActiveChannel(currentTab));
                 }
             } else {
                 //No channels were retrieved
@@ -370,9 +370,9 @@ public class PlayingActivity extends FragmentActivity
         {
             Log.d("Tab Selected", "Selected " + String.valueOf(position));
             if(UheerPlayer.isInitiated())
-                UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(position));
+                UheerPlayer.changeChannel(ServerInformation.getActiveChannel(position));
             else
-                UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(position),connectedEmail);
+                UheerPlayer.initPlayer(getApplicationContext(), ServerInformation.getActiveChannel(position),connectedEmail);
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
@@ -388,14 +388,14 @@ public class PlayingActivity extends FragmentActivity
         @Override
         protected Void doInBackground(Void... params)
         {
-            ArrayList<String>[] listeners = new ArrayList[ActiveChannels.getNumberOfActiveChannels()];
-            for(int i = 0; i < ActiveChannels.getNumberOfActiveChannels(); i++){
+            ArrayList<String>[] listeners = new ArrayList[ServerInformation.getNumberOfActiveChannels()];
+            for(int i = 0; i < ServerInformation.getNumberOfActiveChannels(); i++){
                 URL url = null;
                 HttpURLConnection urlConnection = null;
                 String response = null;
                 try{
                     response = null;
-                    String s = "http://debugmaster.koding.io:9000/" + ActiveChannels.getActiveChannel(i).Id;
+                    String s = "http://debugmaster.koding.io:9000/" + ServerInformation.getActiveChannel(i).Id;
                     System.out.println(s);
                     url = new URL(s);
                     urlConnection = (HttpURLConnection) url.openConnection();
@@ -430,7 +430,7 @@ public class PlayingActivity extends FragmentActivity
                 }
 
             }
-            ActiveChannels.setActiveListeners(listeners);
+            ServerInformation.setActiveListeners(listeners);
             return null;
         }
 
@@ -485,9 +485,9 @@ public class PlayingActivity extends FragmentActivity
         try
         {
             ArrayList<String> friendsEmails = new ArrayList<>();
-            for(int i = 0; i < ActiveChannels.getNumberOfActiveChannels(); i++){
-                String channel = ActiveChannels.getActiveChannel(i).Name;
-                for(String s : ActiveChannels.getActiveListeners(i)){
+            for(int i = 0; i < ServerInformation.getNumberOfActiveChannels(); i++){
+                String channel = ServerInformation.getActiveChannel(i).Name;
+                for(String s : ServerInformation.getActiveListeners(i)){
                     if(s.compareTo(connectedEmail) == 0)
                         continue;
 

@@ -10,9 +10,7 @@ import android.widget.TextView;
 
 import com.caju.uheer.R;
 import com.caju.uheer.app.core.Channel;
-import com.caju.uheer.app.services.ActiveChannels;
-
-import org.w3c.dom.Text;
+import com.caju.uheer.app.services.ServerInformation;
 
 public class DrawerPlayingFragment extends Fragment
 {
@@ -37,7 +35,7 @@ public class DrawerPlayingFragment extends Fragment
         TextView your_friends = (TextView) view.findViewById(R.id.your_friends_list);
 
         TextView channel;
-        for(Channel c : ActiveChannels.getAllActiveChannels()){
+        for(Channel c : ServerInformation.getAllActiveChannels()){
             channel = new TextView(this.getActivity());
             channel.setGravity(View.TEXT_ALIGNMENT_CENTER);
             channel.setText(c.Name);
