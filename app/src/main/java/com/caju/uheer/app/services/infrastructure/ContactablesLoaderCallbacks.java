@@ -28,13 +28,18 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds;
 import android.util.Log;
-import android.widget.TextView;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.caju.uheer.R;
+import com.caju.uheer.app.services.ActiveChannels;
+import com.caju.uheer.app.services.adapters.EmailListAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
 
 /**
  * Helper class to handle all the callbacks that occur when interacting with loaders.  Most of the
@@ -44,12 +49,9 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
     Context mContext;
 
-    public static final String QUERY_KEY = "query";
-
-    public static final String TAG = "ContactLoaderCallbacks";
+    String connectedEmail;
 
     JSONArray usersFound = new JSONArray();
-//    HashMap<String, double[]> usersFound = new HashMap<String, double[]>();
 
     public ContactablesLoaderCallbacks(Context context) {
         mContext = context;
@@ -100,6 +102,7 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
             Cursor cursor = cursorLoader.loadInBackground();
 
+            Toast.makeText(mContext, "entrei no cursorLoader", Toast.LENGTH_LONG).show();
             if (cursor.getCount() == 0) {
                 return cursorLoader;
             }
@@ -119,17 +122,20 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
                 }
             } while (cursor.moveToNext());
 
+            Toast.makeText(mContext, displayName, Toast.LENGTH_LONG).show();
             try {
-                double[] geoPoint = new double[2];
-                query = nearbyUsers.getJSONObject(i).getString("email");
-                geoPoint[0] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("latitude");
-                geoPoint[1] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("longitude");
-
                 JSONObject jobj = new JSONObject().put("name", displayName);
-                jobj.put("lat", geoPoint[0]);
-                jobj.put("lon", geoPoint[1]);
+                if(!nearbyUsers.getJSONObject(i).has("channel")) {
+                    double[] geoPoint = new double[2];
+                    geoPoint[0] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("latitude");
+                    geoPoint[1] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("longitude");
+                    jobj.put("lat", geoPoint[0]);
+                    jobj.put("lon", geoPoint[1]);
+                }else{
+                    String channel = nearbyUsers.getJSONObject(i).getString("channel");
+                    jobj.put("channel", channel);
+                }
                 usersFound.put(jobj);
-                //            usersFound.put("Lucas", geoPoint);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -140,18 +146,10 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
     @Override
     public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-        final TextView tv  = (TextView) ((Activity)mContext).findViewById(R.id.contact);
-        if(tv == null) {
-            Log.e(TAG, "TextView is null?!");
-        } else if (mContext == null) {
-            Log.e(TAG, "Context is null?");
-        } else {
-            Log.e(TAG, "Nothing is null?!");
-        }
-
+        final ArrayList<String> infoAndName = new ArrayList<String>();
         try {
             for(int i=0; i<usersFound.length(); i++) {
-                tv.append(usersFound.getJSONObject(i).getString("name") + "\n");
+                infoAndName.add(usersFound.getJSONObject(i).getString("name"));
             }
         }catch (JSONException e) {e.printStackTrace();}
 
@@ -161,11 +159,35 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
             public void onLocationChanged(Location location) {
                 Location geoPointLocation = new Location("geoPoint");
                 try {
+                    infoAndName.clear();
                     for(int i=0; i<usersFound.length(); i++) {
-                        geoPointLocation.setLongitude(usersFound.getJSONObject(i).getDouble("lon") );
-                        geoPointLocation.setLatitude(usersFound.getJSONObject(i).getDouble("lat"));
-                        float distance = location.distanceTo(geoPointLocation)/1000;
-                        tv.setText(usersFound.getJSONObject(i).getString("name") + "\t" + String.format("%.1f",distance) + "Km" + "\n");
+                        String appendedText = "";
+                        if(!usersFound.getJSONObject(i).has("channel")) {
+                            geoPointLocation.setLongitude(usersFound.getJSONObject(i).getDouble("lon"));
+                            geoPointLocation.setLatitude(usersFound.getJSONObject(i).getDouble("lat"));
+                            float distance = location.distanceTo(geoPointLocation) / 1000;
+                            appendedText = String.format("%.1f", distance) + "Km";
+                        }else{
+                            appendedText = usersFound.getJSONObject(i).getString("channel");
+                        }
+                        infoAndName.add(appendedText + usersFound.getJSONObject(i).getString("name"));
+                        Log.e("infoandname", infoAndName.toString() + infoAndName.get(0) + infoAndName.get(1));
+                        Toast.makeText(mContext, infoAndName.toString() + infoAndName.get(0) + infoAndName.get(1), Toast.LENGTH_LONG).show();
+
+                        // infoAndName tem a informacao de distancia ou canal e o nome. Precisa editar
+                        //essa parte de baixo pra usar o infoAndName.
+                        ArrayList<String> friendsEmails;
+
+                        friendsEmails = new ArrayList<>();
+                        for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){
+                            friendsEmails.addAll(array);
+                            while(friendsEmails.contains(connectedEmail))
+                                friendsEmails.remove(connectedEmail);
+                        }
+                        EmailListAdapter listAdapter = new EmailListAdapter(mContext, R.layout.adapter_email_list, friendsEmails);
+                        ListView emails = (ListView) ((Activity)mContext).findViewById(R.id.gps_friends_from_drawer);
+                        emails.setAdapter(listAdapter);
+
                     }
                 }catch (JSONException e) {e.printStackTrace();}
             }
