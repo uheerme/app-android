@@ -256,11 +256,11 @@ public class PlayingActivity extends FragmentActivity
 
                 if(allActiveChannels != null)
                 {
-                    /*// Filter not available channels
+                    // Filter not available channels
                     for(int i = 0; i < allActiveChannels.length ; i++){
                         if(allActiveChannels[i].HostIpAddress.compareTo(ip) != 0)
                             allActiveChannels[i] = null;
-                    }*/
+                    }
 
                     for(Channel c : allActiveChannels)
                     {
@@ -289,21 +289,7 @@ public class PlayingActivity extends FragmentActivity
 
             // Filter not available channels
             Channel[] possibleChannels = null;
-            int j = 0;
-            for(int i = 0; i < channels.length; i++){
-                if(channels[i] != null)
-                    j++;
-            }
-            if(j > 0)
-            {
-                possibleChannels = new Channel[j];
-                j=0;
-                for(int i = 0; i < channels.length; i++)
-                {
-                    if(channels[i] != null)
-                        possibleChannels[j++] = channels[i];
-                }
-            }
+
 
             /*
                 Update active channels locally
@@ -311,6 +297,22 @@ public class PlayingActivity extends FragmentActivity
             ActiveChannels.setActiveChannels(possibleChannels);
             if(possibleChannels != null)
             {
+                int j = 0;
+                for(int i = 0; i < channels.length; i++){
+                    if(channels[i] != null)
+                        j++;
+                }
+                if(j > 0)
+                {
+                    possibleChannels = new Channel[j];
+                    j=0;
+                    for(int i = 0; i < channels.length; i++)
+                    {
+                        if(channels[i] != null)
+                            possibleChannels[j++] = channels[i];
+                    }
+                }
+
                 tabsInfoContainer.setVisibility(View.VISIBLE);
                 playAndStopFAB.setVisibility(View.VISIBLE);
                 socialFAB.setVisibility(View.VISIBLE);
