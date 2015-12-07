@@ -120,16 +120,18 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
             } while (cursor.moveToNext());
 
             try {
-                double[] geoPoint = new double[2];
-                query = nearbyUsers.getJSONObject(i).getString("email");
-                geoPoint[0] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("latitude");
-                geoPoint[1] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("longitude");
-
                 JSONObject jobj = new JSONObject().put("name", displayName);
-                jobj.put("lat", geoPoint[0]);
-                jobj.put("lon", geoPoint[1]);
+                if(!nearbyUsers.getJSONObject(i).has("channel")) {
+                    double[] geoPoint = new double[2];
+                    geoPoint[0] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("latitude");
+                    geoPoint[1] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("longitude");
+                    jobj.put("lat", geoPoint[0]);
+                    jobj.put("lon", geoPoint[1]);
+                }else{
+                    String channel = nearbyUsers.getJSONObject(i).getString("channel");
+                    jobj.put("channel", channel);
+                }
                 usersFound.put(jobj);
-                //            usersFound.put("Lucas", geoPoint);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -161,11 +163,18 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
             public void onLocationChanged(Location location) {
                 Location geoPointLocation = new Location("geoPoint");
                 try {
+                    tv.setText("");
                     for(int i=0; i<usersFound.length(); i++) {
-                        geoPointLocation.setLongitude(usersFound.getJSONObject(i).getDouble("lon") );
-                        geoPointLocation.setLatitude(usersFound.getJSONObject(i).getDouble("lat"));
-                        float distance = location.distanceTo(geoPointLocation)/1000;
-                        tv.setText(usersFound.getJSONObject(i).getString("name") + "\t" + String.format("%.1f",distance) + "Km" + "\n");
+                        String appendedText = "";
+                        if(!usersFound.getJSONObject(i).has("channel")) {
+                            geoPointLocation.setLongitude(usersFound.getJSONObject(i).getDouble("lon"));
+                            geoPointLocation.setLatitude(usersFound.getJSONObject(i).getDouble("lat"));
+                            float distance = location.distanceTo(geoPointLocation) / 1000;
+                            appendedText = String.format("%.1f", distance) + "Km" + "\n";
+                        }else{
+                            appendedText = usersFound.getJSONObject(i).getString("channel");
+                        }
+                        tv.append(usersFound.getJSONObject(i).getString("name") + "             " + appendedText +"\n");
                     }
                 }catch (JSONException e) {e.printStackTrace();}
             }

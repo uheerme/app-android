@@ -37,6 +37,10 @@ public class FriendsInOtherPlacesActivity extends ActionBarActivity {
                 "\"geoPoint\": {\"latitude\": -15.923298, \"longitude\": -47.806466} " +
             "}," +
             "{" +
+                "\"email\": \"fabiano@dc.ufscar.br\", " +
+                "\"channel\": \"MDS CHANNEL A\" " +
+            "}," +
+            "{" +
                 "\"email\": \"lucasolivdavid@gmail.com\", " +
                 "\"geoPoint\": {\"latitude\": -22.000540, \"longitude\": -47.899306} " +
             "}," +
