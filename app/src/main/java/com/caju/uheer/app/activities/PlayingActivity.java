@@ -19,8 +19,6 @@ import android.util.Patterns;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.caju.uheer.R;
@@ -28,9 +26,9 @@ import com.caju.uheer.app.core.Channel;
 import com.caju.uheer.app.core.Music;
 import com.caju.uheer.app.interfaces.Routes;
 import com.caju.uheer.app.services.ActiveChannels;
-import com.caju.uheer.app.services.adapters.EmailListAdapter;
-import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
 import com.caju.uheer.app.services.EmailLookup;
+import com.caju.uheer.app.services.adapters.PlayingFragmentAdapter;
+import com.caju.uheer.app.services.infrastructure.ContactablesLoaderCallbacks;
 import com.caju.uheer.app.services.player.UheerPlayer;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -57,7 +55,6 @@ public class PlayingActivity extends FragmentActivity
     FrameLayout errorFragment;
 
     String connectedEmail;
-    ArrayList<String> friendsEmails;
 
     DrawerLayout mDrawerLayout;
 
@@ -426,18 +423,56 @@ public class PlayingActivity extends FragmentActivity
         }
     }
 
+    // Fake data, a simulation of what would we receive from the server.
+    public static final String nearbyUsersString = "{\"nearbyUsers\": [" +
+            "{" +
+            "\"email\": \"flaviafernanda_moraes@hotmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -22.002899, \"longitude\": -47.893118} " +
+            "}," +
+            "{" +
+            "\"email\": \"cesarteixeira@gmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -21.985047, \"longitude\": -47.882528} " +
+            "}," +
+            "{" +
+            "\"email\": \"lucasolivdavid@gmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -22.000540, \"longitude\": -47.899306} " +
+            "}," +
+            "{" +
+            "\"email\": \"cristiadu@gmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -22.904066, \"longitude\": -47.099372} " +
+            "}," +
+            "{" +
+            "\"email\": \"francielledemattos@gmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -21.979670, \"longitude\": -47.880059} " +
+            "}," +
+            "{" +
+            "\"email\": \"felipe_reis@dc.ufscar.br\", " +
+            "\"geoPoint\": {\"latitude\": -15.923298, \"longitude\": -47.806466} " +
+            "}," +
+            "{" +
+            "\"email\": \"fabiano@dc.ufscar.br\", " +
+            "\"channel\": \"MDS CHANNEL A\" " +
+            "}," +
+            "{" +
+            "\"email\": \"lucasolivdavid@gmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -22.000540, \"longitude\": -47.899306} " +
+            "}," +
+            "{" +
+            "\"email\": \"thamenato@gmail.com\", " +
+            "\"geoPoint\": {\"latitude\": -39.129986, \"longitude\": -77.093338} " +
+            "}" +
+            "]}";
+
     private void doAfter(){
         mDrawerLayout.setVisibility(View.VISIBLE);
         mDrawerLayout.openDrawer(Gravity.RIGHT);
 
-        friendsEmails = new ArrayList<>();
-        for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){
-            friendsEmails.addAll(array);
-            while(friendsEmails.contains(connectedEmail))
-                friendsEmails.remove(connectedEmail);
-        }
-        EmailListAdapter listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
-        ListView emails = (ListView) findViewById(R.id.list_from_drawer);
-        emails.setAdapter(listAdapter);
+        // Querying contacts with the same email received from the server.
+        Bundle bundle = new Bundle();
+        bundle.putString("jsonString", nearbyUsersString);
+        bundle.putString("connectedEmail", connectedEmail);
+        ContactablesLoaderCallbacks loaderCallbacks = new ContactablesLoaderCallbacks(this);
+        getLoaderManager().restartLoader(0, bundle, loaderCallbacks);
+
     }
 }
