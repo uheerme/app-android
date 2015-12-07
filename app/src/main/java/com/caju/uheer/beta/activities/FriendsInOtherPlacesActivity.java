@@ -15,6 +15,18 @@ import com.caju.uheer.app.services.infrastructure.ContactablesLoaderCallbacks;
 
 public class FriendsInOtherPlacesActivity extends ActionBarActivity {
 
+    // Fake data, a simulation of what would we receive from the server.
+    public static final String nearbyUsersString = "{\"nearbyUsers\": [" +
+            "{" +
+                "\"email\": \"lucasolivdavid@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -22.000540, \"longitude\": -47.899306} " +
+            "}," +
+            "{" +
+                "\"email\": \"thamenato@gmail.com\", " +
+                "\"geoPoint\": {\"latitude\": -39.129986, \"longitude\": -77.093338} " +
+            "}" +
+            "]}";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,11 +67,9 @@ public class FriendsInOtherPlacesActivity extends ActionBarActivity {
         // Minimum of 2 minutes between checks (120000 milisecs).
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 120000, 0, locationListener);
 
-        // Searching for contacts
-        String query = "lumagri@gmail.com";
-
         Bundle bundle = new Bundle();
-        bundle.putString("query", query);
+        bundle.putString("jsonString", nearbyUsersString);
+//        bundle.putString("query", "lucasolivdavid@gmail.com");
 
         ContactablesLoaderCallbacks loaderCallbacks = new ContactablesLoaderCallbacks(this);
 
