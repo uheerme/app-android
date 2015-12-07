@@ -209,7 +209,7 @@ public class PlayingActivity extends FragmentActivity
             UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         } else {
-            UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(currentTab));
+            UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(currentTab),connectedEmail);
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 
@@ -345,7 +345,7 @@ public class PlayingActivity extends FragmentActivity
                 //Start Playing
                 int currentTab = tabsInfoContainer.getCurrentItem();
                 if (!UheerPlayer.isInitiated()) {
-                    UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0));
+                    UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(0),connectedEmail);
                 //This is necessary in the case the app was closed with the back button
                 } else if (UheerPlayer.currentChannelId() != ActiveChannels.getActiveChannel(currentTab).Id ) {
                     UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(currentTab));
@@ -385,7 +385,7 @@ public class PlayingActivity extends FragmentActivity
             if(UheerPlayer.isInitiated())
                 UheerPlayer.changeChannel(ActiveChannels.getActiveChannel(position));
             else
-                UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(position));
+                UheerPlayer.initPlayer(getApplicationContext(),ActiveChannels.getActiveChannel(position),connectedEmail);
             playAndStopFAB.setImageDrawable(getResources().getDrawable(R.drawable.white_stop_icon));
         }
 

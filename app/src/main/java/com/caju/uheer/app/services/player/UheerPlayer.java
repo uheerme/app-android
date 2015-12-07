@@ -14,10 +14,16 @@ import com.caju.uheer.app.services.infrastructure.StreamItem;
 import com.caju.uheer.app.services.infrastructure.SyncItem;
 
 import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class UheerPlayer {
     private static Context context = null;
     private static Channel channel = null;
+    private static String email = null;
+    private static AsyncTask task = null;
 
     private static Streamer streamer;
     private static Synchronizer synchronizer;
@@ -25,13 +31,14 @@ public class UheerPlayer {
     private static PlayItem currentOnPlay;
     private static AsyncPlayerResync resyncService;
 
-    public static boolean initPlayer(Context context,Channel channel) {
+    public static boolean initPlayer(Context context,Channel channel, String email) {
 
         if(UheerPlayer.context != null || UheerPlayer.channel != null)
             return false;
 
         UheerPlayer.context = context;
         UheerPlayer.channel = channel;
+        UheerPlayer.email = email;
 
         if(UheerPlayer.player != null){
             UheerPlayer.player.stop();
@@ -71,6 +78,8 @@ public class UheerPlayer {
 
         resyncService = null;
         start();
+
+        task = new ConnectedToChannelTask().execute();
 
         return true;
     }
@@ -114,6 +123,9 @@ public class UheerPlayer {
                 });
 
         start();
+
+        task = new ConnectedToChannelTask().execute();
+
     }
 
     public static int currentChannelId(){
@@ -221,6 +233,35 @@ public class UheerPlayer {
                 }
             } catch (InterruptedException e) {
             }
+            return null;
+        }
+    }
+
+    static class ConnectedToChannelTask extends AsyncTask<Void, Void, Void>{
+
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            URL url = null;
+            HttpURLConnection urlConnection = null;
+            try{
+                String s = "http://debugmaster.koding.io:9000/" + channel.Id + "/" + email;
+                System.out.println(s);
+                url = new URL(s);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.getResponseMessage();
+            } catch (MalformedURLException e)
+            {
+                e.printStackTrace();
+            } catch (IOException e)
+            {
+                e.printStackTrace();
+            } finally
+            {
+                if(urlConnection != null)
+                    urlConnection.disconnect();
+            }
+
             return null;
         }
     }

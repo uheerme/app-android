@@ -27,14 +27,12 @@ public class EmailLookup
                 while (cur1.moveToNext()) {
                     String email = cur1.getString(cur1.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
                     if(email != null){
-                        System.out.println(email);
                         names.add(email);
                     }
                 }
                 cur1.close();
             }
         }
-        System.out.println(names.size());
         Collections.sort(names);
         return names;
     }
