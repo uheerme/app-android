@@ -411,10 +411,17 @@ public class PlayingActivity extends FragmentActivity
                         urlConnection.disconnect();
                 }
                 response = response.substring(response.indexOf("[")+1,response.indexOf("]"));
-                System.out.println(response);
-                String[] split = response.split(",");
-                ArrayList<String> array = new ArrayList<String>(Arrays.asList(split));
-                listeners[i] = array;
+                if(response != null && response.length() > 0){
+                    System.out.println(response);
+                    String[] split = response.split(",");
+                    ArrayList<String> array = new ArrayList<String>(Arrays.asList(split));
+                    for(String s : split){
+                        if(!EmailLookup.searchEmail(s))
+                            array.remove(s);
+                    }
+                    listeners[i] = array;
+                }
+
             }
             ActiveChannels.setActiveListeners(listeners);
             return null;
@@ -429,11 +436,19 @@ public class PlayingActivity extends FragmentActivity
     private void doAfter(){
 
         ArrayList<String> friendsEmails = new ArrayList<>();
-        for(ArrayList<String> array : ActiveChannels.getAllActiveListeners()){
-            friendsEmails.addAll(array);
-            while(friendsEmails.contains(connectedEmail))
-                friendsEmails.remove(connectedEmail);
+        for(int i = 0; i < ActiveChannels.getNumberOfActiveChannels(); i++){
+            String channel = ActiveChannels.getActiveChannel(i).Name;
+            for(String s : ActiveChannels.getActiveListeners(i)){
+                if(s.compareTo(connectedEmail) == 0)
+                    continue;
+
+                if(android.os.Build.VERSION.SDK_INT >= 19)
+                    friendsEmails.add(channel + System.lineSeparator() + s);
+                else
+                    friendsEmails.add(s);
+            }
         }
+        Collections.sort(friendsEmails);
         EmailListAdapter listAdapter = new EmailListAdapter(this, R.layout.adapter_email_list, friendsEmails);
         ListView emails = (ListView) findViewById(R.id.email_friends_from_drawer);
         emails.setAdapter(listAdapter);
