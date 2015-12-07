@@ -8,7 +8,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:elevation="2dp"
+        android:elevation="4dp"
         android:background="@color/accent_material_light">
 
         <TextView
@@ -65,7 +65,8 @@
         android:padding="5dp"
         android:background="@color/background_material_light"
         android:visibility="gone"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:elevation="2dp">
 
         <TextView
             android:textSize="@dimen/abc_text_size_medium_material"

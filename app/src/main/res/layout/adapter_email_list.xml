@@ -9,11 +9,10 @@
               android:layout_height="wrap_content">
 
     <ImageView
-        android:layout_width="12dp"
-        android:layout_height="12dp"
-        android:src="@drawable/white_social"
-        android:layout_gravity="center"
-        android:padding="2dp"/>
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:src="@drawable/black_face"
+        android:layout_gravity="center"/>
 
     <TextView
         android:id="@+id/email_in_list_view"
