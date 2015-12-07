@@ -21,6 +21,9 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds;
@@ -84,10 +87,6 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
             } catch (JSONException e) { e.printStackTrace(); }
 //            query = args.getString("query");
 
-            double[] geoPoint = new double[2];
-            geoPoint[0] = 0.123456;
-            geoPoint[1] = 0.654321;
-
             uri = Uri.withAppendedPath(
                     CommonDataKinds.Contactables.CONTENT_FILTER_URI, query);
 
@@ -121,9 +120,14 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
             } while (cursor.moveToNext());
 
             try {
+                double[] geoPoint = new double[2];
+                query = nearbyUsers.getJSONObject(i).getString("email");
+                geoPoint[0] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("latitude");
+                geoPoint[1] = nearbyUsers.getJSONObject(i).getJSONObject("geoPoint").getDouble("longitude");
+
                 JSONObject jobj = new JSONObject().put("name", displayName);
-                jobj.put("lat", 0.123456);
-                jobj.put("lon", 0.654321);
+                jobj.put("lat", geoPoint[0]);
+                jobj.put("lon", geoPoint[1]);
                 usersFound.put(jobj);
                 //            usersFound.put("Lucas", geoPoint);
             } catch (JSONException e) {
@@ -136,7 +140,7 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
     @Override
     public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
-        TextView tv  = (TextView) ((Activity)mContext).findViewById(R.id.contact);
+        final TextView tv  = (TextView) ((Activity)mContext).findViewById(R.id.contact);
         if(tv == null) {
             Log.e(TAG, "TextView is null?!");
         } else if (mContext == null) {
@@ -147,10 +151,43 @@ public class ContactablesLoaderCallbacks implements LoaderManager.LoaderCallback
 
         try {
             for(int i=0; i<usersFound.length(); i++) {
-                tv.append(usersFound.getJSONObject(i).getString("name") + ":" + usersFound.getJSONObject(i).getDouble("lat") + ", " + usersFound.getJSONObject(i).getDouble("lon") + "\n");
+                tv.append(usersFound.getJSONObject(i).getString("name") + "\n");
             }
         }catch (JSONException e) {e.printStackTrace();}
 
+        LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Location geoPointLocation = new Location("geoPoint");
+                try {
+                    for(int i=0; i<usersFound.length(); i++) {
+                        geoPointLocation.setLongitude(usersFound.getJSONObject(i).getDouble("lon") );
+                        geoPointLocation.setLatitude(usersFound.getJSONObject(i).getDouble("lat"));
+                        float distance = location.distanceTo(geoPointLocation)/1000;
+                        tv.setText(usersFound.getJSONObject(i).getString("name") + "\t" + String.format("%.1f",distance) + "Km" + "\n");
+                    }
+                }catch (JSONException e) {e.printStackTrace();}
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+
+            }
+        };
+
+        // Minimum of 2 minutes between checks (120000 milisecs).
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 120000, 0, locationListener);
     }
 
     @Override
